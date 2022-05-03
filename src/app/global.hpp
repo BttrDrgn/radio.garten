@@ -1,0 +1,10 @@
+#pragma once
+
+class global
+{
+public:
+	static bool shutdown;
+	static SDL_Window* window;
+	static SDL_Renderer* renderer;
+	static ImVec2 resolution;
+};
