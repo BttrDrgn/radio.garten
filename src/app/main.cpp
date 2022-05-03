@@ -2,8 +2,10 @@
 
 #include "global.hpp"
 #include "input/input.hpp"
+#include "api/api.hpp"
 
 //Main app init
+
 void init()
 {
 	global::window = SDL_CreateWindow("Radio.Garten", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, global::resolution.x, global::resolution.y, 0);
@@ -14,6 +16,7 @@ void init()
 	ImGui_ImplSDL2_InitForSDLRenderer(global::window, global::renderer);
 	ImGui_ImplSDLRenderer_Init(global::renderer);
 
+	api::get_places();
 
 	while (!global::shutdown)
 	{
@@ -24,7 +27,28 @@ void init()
 		ImGui::NewFrame();
 
 		//Menu render
-		ImGui::ShowDemoWindow();
+		ImGui::Begin("Actions", nullptr, 0);
+		if (ImGui::Button("Refresh"))
+		{
+			api::get_places();
+		}
+		ImGui::End();
+
+		ImGui::Begin("Place ID's", nullptr, 0);
+
+		if (api::places_done)
+		{
+			for (auto i = 0; i < api::place.size(); i++)
+			{
+				std::string country = api::place[i].country;
+				std::string city = api::place[i].city;
+				std::string id = api::place[i].id;
+				std::string title = logger::va("[%s] %s : %s", country.c_str(), city.c_str(), id.c_str());
+				ImGui::Button(title.c_str());
+			}
+		}
+
+		ImGui::End();
 		//end
 
 		ImGui::Render();

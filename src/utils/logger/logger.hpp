@@ -13,3 +13,16 @@
 #define LOG_WARNING(__FMT__, ...) std::printf("[ WARNING ]: " __FMT__ "\n", __VA_ARGS__)
 #define LOG_ERROR(__FMT__, ...) std::printf("[ ERROR ]: " __FMT__ "\n", __VA_ARGS__)
 #endif
+
+class logger
+{
+public:
+	static std::string va(const char* fmt, ...)
+	{
+		char* va = ::va_list();
+		va_start(va, fmt);
+		char result[512]{};
+		std::vsprintf(result, fmt, va);
+		return std::string(result);
+	}
+};
