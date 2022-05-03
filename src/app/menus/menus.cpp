@@ -119,13 +119,18 @@ void menus::places()
 						{
 							if (ImGui::Button(&logger::va("%s", &place.city[0])[0]))
 							{
-								SDL_SetClipboardText(&place.id[0]);
+								api::get_details(place.id);
+								ImGui::CloseCurrentPopup();
 							}
 						}
 					}
 					else
 					{
-						ImGui::Button(&logger::va("[%s] %s", &country[0], &place.city[0])[0]);
+						if (ImGui::Button(&logger::va("[%s] %s", &country[0], &place.city[0])[0]))
+						{
+							api::get_details(place.id);
+							ImGui::CloseCurrentPopup();
+						}
 					}
 				}
 			}
@@ -139,7 +144,10 @@ void menus::stations()
 {
 	if (ImGui::BeginMenu("Stations"))
 	{
-
+		for (auto station : api::station)
+		{
+			ImGui::Button(&logger::va("%s", &station.title[0])[0]);
+		}
 		ImGui::EndMenu();
 	}
 }

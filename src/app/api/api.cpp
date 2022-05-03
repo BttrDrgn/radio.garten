@@ -82,8 +82,73 @@ void api::get_places()
 	}).detach();
 }
 
+void api::get_details(std::string id)
+{
+	api::detail_done = false;
+
+	std::thread([id]
+		{
+			httplib::Client cli(API_URL);
+
+			std::string detail = logger::va("%s/%s", PLACE_DETAIL_ENDPOINT, &id[0]);
+
+			if (httplib::Result res = cli.Get(&detail[0]))
+			{
+				LOG_DEBUG("Accessing %s%s", API_URL, &detail[0]);
+
+				if (res->status == 200)
+				{
+					api::details = nl::json::parse(res->body);
+
+					//Check version matching for future updates
+					std::int32_t version = api::details["apiVersion"].get<std::int32_t>();
+					if (version != 1)
+					{
+						SDL_ShowSimpleMessageBox(0, "Radio.Garten", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
+						global::shutdown = true;
+					}
+
+					std::string version_hash = api::details["version"].dump();
+					if (std::strcmp(VERSION_HASH, &version_hash[0]))
+					{
+						LOG_WARNING("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
+					}
+
+					nl::json data = nl::json::parse(api::details["data"].dump());
+
+					for (auto& i : data["content"][0]["items"])
+					{
+						std::string id = i["href"].dump();
+						std::string title = i["title"].dump();
+
+						id.erase(std::remove(id.begin(), id.end(), '\"'), id.end());
+						title.erase(std::remove(title.begin(), title.end(), '\"'), title.end());
+
+						api::station.emplace_back(station_t{title, id.substr(6) });
+					}
+
+					//Finish
+					api::detail_done = true;
+				}
+				else
+				{
+					LOG_ERROR("An error occured when gathering station data!");
+				}
+			}
+		}).detach();
+}
+
 nl::json api::places;
 std::vector<place_t> api::place;
 bool api::places_done = true;
+
+nl::json api::details;
+bool api::detail_done = true;
+
+nl::json api::stations;
+std::vector<station_t> api::station;
+bool api::stations_done = true;
+
+std::string api::current_place_id = "N/A";
 
 std::vector<std::string> api::all_countries;
