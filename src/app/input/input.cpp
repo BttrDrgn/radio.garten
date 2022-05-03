@@ -4,7 +4,6 @@
 
 void input::update()
 {
-	ImGuiIO& io = ImGui::GetIO();
 	SDL_Event evt;
 	while (SDL_PollEvent(&evt))
 	{

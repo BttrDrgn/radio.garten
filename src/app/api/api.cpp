@@ -1,12 +1,12 @@
-#include <logger/logger.hpp>
-
 #include "global.hpp"
+#include "logger/logger.hpp"
 #include "api.hpp"
 
 void api::get_places()
 {
 	api::places_done = false;
 	api::place.empty();
+	api::all_countries.empty();
 
 	std::thread([]
 	{
@@ -47,10 +47,31 @@ void api::get_places()
 					country.erase(std::remove(country.begin(), country.end(), '\"'), country.end());
 					city.erase(std::remove(city.begin(), city.end(), '\"'), city.end());
 
+					//Check if we already have this country
+					bool found = false;
+					for (auto j : api::all_countries)
+					{
+						if (!std::strcmp(&j[0], &country[0]))
+						{
+							found = true;
+							break;
+						}
+					}
+
+					//If we don't add it
+					if (!found)
+					{
+						api::all_countries.emplace_back(country);
+					}
+
 					//Add
 					api::place.emplace_back(place_t{ country, city, id });
 				}
 
+				//Sort alphabetically
+				std::sort(api::all_countries.begin(), api::all_countries.end());
+
+				//Finish
 				api::places_done = true;
 			}
 			else
@@ -63,4 +84,6 @@ void api::get_places()
 
 nl::json api::places;
 std::vector<place_t> api::place;
-bool api::places_done = false;
+bool api::places_done = true;
+
+std::vector<std::string> api::all_countries;

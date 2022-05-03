@@ -7,4 +7,5 @@ public:
 	static SDL_Window* window;
 	static SDL_Renderer* renderer;
 	static ImVec2 resolution;
+	static bool always_on_top;
 };
