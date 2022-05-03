@@ -4,6 +4,7 @@
 #include "api/api.hpp"
 #include "window/window.hpp"
 #include "menus/menus.hpp"
+#include "audio/audio.hpp"
 
 //Main app init
 
@@ -14,6 +15,7 @@ void init()
 
 	global::renderer = SDL_CreateRenderer(global::window, 0, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 
+	audio::init();
 	menus::init();
 
 	while (!global::shutdown)
@@ -25,7 +27,7 @@ void init()
 		menus::update();
 		menus::present();
 
-		if (!api::places_done)
+		if (!api::places_done || !api::detail_done || !api::stations_done)
 		{
 			//Prevent shutdown while enumerating data as it causes a hard crash in the http lib
 			global::shutdown = false;

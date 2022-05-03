@@ -5,7 +5,8 @@
 #define VERSION_HASH "\"2dda17c\""
 #define PLACES_ENDPOINT "/api/ara/content/places"
 #define PLACE_DETAIL_ENDPOINT "/api/ara/content/page"
-#define STATION_ENDPOINT "/api/ara/content/channel"
+#define STATION_ENDPOINT(...) &logger::va("/api/ara/content/channel/%s", __VA_ARGS__)[0]
+#define AUDIO_ENDPOINT(...) &logger::va("/api/ara/content/listen/%s/channel.mp3", __VA_ARGS__)[0]
 
 struct place_t
 {
@@ -26,8 +27,8 @@ class api
 {
 public:
 	static void get_places();
-	static void get_details(std::string id);
-	static void get_station(std::string id);
+	static void get_details(const std::string& id);
+	static void get_station(const std::string& id);
 
 	static nl::json places;
 	static std::vector<place_t> place;

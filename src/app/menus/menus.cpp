@@ -2,6 +2,7 @@
 #include "logger/logger.hpp"
 #include "menus.hpp"
 #include "api/api.hpp"
+#include "audio/audio.hpp"
 
 void menus::init()
 {
@@ -146,7 +147,10 @@ void menus::stations()
 	{
 		for (auto station : api::station)
 		{
-			ImGui::Button(&logger::va("%s", &station.title[0])[0]);
+			if (ImGui::Button(&logger::va("%s", &station.title[0])[0]))
+			{
+				audio::play(station.id);
+			}
 		}
 		ImGui::EndMenu();
 	}

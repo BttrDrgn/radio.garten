@@ -24,7 +24,7 @@ void api::get_places()
 				std::int32_t version = api::places["apiVersion"].get<std::int32_t>();
 				if (version != 1)
 				{
-					SDL_ShowSimpleMessageBox(0, "Radio.Garten", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
+					SDL_ShowSimpleMessageBox(0, "Radio.Garten Places", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
 					global::shutdown = true;
 				}
 
@@ -82,7 +82,7 @@ void api::get_places()
 	}).detach();
 }
 
-void api::get_details(std::string id)
+void api::get_details(const std::string& id)
 {
 	api::detail_done = false;
 
@@ -104,7 +104,7 @@ void api::get_details(std::string id)
 					std::int32_t version = api::details["apiVersion"].get<std::int32_t>();
 					if (version != 1)
 					{
-						SDL_ShowSimpleMessageBox(0, "Radio.Garten", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
+						SDL_ShowSimpleMessageBox(0, "Radio.Garten Details", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
 						global::shutdown = true;
 					}
 
@@ -124,11 +124,52 @@ void api::get_details(std::string id)
 						id.erase(std::remove(id.begin(), id.end(), '\"'), id.end());
 						title.erase(std::remove(title.begin(), title.end(), '\"'), title.end());
 
-						api::station.emplace_back(station_t{title, id.substr(6) });
+						api::station.emplace_back(station_t{title, id.substr(id.size() - 8)});
 					}
 
 					//Finish
 					api::detail_done = true;
+				}
+				else
+				{
+					LOG_ERROR("An error occured when gathering station data!");
+				}
+			}
+		}).detach();
+}
+
+void api::get_station(const std::string& id)
+{
+	api::stations_done = false;
+
+	std::thread([id]
+		{
+			httplib::Client cli(API_URL);
+
+			if (httplib::Result res = cli.Get(STATION_ENDPOINT(&id[0])))
+			{
+				LOG_DEBUG("Accessing %s%s", API_URL, STATION_ENDPOINT(&id[0]));
+
+				if (res->status == 200)
+				{
+					api::details = nl::json::parse(res->body);
+
+					//Check version matching for future updates
+					std::int32_t version = api::details["apiVersion"].get<std::int32_t>();
+					if (version != 1)
+					{
+						SDL_ShowSimpleMessageBox(0, "Radio.Garten Station", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
+						global::shutdown = true;
+					}
+
+					std::string version_hash = api::details["version"].dump();
+					if (std::strcmp(VERSION_HASH, &version_hash[0]))
+					{
+						LOG_WARNING("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
+					}
+
+					//Finish
+					api::stations_done = true;
 				}
 				else
 				{

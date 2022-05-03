@@ -10,17 +10,16 @@ workspace "Radio.Garten"
 	staticruntime "on"
 
 	systemversion "latest"
-	characterset "unicode"
+	characterset "ASCII"
 	architecture "x86"
 	warnings "extra"
 
 	syslibdirs {
-		"$(DXSDK_DIR)lib\\x86\\",
+		".\\deps\\bass\\c\\",
 	}
 
 	includedirs {
 		".\\src\\",
-		"$(DXSDK_DIR)include\\",
 		".\\deps\\imgui\\",
 	}
 
@@ -89,13 +88,15 @@ workspace "Radio.Garten"
 		}
 
 		links {
-			"d3d9",
 			"imgui",
+			"bass",
 		}
 		
 		files {
 			".\\src\\app\\**",
 			".\\src\\utils\\**",
+
+			".\\deps\\bass\\c\\bass.h",
 		}
 
 		includedirs {
@@ -104,8 +105,9 @@ workspace "Radio.Garten"
 			".\\deps\\json\\include\\",
 			".\\deps\\cpp-httplib\\",
 			".\\deps\\imgui\\backends\\",
+			".\\deps\\bass\\c\\",
 		}
-		
+
 	group "Dependencies"
 	
 	project "ImGui"
