@@ -1,6 +1,10 @@
 # Radio.Garten
 A [radio.garden](https://radio.garden/) desktop client written with SDL2 and ImGui
 
+<p align="center">
+  <img width="400" height="300" src="/../assets/preview.png">
+</p>
+
 ## Compiling
 Windows:
 - Run `generate.bat` for Visual Studio 2022
