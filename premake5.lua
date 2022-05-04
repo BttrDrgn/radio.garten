@@ -10,7 +10,7 @@ workspace "Radio.Garten"
 	staticruntime "on"
 
 	systemversion "latest"
-	characterset "ASCII"
+	characterset "unicode"
 	architecture "x86"
 	warnings "extra"
 

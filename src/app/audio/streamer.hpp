@@ -1,2 +1,2 @@
 #pragma once
-DWORD WINAPI OpenURL(const char* url);
+void open_url(const char* url);

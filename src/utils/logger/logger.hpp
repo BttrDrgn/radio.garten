@@ -25,4 +25,15 @@ public:
 		std::vsprintf(result, fmt, va);
 		return std::string(result);
 	}
+
+	//https://stackoverflow.com/questions/10178700/c-strip-non-ascii-characters-from-string
+	static bool check_invalid(char c)
+	{
+		return !(c >= 0 && c < 128);
+	}
+
+	static void strip_unicode(std::string str)
+	{
+		str.erase(remove_if(str.begin(), str.end(), check_invalid), str.end());
+	}
 };

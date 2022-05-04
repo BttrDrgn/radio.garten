@@ -29,5 +29,5 @@ void audio::play(const std::string& url)
 {
 	std::string final_url = logger::va("%s%s", API_URL, AUDIO_ENDPOINT(&url[0]));
 	LOG_DEBUG("Playing: %s", &final_url[0]);
-	OpenURL(&final_url[0]);
+	open_url(&final_url[0]);
 }

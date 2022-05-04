@@ -3,21 +3,12 @@
 	Copyright (c) 2002-2021 Un4seen Developments Ltd.
 */
 
-// HLS definitions (copied from BASSHLS.H)
-#define BASS_SYNC_HLS_SEGMENT	0x10300
-#define BASS_TAG_HLS_EXTINF		0x14000
+#include "global.hpp"
+#include "audio.hpp"
 
 HWND win;
 DWORD req;	// request number/counter
 HSTREAM chan;	// stream handle
-
-// display error messages
-void Error(const char *es)
-{
-	char mes[200];
-	sprintf(mes, "%s\n(error code: %d)", es, BASS_ErrorGetCode());
-	MessageBoxA(win, mes, 0, 0);
-}
 
 #define MESS(id,m,w,l) SendDlgItemMessage(win,id,m,(WPARAM)(w),(LPARAM)(l))
 
@@ -89,23 +80,20 @@ void CALLBACK StatusProc(const void *buffer, DWORD length, void *user)
 		MESS(32, WM_SETTEXT, 0, buffer); // display status
 }
 
-DWORD WINAPI OpenURL(const char* url)
+void open_url(const char* url)
 {
 	DWORD c, r;
+
 	r = ++req; // increment the request counter for this request
 	if (chan) BASS_StreamFree(chan); // close old stream
-	MESS(31, WM_SETTEXT, 0, "connecting...");
-	MESS(30, WM_SETTEXT, 0, "");
-	MESS(32, WM_SETTEXT, 0, "");
 	c = BASS_StreamCreateURL(url, 0, BASS_STREAM_BLOCK | BASS_STREAM_STATUS | BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT, StatusProc, (void*)r); // open URL
 	if (r != req) { // there is a newer request, discard this stream
 		if (c) BASS_StreamFree(c);
-		return 0;
+		return;
 	}
 	chan = c; // this is now the current stream
 	if (!chan) { // failed to open
-		MESS(31, WM_SETTEXT, 0, "not playing");
-		Error("Can't play the stream");
+		SDL_ShowSimpleMessageBox(0, "Radio.Garten Streamer", "Can't play the stream", global::window);
 	} else {
 		// set syncs for stream title updates
 		BASS_ChannelSetSync(chan, BASS_SYNC_META, 0, MetaSync, 0); // Shoutcast
@@ -120,5 +108,4 @@ DWORD WINAPI OpenURL(const char* url)
 		// start buffer monitoring (and display stream info when done)
 		SetTimer(win, 0, 50, 0);
 	}
-	return 0;
 }
