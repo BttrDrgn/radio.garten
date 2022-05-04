@@ -50,6 +50,11 @@ workspace "Radio.Garten"
 				".\\deps\\bass\\c\\",
 				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\",
 			}
+
+			postbuildcommands {
+				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\SDL2.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\bass\\bass.dll\" \"$(OutDir)\"",
+			}
 		filter ""
 
 
@@ -59,6 +64,11 @@ workspace "Radio.Garten"
 			syslibdirs {
 				".\\deps\\bass\\c\\x64\\",
 				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\",
+			}
+
+			postbuildcommands {
+				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\SDL2.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\bass\\x64\\bass.dll\" \"$(OutDir)\"",
 			}
 		filter ""
 	end
