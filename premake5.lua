@@ -1,22 +1,13 @@
 workspace "Radio.Garten"
 	location ".\\build\\"
 
-	targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}\\"
-	objdir "%{wks.location}\\obj\\%{cfg.buildcfg}\\%{prj.name}\\"
-	buildlog "%{wks.location}\\obj\\%{cfg.buildcfg}\\%{prj.name}.log"
-
 	largeaddressaware "on"
 	editandcontinue "off"
 	staticruntime "on"
 
 	systemversion "latest"
 	characterset "unicode"
-	architecture "x86"
 	warnings "extra"
-
-	syslibdirs {
-		".\\deps\\bass\\c\\",
-	}
 
 	includedirs {
 		".\\src\\",
@@ -47,6 +38,7 @@ workspace "Radio.Garten"
 
 	platforms {
 		"x86",
+		"x86_64",
 	}
 
 	configurations {
@@ -59,14 +51,30 @@ workspace "Radio.Garten"
 		optimize "full"
 		runtime "release"
 		symbols "off"
-	filter ""
 
 	filter "Debug"
 		defines "DEBUG"
 		optimize "debug"
 		runtime "debug"
 		symbols "on"
-	filter ""
+
+	filter "platforms:x86"
+		targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}-x86\\"
+		objdir "%{wks.location}\\obj\\%{prj.name}\\%{cfg.buildcfg}-x86\\"
+		buildlog "%{wks.location}\\obj\\x86\\%{cfg.buildcfg}-%{prj.name}.log"
+		architecture "x86"
+		syslibdirs {
+			".\\deps\\bass\\c\\",
+		}
+
+	filter "platforms:x86_64"
+		targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}-x64\\"
+		objdir "%{wks.location}\\obj\\%{prj.name}\\%{cfg.buildcfg}-x64\\"
+		buildlog "%{wks.location}\\obj\\x64\\%{cfg.buildcfg}-%{prj.name}.log"
+		architecture "x86_64"
+		syslibdirs {
+			".\\deps\\bass\\c\\x64\\",
+		}
 
 	project "App"
 		targetname "radio.garten"
