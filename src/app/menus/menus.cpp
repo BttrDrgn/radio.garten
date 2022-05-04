@@ -239,6 +239,7 @@ void menus::render_snow()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
+	std::int32_t gravity = (std::int32_t)std::ceil(global::get_timestep() * 1.0f);
 	for (std::int32_t i = 0; i < menus::snow.size(); i++)
 	{
 		if (menus::snow[i].pos.y > global::resolution.y)
@@ -247,7 +248,7 @@ void menus::render_snow()
 		}
 		else
 		{
-			menus::snow[i].pos.y += (std::int32_t)std::ceil(2.0f * io.DeltaTime);
+			menus::snow[i].pos.y += gravity;
 		}
 
 		gfx::draw_circle(menus::snow[i].pos, 1.0f, { 255, 255, 255, 255 });

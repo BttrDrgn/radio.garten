@@ -10,18 +10,20 @@
 
 void init()
 {
+	global::desired_framerate = 60;
+	global::framelimit = 1000 / global::desired_framerate;
+
 	global::window = SDL_CreateWindow("Radio.Garten", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		global::resolution.x, global::resolution.y, SDL_WINDOW_BORDERLESS);
 
-	global::renderer = SDL_CreateRenderer(global::window, 0, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+	global::renderer = SDL_CreateRenderer(global::window, 0, SDL_RENDERER_SOFTWARE);
 
 	audio::init();
 	menus::init();
 
 	while (!global::shutdown)
 	{
-		std::uint64_t s = SDL_GetPerformanceCounter();
-		std::uint32_t start = SDL_GetTicks();
+		global::tick_start();
 
 		window::update();
 		input::update();
@@ -30,18 +32,13 @@ void init()
 		menus::update();
 		menus::present();
 
-		if (global::framelimit > (SDL_GetTicks() - start))
-		{
-			SDL_Delay(global::framelimit - (SDL_GetTicks() - start));
-		}
-
-		global::framerate = 1.0f / ((SDL_GetPerformanceCounter() - s) / (float)SDL_GetPerformanceFrequency());
-
 		if (!api::places_done || !api::detail_done || !api::stations_done)
 		{
 			//Prevent shutdown while enumerating data as it causes a hard crash in the http lib
 			global::shutdown = false;
 		}
+
+		global::tick_end();
 	}
 
 	menus::cleanup();
@@ -70,5 +67,8 @@ SDL_Window* global::window = 0;
 SDL_Renderer* global::renderer = 0;
 ImVec2 global::resolution = {800, 600};
 bool global::always_on_top = false;
-float global::framerate = 0.0f;
-std::uint32_t global::framelimit = 1000 / 60;
+std::float_t global::framerate = 0.0f;
+std::uint32_t  global::desired_framerate;
+std::uint32_t global::framelimit;
+std::uint64_t global::counter;
+std::uint32_t global::start;
