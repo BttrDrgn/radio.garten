@@ -17,30 +17,17 @@ workspace "Radio.Garten"
 		".\\deps\\imgui\\",
 	}
 
-	buildoptions {
-		"/Zm200",
-		"/utf-8",
-		"/std:c++17",
-		"/bigobj",
-	}
-
 	flags {
-		"noincrementallink",
-		"no64bitchecks",
 		"shadowedvariables",
 		"undefinedidentifiers",
-		"multiprocessorcompile",
-	}
-
-	defines {
-		"NOMINMAX",
-		"WIN32_LEAN_AND_MEAN",
-		"_CRT_SECURE_NO_WARNINGS",
-		"_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS",
 	}
 
 	if string.contains(_ACTION, "vs") then
 		printf("Building for Windows in Visual Studio..");
+
+		flags {
+			"multiprocessorcompile",
+		}
 
 		platforms {
 			"Win-x86",
@@ -63,10 +50,6 @@ workspace "Radio.Garten"
 				".\\deps\\bass\\c\\",
 				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\",
 			}
-
-			files {
-				".\\src\\app\\resource\\**"
-			}
 		filter ""
 
 
@@ -76,10 +59,6 @@ workspace "Radio.Garten"
 			syslibdirs {
 				".\\deps\\bass\\c\\x64\\",
 				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\",
-			}
-
-			files {
-				".\\src\\app\\resource\\**"
 			}
 		filter ""
 	end
@@ -135,6 +114,12 @@ workspace "Radio.Garten"
 
 			".\\deps\\bass\\c\\bass.h",
 		}
+
+		if string.contains(_ACTION, "vs") then
+			files {
+				".\\src\\app\\resource\\**"
+			}
+		end
 
 		includedirs {
 			".\\src\\app\\",
