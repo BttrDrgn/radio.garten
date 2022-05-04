@@ -2,7 +2,7 @@
 
 #define API_URL "http://radio.garden"
 #define VERSION 1
-#define VERSION_HASH "\"2dda17c\""
+#define VERSION_HASH "\"4b49c2c\""	//radio.garden git commit hash
 #define PLACES_ENDPOINT "/api/ara/content/places"
 #define PLACE_DETAIL_ENDPOINT(...) &logger::va("/api/ara/content/page/%s/channels", __VA_ARGS__)[0]
 #define STATION_ENDPOINT(...) &logger::va("/api/ara/content/channel/%s", __VA_ARGS__)[0]

@@ -8,8 +8,6 @@
 #include "audio.hpp"
 
 
-
-
 // update stream title from metadata
 void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 {
@@ -101,18 +99,15 @@ void open_url(const char* url)
 	}
 	else
 	{
-		// set syncs for stream title updates
+		//Meta data updates
 		BASS_ChannelSetSync(audio::chan, BASS_SYNC_META, 0, meta_sync, 0); // Shoutcast
-		BASS_ChannelSetSync(audio::chan, BASS_SYNC_OGG_CHANGE, 0, meta_sync, 0); // Icecast/OGG
-		BASS_ChannelSetSync(audio::chan, BASS_SYNC_HLS_SEGMENT, 0, meta_sync, 0); // HLS
+		BASS_ChannelSetSync(audio::chan, BASS_SYNC_OGG_CHANGE, 0, meta_sync, 0);
+		BASS_ChannelSetSync(audio::chan, BASS_SYNC_HLS_SEGMENT, 0, meta_sync, 0);
 
-		// set sync for stalling/buffering
-		BASS_ChannelSetSync(audio::chan, BASS_SYNC_STALL, 0, null_callback, 0);
-
-		// set sync for end of stream (when freed due to AUTOFREE)
+		//Free on end
 		BASS_ChannelSetSync(audio::chan, BASS_SYNC_FREE, 0, free_sync, 0);
 
-		// play it!
+		//Play channel
 		BASS_ChannelPlay(audio::chan, FALSE);
 	}
 }

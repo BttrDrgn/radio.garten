@@ -35,7 +35,7 @@ void api::get_places()
 				std::string version_hash = api::places["version"].dump();
 				if (std::strcmp(VERSION_HASH, &version_hash[0]))
 				{
-					LOG_WARNING("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
+					LOG_DEBUG("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
 				}
 
 				nl::json data = nl::json::parse(api::places["data"].dump());
@@ -115,7 +115,7 @@ void api::get_details(const std::string& id)
 					std::string version_hash = api::details["version"].dump();
 					if (std::strcmp(VERSION_HASH, &version_hash[0]))
 					{
-						LOG_WARNING("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
+						LOG_DEBUG("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
 					}
 
 					nl::json data = nl::json::parse(api::details["data"].dump());
@@ -173,7 +173,7 @@ void api::get_station(const std::string& id)
 					std::string version_hash = api::stations["version"].dump();
 					if (std::strcmp(VERSION_HASH, &version_hash[0]))
 					{
-						LOG_WARNING("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
+						LOG_DEBUG("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
 					}
 
 					//Finish
