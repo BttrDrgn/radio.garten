@@ -187,8 +187,23 @@ void api::get_station(const std::string& id)
 		}).detach();
 }
 
+void api::filter_place(const std::string& key)
+{
+	api::filtered_place.clear();
+
+	for (auto place : api::place)
+	{
+		//Look for city, country, or id with this string
+		if (place.city.find(key) != std::string::npos || place.country.find(key) != std::string::npos || place.id.find(key) != std::string::npos)
+		{
+			api::filtered_place.emplace_back(place);
+		}
+	}
+}
+
 nl::json api::places;
 std::vector<place_t> api::place;
+std::vector<place_t> api::filtered_place;
 bool api::places_done = true;
 
 nl::json api::details;

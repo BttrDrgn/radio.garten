@@ -27,11 +27,13 @@ class api
 {
 public:
 	static void get_places();
+	static void filter_place(const std::string& key);
 	static void get_details(const std::string& id);
 	static void get_station(const std::string& id);
 
 	static nl::json places;
 	static std::vector<place_t> place;
+	static std::vector<place_t> filtered_place;
 	static bool places_done;
 
 	static nl::json details;

@@ -15,17 +15,19 @@ public:
 	static void init();
 	static void update();
 
-	static std::string current_country;
 	static std::vector<snow_t> snow;
 	static std::int32_t max_points;
 
+	static bool show_all_stations;
 	static bool show_snow;
+	static char search_buffer[64];
 
 private:
 	static void main_menu_bar();
 	static void actions();
 	static void places();
 	static void stations();
+	static bool filtering;
 
 	static void render_snow();
 	static void enumerate_snow();

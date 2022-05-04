@@ -109,56 +109,77 @@ void menus::places()
 {
 	if (ImGui::BeginMenu("Places"))
 	{
-		
-		if (ImGui::BeginCombo("Country", &menus::current_country[0]))
+		if (std::strlen(menus::search_buffer) == 0)
 		{
-			if (api::places_done)
-			{
-				if (ImGui::Button("Reset"))
-				{
-					menus::current_country = "N/A";
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::NewLine();
-
-				for (auto c : api::all_countries)
-				{
-					if (ImGui::Button(&c[0]))
-					{
-						menus::current_country = c;
-						ImGui::CloseCurrentPopup();
-					}
-				}
-			}
-			ImGui::EndCombo();
+			menus::filtering = false;
 		}
 
+		if (ImGui::Button("Reset Filter"))
+		{
+			menus::filtering = false;
+			memset(menus::search_buffer, 0, sizeof(menus::search_buffer));
+		}
+
+		if (ImGui::InputText("Search", menus::search_buffer, sizeof(search_buffer)))
+		{
+			menus::filtering = true;
+			api::filter_place(std::string(menus::search_buffer));
+		}
 
 		if (ImGui::BeginMenu("Locations"))
 		{
 			if (api::places_done)
 			{
-				for (auto place : api::place)
+				if (!menus::filtering)
 				{
-					std::string country = place.country;
-					if (std::strcmp(&menus::current_country[0], "N/A"))
+					if (api::place.empty())
 					{
-						if (!std::strcmp(&place.country[0], &menus::current_country[0]))
+						ImGui::Text("Places are empty!\nYou might need to refresh\n\nPlease click Actions -> Refresh Places.");
+					}
+					else
+					{
+						if (!menus::show_all_stations)
 						{
-							if (ImGui::Button(&logger::va("%s", &place.city[0])[0]))
+							ImGui::Text("There are %i places, hidden by default for performance.\nClick the button to show all stations", api::place.size());
+							if (ImGui::Button("Show All"))
+							{
+								menus::show_all_stations = true;
+							}
+						}
+						else if (menus::show_all_stations)
+						{
+							if (ImGui::Button("Hide All"))
+							{
+								menus::show_all_stations = false;
+							}
+
+							ImGui::NewLine();
+
+							for (auto place : api::place)
+							{
+								if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
+								{
+									api::get_details(place.id);
+									ImGui::CloseCurrentPopup();
+								}
+							}
+						}
+					}
+				}
+				else if (menus::filtering)
+				{
+					if (api::filtered_place.empty())
+					{
+						ImGui::Text("Places are empty!\nYou might need to refresh\n\nPlease click Actions -> Refresh Places.");
+					}
+					{
+						for (auto place : api::filtered_place)
+						{
+							if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
 							{
 								api::get_details(place.id);
 								ImGui::CloseCurrentPopup();
 							}
-						}
-					}
-					else
-					{
-						if (ImGui::Button(&logger::va("[%s] %s", &country[0], &place.city[0])[0]))
-						{
-							api::get_details(place.id);
-							ImGui::CloseCurrentPopup();
 						}
 					}
 				}
@@ -173,11 +194,18 @@ void menus::stations()
 {
 	if (ImGui::BeginMenu("Stations"))
 	{
-		for (station_t station : api::station)
+		if (api::station.empty())
 		{
-			if (ImGui::Button(&logger::va("%s", &station.title[0])[0]))
+			ImGui::Text("Stations are empty!\nYou might need to select a place.");
+		}
+		else
+		{
+			for (station_t station : api::station)
 			{
-				audio::play(station.id);
+				if (ImGui::Button(&logger::va("%s", &station.title[0])[0]))
+				{
+					audio::play(station.id);
+				}
 			}
 		}
 		ImGui::EndMenu();
@@ -218,7 +246,9 @@ void menus::enumerate_snow()
 	}
 }
 
-std::string menus::current_country = "N/A";
 std::vector<snow_t> menus::snow;
 std::int32_t menus::max_points = 255;
+bool menus::show_all_stations = false;
 bool menus::show_snow = false;
+bool menus::filtering = false;
+char menus::search_buffer[64];
