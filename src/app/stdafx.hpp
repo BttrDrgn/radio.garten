@@ -2,7 +2,6 @@
 
 //System
 #include <vector>
-#include <cstring>
 
 //Deps
 #include <SDL.h>
