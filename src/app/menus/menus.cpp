@@ -4,6 +4,7 @@
 #include "api/api.hpp"
 #include "audio/audio.hpp"
 #include "gfx/gfx.hpp"
+#include "drpc/drpc.hpp"
 
 #ifdef _WIN32
 #include <shellapi.h>
@@ -80,7 +81,7 @@ void menus::main_menu_bar()
 		menus::actions();
 		menus::places();
 		menus::stations();
-		ImGui::Text("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station[0]);
+		ImGui::Text("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station.title[0]);
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -96,7 +97,21 @@ void menus::actions()
 
 		ImGui::NewLine();
 
-		if(ImGui::Button("Toggle Snow"))
+		if (ImGui::Button(&logger::va("Toggle Discord RPC [%s]", &logger::get_toggle(menus::show_drpc)[0])[0]))
+		{
+			menus::show_drpc = !menus::show_drpc;
+			switch (menus::show_drpc)
+			{
+			case true:
+				drpc::init();
+				break;
+			case false:
+				drpc::deinit();
+				break;
+			}
+		}
+
+		if (ImGui::Button(&logger::va("Toggle Snow [%s]", &logger::get_toggle(menus::show_snow)[0])[0]))
 		{
 			menus::show_snow = !menus::show_snow;
 		}
@@ -217,7 +232,10 @@ void menus::stations()
 
 				if (ImGui::Button(&logger::va("%s", &station.title[0])[0]))
 				{
-					audio::currently_playing.station = station.title;
+					audio::currently_playing.station.title = station.title;
+					audio::currently_playing.station.id = station.id;
+					audio::currently_playing.region.city = station.region.city;
+					audio::currently_playing.region.country = station.region.country;
 					audio::play(station.id);
 				}
 
@@ -272,7 +290,10 @@ void menus::enumerate_snow()
 
 std::vector<snow_t> menus::snow;
 std::int32_t menus::max_points = 255;
+
 bool menus::show_all_stations = false;
 bool menus::show_snow = false;
+bool menus::show_drpc = false;
+
 bool menus::filtering = false;
 char menus::search_buffer[64];

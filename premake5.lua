@@ -49,11 +49,13 @@ workspace "Radio.Garten"
 			syslibdirs {
 				".\\deps\\bass\\c\\",
 				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\",
+				".\\deps\\discord\\lib\\x86\\",
 			}
 
 			postbuildcommands {
 				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\SDL2.dll\" \"$(OutDir)\"",
 				"copy /y \"..\\deps\\bass\\bass.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"",
 			}
 		filter ""
 
@@ -64,11 +66,13 @@ workspace "Radio.Garten"
 			syslibdirs {
 				".\\deps\\bass\\c\\x64\\",
 				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\",
+				".\\deps\\discord\\lib\\x86_64\\",
 			}
 
 			postbuildcommands {
 				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\SDL2.dll\" \"$(OutDir)\"",
 				"copy /y \"..\\deps\\bass\\x64\\bass.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"",
 			}
 		filter ""
 	end
@@ -101,13 +105,26 @@ workspace "Radio.Garten"
 			"ImGui",
 		}
 
+		if string.contains(_ACTION, "vs") then
+			dependson {
+				"Discord",
+			}
+		end
+
 		links {
 			"imgui",
 			"bass",
 			"SDL2",
-			"SDL2main"
+			"SDL2main",
 		}
 		
+		if string.contains(_ACTION, "vs") then
+			links {
+				"Discord",
+				"discord_game_sdk.dll.lib",
+			}
+		end
+
 		files {
 			".\\src\\app\\stdafx.hpp",
 			".\\src\\app\\stdafx.cpp",
@@ -127,7 +144,8 @@ workspace "Radio.Garten"
 
 		if string.contains(_ACTION, "vs") then
 			files {
-				".\\src\\app\\resource\\**"
+				".\\src\\app\\resource\\**",
+				".\\src\\app\\drpc\\**",
 			}
 		end
 
@@ -139,6 +157,13 @@ workspace "Radio.Garten"
 			".\\deps\\imgui\\backends\\",
 			".\\deps\\bass\\c\\",
 		}
+
+		if string.contains(_ACTION, "vs") then
+			includedirs {
+				".\\deps\\discord\\cpp\\",
+			}
+		end
+
 
 	group "Dependencies"
 	
@@ -165,3 +190,19 @@ workspace "Radio.Garten"
 			".\\deps\\imgui\\",
 			".\\deps\\imgui\\backends\\",
 		}
+	
+	if string.contains(_ACTION, "vs") then
+		project "Discord"
+			targetname "discord"
+
+			language "c++"
+			kind "staticlib"
+
+			files {
+				".\\deps\\discord\\cpp\\**",
+			}
+
+			includedirs {
+				".\\deps\\discord\\cpp\\",
+			}
+	end

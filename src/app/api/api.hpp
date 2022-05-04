@@ -21,6 +21,7 @@ struct city_t
 struct station_t
 {
 	std::string title, id;
+	city_t region;
 };
 
 class api

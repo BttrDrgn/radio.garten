@@ -23,8 +23,12 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 			{
 				char *t = strdup(p + 13);
 				t[p2 - (p + 13)] = 0;
-				LOG_DEBUG("%s", t);
 				audio::currently_playing.title = std::string(t);
+
+				LOG_DEBUG("Song: %s | Station: %s | Country: %s | City: %s",
+					&audio::currently_playing.title[0], &audio::currently_playing.station.title[0],
+					&audio::currently_playing.region.country[0], &audio::currently_playing.region.city[0]);
+
 				free(t);
 			}
 		}

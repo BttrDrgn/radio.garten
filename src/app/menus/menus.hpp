@@ -20,6 +20,8 @@ public:
 
 	static bool show_all_stations;
 	static bool show_snow;
+	static bool show_drpc;
+
 	static char search_buffer[64];
 
 	static std::string currently_playing;

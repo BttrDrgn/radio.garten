@@ -26,6 +26,24 @@ public:
 		return std::string(result);
 	}
 
+	static std::string get_toggle(bool input)
+	{
+		switch (input)
+		{
+		case true:
+			return "On";
+			break;
+
+		case false:
+			return "Off";
+			break;
+
+		default:
+			return "???";
+			break;
+		}
+	}
+
 	//https://stackoverflow.com/questions/10178700/c-strip-non-ascii-characters-from-string
 	static bool check_invalid(char c)
 	{
