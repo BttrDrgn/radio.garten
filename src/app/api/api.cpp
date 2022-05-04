@@ -77,6 +77,7 @@ void api::get_places()
 
 				//Finish
 				api::places_done = true;
+				api::places = {};
 			}
 			else
 			{
@@ -137,6 +138,7 @@ void api::get_details(const std::string& id)
 
 					//Finish
 					api::detail_done = true;
+					api::details = {};
 				}
 				else
 				{
@@ -178,6 +180,7 @@ void api::get_station(const std::string& id)
 
 					//Finish
 					api::stations_done = true;
+					api::stations = {};
 				}
 				else
 				{
