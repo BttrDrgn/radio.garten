@@ -11,7 +11,7 @@
 void init()
 {
 	global::window = SDL_CreateWindow("Radio.Garten", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		global::resolution.x, global::resolution.y, 0);
+		global::resolution.x, global::resolution.y, SDL_WINDOW_BORDERLESS);
 
 	global::renderer = SDL_CreateRenderer(global::window, 0, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 
@@ -52,5 +52,5 @@ int main(int argc, char* argv[])
 bool global::shutdown = false;
 SDL_Window* global::window = 0;
 SDL_Renderer* global::renderer = 0;
-ImVec2 global::resolution = {1280, 720};
+ImVec2 global::resolution = {800, 600};
 bool global::always_on_top = false;
