@@ -7,9 +7,9 @@ void api::get_places()
 	api::places = {};
 	api::details = {};
 	api::places_done = false;
-	api::place.clear();
-	api::all_countries.clear();
-	api::station.clear();
+	api::place = {};
+	api::all_countries = {};
+	api::station = {};
 	api::station = {};
 
 	std::thread([]
@@ -91,7 +91,7 @@ void api::get_details(const std::string& id)
 {
 	api::details = {};
 	api::detail_done = false;
-	api::station.clear();
+	api::station = {};
 
 	std::thread([id]
 		{
@@ -192,7 +192,7 @@ void api::get_station(const std::string& id)
 
 void api::filter_place(const std::string& key)
 {
-	api::filtered_place.clear();
+	api::filtered_place = {};
 
 	for (auto place : api::place)
 	{
