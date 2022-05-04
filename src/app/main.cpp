@@ -49,6 +49,12 @@ void init()
 
 int main(int argc, char* argv[])
 {
+#ifdef _WIN32
+#ifdef NDEBUG
+	ShowWindow(GetConsoleWindow(), 0);
+#endif
+#endif
+
 	if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0)
 	{
 		LOG_ERROR("%s", SDL_GetError());
