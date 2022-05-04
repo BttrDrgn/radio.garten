@@ -87,19 +87,19 @@ void api::get_places()
 	}).detach();
 }
 
-void api::get_details(const std::string& id)
+void api::get_details(const place_t& place_in)
 {
 	api::details = {};
 	api::detail_done = false;
 	api::station = {};
 
-	std::thread([id]
+	std::thread([place_in]
 		{
 			httplib::Client cli(API_URL);
 
-			if (httplib::Result res = cli.Get(PLACE_DETAIL_ENDPOINT(&id[0])))
+			if (httplib::Result res = cli.Get(PLACE_DETAIL_ENDPOINT(&place_in.id[0])))
 			{
-				LOG_DEBUG("Accessing %s%s", API_URL, PLACE_DETAIL_ENDPOINT(&id[0]));
+				LOG_DEBUG("Accessing %s%s", API_URL, PLACE_DETAIL_ENDPOINT(&place_in.id[0]));
 
 				if (res->status == 200)
 				{
@@ -131,7 +131,7 @@ void api::get_details(const std::string& id)
 
 						if (std::strcmp(&id[0], "null"))
 						{
-							api::station.emplace_back(station_t{ title, id.substr(id.size() - 8) });
+							api::station.emplace_back(station_t{ title, id.substr(id.size() - 8), place_in });
 						}
 
 					}

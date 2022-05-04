@@ -185,7 +185,7 @@ void menus::places()
 							{
 								if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
 								{
-									api::get_details(place.id);
+									api::get_details(place);
 									ImGui::CloseCurrentPopup();
 								}
 							}
@@ -203,7 +203,7 @@ void menus::places()
 						{
 							if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
 							{
-								api::get_details(place.id);
+								api::get_details(place);
 								ImGui::CloseCurrentPopup();
 							}
 						}
@@ -234,8 +234,8 @@ void menus::stations()
 				{
 					audio::currently_playing.station.title = station.title;
 					audio::currently_playing.station.id = station.id;
-					audio::currently_playing.region.city = station.region.city;
-					audio::currently_playing.region.country = station.region.country;
+					audio::currently_playing.region.city = station.place.city;
+					audio::currently_playing.region.country = station.place.country;
 					audio::play(station.id);
 				}
 

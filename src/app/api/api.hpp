@@ -13,15 +13,10 @@ struct place_t
 	std::string country, city, id;
 };
 
-struct city_t
-{
-	std::string country, city;
-};
-
 struct station_t
 {
 	std::string title, id;
-	city_t region;
+	place_t place;
 };
 
 class api
@@ -29,7 +24,7 @@ class api
 public:
 	static void get_places();
 	static void filter_place(const std::string& key);
-	static void get_details(const std::string& id);
+	static void get_details(const place_t& place_in);
 	static void get_station(const std::string& id);
 
 	static nl::json places;

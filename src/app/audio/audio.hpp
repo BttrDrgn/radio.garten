@@ -9,7 +9,7 @@ struct playing_t
 {
 	std::string title;
 	station_t station;
-	city_t region;
+	place_t region;
 };
 
 class audio
