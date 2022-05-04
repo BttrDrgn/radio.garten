@@ -37,8 +37,8 @@ workspace "Radio.Garten"
 	}
 
 	platforms {
-		"x86",
-		"x86_64",
+		"Win-x86",
+		"Win-x64",
 	}
 
 	configurations {
@@ -58,19 +58,19 @@ workspace "Radio.Garten"
 		runtime "debug"
 		symbols "on"
 
-	filter "platforms:x86"
-		targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}-x86\\"
-		objdir "%{wks.location}\\obj\\%{prj.name}\\%{cfg.buildcfg}-x86\\"
-		buildlog "%{wks.location}\\obj\\x86\\%{cfg.buildcfg}-%{prj.name}.log"
+	filter "platforms:Win-x86"
+		targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}-Win-x86\\"
+		objdir "%{wks.location}\\obj\\%{prj.name}\\%{cfg.buildcfg}-Win-x86\\"
+		buildlog "%{wks.location}\\obj\\Win-x86\\%{cfg.buildcfg}-%{prj.name}.log"
 		architecture "x86"
 		syslibdirs {
 			".\\deps\\bass\\c\\",
 		}
 
-	filter "platforms:x86_64"
-		targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}-x64\\"
-		objdir "%{wks.location}\\obj\\%{prj.name}\\%{cfg.buildcfg}-x64\\"
-		buildlog "%{wks.location}\\obj\\x64\\%{cfg.buildcfg}-%{prj.name}.log"
+	filter "platforms:Win-x64"
+		targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}-Win-x64\\"
+		objdir "%{wks.location}\\obj\\%{prj.name}\\%{cfg.buildcfg}-Win-x64\\"
+		buildlog "%{wks.location}\\obj\\Win-x64\\%{cfg.buildcfg}-%{prj.name}.log"
 		architecture "x86_64"
 		syslibdirs {
 			".\\deps\\bass\\c\\x64\\",
