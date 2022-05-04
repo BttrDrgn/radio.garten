@@ -29,8 +29,10 @@ void audio::play(const std::string& url)
 {
 	std::string final_url = logger::va("%s%s", API_URL, AUDIO_ENDPOINT(&url[0]));
 	LOG_DEBUG("Playing: %s", &final_url[0]);
+	audio::currently_playing.title = "N/A";
 	open_url(&final_url[0]);
 }
 
 std::int32_t audio::req;
 std::int32_t audio::chan;
+playing_t audio::currently_playing = {"N/A", "N/A"};

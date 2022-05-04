@@ -22,6 +22,8 @@ public:
 	static bool show_snow;
 	static char search_buffer[64];
 
+	static std::string currently_playing;
+
 private:
 	static void main_menu_bar();
 	static void actions();

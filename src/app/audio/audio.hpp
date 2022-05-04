@@ -3,6 +3,11 @@
 #define BASS_SYNC_HLS_SEGMENT	0x10300
 #define BASS_TAG_HLS_EXTINF		0x14000
 
+struct playing_t
+{
+	std::string title, station;
+};
+
 class audio
 {
 public:
@@ -11,4 +16,6 @@ public:
 
 	static std::int32_t req;
 	static std::int32_t chan;
+
+	static playing_t currently_playing;
 };

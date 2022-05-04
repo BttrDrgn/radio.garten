@@ -1,7 +1,10 @@
 #pragma once
 
+//System
 #include <vector>
+#include <cstring>
 
+//Deps
 #include <SDL.h>
 #include <SDL_syswm.h>
 

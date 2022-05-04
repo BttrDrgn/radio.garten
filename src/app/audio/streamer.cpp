@@ -24,6 +24,7 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 				char *t = strdup(p + 13);
 				t[p2 - (p + 13)] = 0;
 				LOG_DEBUG("%s", t);
+				audio::currently_playing.title = std::string(t);
 				free(t);
 			}
 		}
@@ -48,11 +49,13 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 				{
 					char text[100];
 					_snprintf(text, sizeof(text), "%s - %s", artist, title);
-					LOG_DEBUG("%s", text);
+					LOG_DEBUG("Text: %s", text);
+					audio::currently_playing.title = std::string(text);
 				}
 				else
 				{
-					LOG_DEBUG("%s", title);
+					LOG_DEBUG("Title: %s", title);
+					audio::currently_playing.title = std::string(title);
 				}
 			}
 		}
@@ -63,7 +66,7 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 			if (meta)
 			{
 				const char *p = strchr(meta, ',');
-				LOG_DEBUG("%s", p + 1);
+				LOG_DEBUG("Meta: %s", p + 1);
 			}
 		}
 	}

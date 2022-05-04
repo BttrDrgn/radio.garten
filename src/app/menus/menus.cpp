@@ -5,6 +5,10 @@
 #include "audio/audio.hpp"
 #include "gfx/gfx.hpp"
 
+#ifdef _WIN32
+#include <shellapi.h>
+#endif
+
 void menus::init()
 {
 	IMGUI_CHECKVERSION();
@@ -21,8 +25,14 @@ void menus::update()
 		{
 			menus::enumerate_snow();
 		}
-
 		menus::render_snow();
+	}
+	else if (!menus::show_snow)
+	{
+		if (!menus::snow.empty())
+		{
+			menus::snow.clear();
+		}
 	}
 
 	ImGui::SetNextWindowPos({0, 0});
@@ -70,6 +80,7 @@ void menus::main_menu_bar()
 		menus::actions();
 		menus::places();
 		menus::stations();
+		ImGui::Text("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station[0]);
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -202,10 +213,22 @@ void menus::stations()
 		{
 			for (station_t station : api::station)
 			{
+				int count = 0;
+
 				if (ImGui::Button(&logger::va("%s", &station.title[0])[0]))
 				{
+					audio::currently_playing.station = station.title;
 					audio::play(station.id);
 				}
+
+				ImGui::SameLine();
+
+				//Favorite button for later
+				if (ImGui::Button(&logger::va("*##%i", count)[0]))
+				{
+
+				}
+				count++;
 			}
 		}
 		ImGui::EndMenu();
