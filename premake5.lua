@@ -66,6 +66,10 @@ workspace "Radio.Garten"
 		syslibdirs {
 			".\\deps\\bass\\c\\",
 		}
+		files {
+			".\\src\\app\\resource\\**"
+		}
+
 
 	filter "platforms:Win-x64"
 		targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}-Win-x64\\"
@@ -74,6 +78,9 @@ workspace "Radio.Garten"
 		architecture "x86_64"
 		syslibdirs {
 			".\\deps\\bass\\c\\x64\\",
+		}
+		files {
+			".\\src\\app\\resource\\**"
 		}
 
 	project "App"
@@ -101,7 +108,17 @@ workspace "Radio.Garten"
 		}
 		
 		files {
-			".\\src\\app\\**",
+			".\\src\\app\\stdafx.hpp",
+			".\\src\\app\\stdafx.cpp",
+			".\\src\\app\\main.cpp",
+			".\\src\\app\\global.hpp",
+			".\\src\\app\\api\\**",
+			".\\src\\app\\audio\\**",
+			".\\src\\app\\gfx\\**",
+			".\\src\\app\\input\\**",
+			".\\src\\app\\menus\\**",
+			".\\src\\app\\window\\**",
+
 			".\\src\\utils\\**",
 
 			".\\deps\\bass\\c\\bass.h",
