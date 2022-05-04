@@ -51,12 +51,19 @@ workspace "Radio.Garten"
 			"Release",
 			"Debug",
 		}
+		
+		includedirs {
+			".\\deps\\SDL2-2.0.22\\MSVC\\include\\",
+		}
 
 		filter "platforms:Win-x86"	
 			architecture "x86"
+
 			syslibdirs {
 				".\\deps\\bass\\c\\",
+				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\",
 			}
+
 			files {
 				".\\src\\app\\resource\\**"
 			}
@@ -65,9 +72,12 @@ workspace "Radio.Garten"
 
 		filter "platforms:Win-x64"
 			architecture "x86_64"
+
 			syslibdirs {
 				".\\deps\\bass\\c\\x64\\",
+				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\",
 			}
+
 			files {
 				".\\src\\app\\resource\\**"
 			}
@@ -97,11 +107,6 @@ workspace "Radio.Garten"
 		pchheader "stdafx.hpp"
 		pchsource "src/app/stdafx.cpp"
 		forceincludes "stdafx.hpp"
-
-		nuget {
-			"sdl2.nuget:2.0.20",
-			"sdl2.nuget.redist:2.0.20"
-		}
 		
 		dependson {
 			"ImGui",
@@ -110,6 +115,8 @@ workspace "Radio.Garten"
 		links {
 			"imgui",
 			"bass",
+			"SDL2",
+			"SDL2main"
 		}
 		
 		files {
@@ -145,12 +152,11 @@ workspace "Radio.Garten"
 
 		language "c++"
 		kind "staticlib"
-		
-		nuget {
-			"sdl2.nuget:2.0.20",
-			"sdl2.nuget.redist:2.0.20"
-		}
 
+		links {
+			"SDL2",
+		}
+		
 		files {
 			".\\deps\\imgui\\*.h",
 			".\\deps\\imgui\\*.cpp",
