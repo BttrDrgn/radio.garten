@@ -96,11 +96,9 @@ void api::get_details(const std::string& id)
 		{
 			httplib::Client cli(API_URL);
 
-			std::string detail = logger::va("%s/%s", PLACE_DETAIL_ENDPOINT, &id[0]);
-
-			if (httplib::Result res = cli.Get(&detail[0]))
+			if (httplib::Result res = cli.Get(PLACE_DETAIL_ENDPOINT(&id[0])))
 			{
-				LOG_DEBUG("Accessing %s%s", API_URL, &detail[0]);
+				LOG_DEBUG("Accessing %s%s", API_URL, PLACE_DETAIL_ENDPOINT(&id[0]));
 
 				if (res->status == 200)
 				{

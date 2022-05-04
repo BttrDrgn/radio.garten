@@ -4,7 +4,7 @@
 #define VERSION 1
 #define VERSION_HASH "\"2dda17c\""
 #define PLACES_ENDPOINT "/api/ara/content/places"
-#define PLACE_DETAIL_ENDPOINT "/api/ara/content/page"
+#define PLACE_DETAIL_ENDPOINT(...) &logger::va("/api/ara/content/page/%s/channels", __VA_ARGS__)[0]
 #define STATION_ENDPOINT(...) &logger::va("/api/ara/content/channel/%s", __VA_ARGS__)[0]
 #define AUDIO_ENDPOINT(...) &logger::va("/api/ara/content/listen/%s/channel.mp3", __VA_ARGS__)[0]
 
