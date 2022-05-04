@@ -18,6 +18,12 @@ void init()
 
 	global::renderer = SDL_CreateRenderer(global::window, 0, SDL_RENDERER_SOFTWARE);
 
+	if (SDL_SetWindowHitTest(global::window, input::hit_test_callback, 0) != 0)
+	{
+		LOG_ERROR("Failed to init hit test!");
+		global::shutdown = true;
+	}
+
 	audio::init();
 	menus::init();
 
