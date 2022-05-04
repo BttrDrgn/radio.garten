@@ -65,4 +65,4 @@ SDL_Renderer* global::renderer = 0;
 ImVec2 global::resolution = {800, 600};
 bool global::always_on_top = false;
 float global::framerate = 0.0f;
-float global::framelimit = 60.0f;
+std::uint32_t global::framelimit = global::get_framelimit(60);
