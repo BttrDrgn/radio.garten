@@ -16,19 +16,20 @@ void drpc::init()
 		if (result == discord::Result::Ok)
 		{
 			core->SetLogHook(discord::LogLevel::Info, [](auto, auto message)
-				{
-					LOG("%s", message);
-				});
+			{
+				logger::log("DISCORD", message);
+			});
 
 			core->SetLogHook(discord::LogLevel::Warn, [](auto, auto message)
-				{
-					LOG("%s", message);
-				});
+			{
+				logger::log("DISCORD", message);
+
+			});
 
 			core->SetLogHook(discord::LogLevel::Error, [](auto, auto message)
-				{
-					LOG("%s", message);
-				});
+			{
+				logger::log("DISCORD", message);
+			});
 
 			drpc::change_large_image("logo", "Radio.Garten");
 			activity.GetTimestamps().SetStart(std::time(nullptr));

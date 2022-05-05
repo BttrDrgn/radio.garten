@@ -18,7 +18,7 @@ void api::get_places()
 
 		if (httplib::Result res = cli.Get(PLACES_ENDPOINT))
 		{
-			std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing " << API_URL << PLACES_ENDPOINT << std::endl;
+			logger::log_info(logger::va("Accessing %s%s", API_URL, PLACES_ENDPOINT));
 
 			if (res->status == 200)
 			{
@@ -35,8 +35,7 @@ void api::get_places()
 				std::string version_hash = api::places["version"].dump();
 				if (std::strcmp(VERSION_HASH, &version_hash[0]))
 				{
-					std::cout << "[ WARNING ] [ " << __FUNCNAME__ << " ] " <<
-					"Hash was expected to be " << VERSION_HASH << " (got " << &version_hash[0] << ")" << std::endl;
+					logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
 				}
 
 				nl::json data = nl::json::parse(api::places["data"].dump());
@@ -82,7 +81,7 @@ void api::get_places()
 			}
 			else
 			{
-				std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << "An error occured when gathering places data!" << std::endl;
+				logger::log_error("An error occured when gathering places data!");
 			}
 		}
 	}).detach();
@@ -100,8 +99,7 @@ void api::get_details(const place_t& place_in)
 
 		if (httplib::Result res = cli.Get(PLACE_DETAIL_ENDPOINT(&place_in.id[0])))
 		{
-			std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing " << API_URL << PLACE_DETAIL_ENDPOINT(&place_in.id[0]) << std::endl;
-
+			logger::log_info(logger::va("Accessing %s%s", API_URL, PLACE_DETAIL_ENDPOINT(&place_in.id[0])));
 			if (res->status == 200)
 			{
 				api::details = nl::json::parse(res->body);
@@ -117,8 +115,7 @@ void api::get_details(const place_t& place_in)
 				std::string version_hash = api::details["version"].dump();
 				if (std::strcmp(VERSION_HASH, &version_hash[0]))
 				{
-					std::cout << "[ WARNING ] [ " << __FUNCNAME__ << " ] " <<
-					"Hash was expected to be " << VERSION_HASH << " (got " << &version_hash[0] << ")" << std::endl;
+					logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
 				}
 
 				nl::json data = nl::json::parse(api::details["data"].dump());
@@ -144,7 +141,7 @@ void api::get_details(const place_t& place_in)
 			}
 			else
 			{
-				std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << "An error occured when gathering station data!" << std::endl;
+				logger::log_error("An error occured when gathering station data!");
 			}
 		}
 	}).detach();
@@ -160,7 +157,7 @@ void api::get_station(const std::string& id)
 
 			if (httplib::Result res = cli.Get(STATION_ENDPOINT(&id[0])))
 			{
-				std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing " << API_URL << STATION_ENDPOINT(&id[0]) << std::endl;
+				logger::log_info(logger::va("Accessing %s%s", API_URL, STATION_ENDPOINT(&id[0])));
 				if (res->status == 200)
 				{
 					api::stations = nl::json::parse(res->body);
@@ -176,8 +173,7 @@ void api::get_station(const std::string& id)
 					std::string version_hash = api::stations["version"].dump();
 					if (std::strcmp(VERSION_HASH, &version_hash[0]))
 					{
-						std::cout << "[ WARNING ] [ " << __FUNCNAME__ << " ] " <<
-						"Hash was expected to be " << VERSION_HASH << " (got " << &version_hash[0] << ")" << std::endl;
+						logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
 					}
 
 					//Finish
@@ -186,7 +182,7 @@ void api::get_station(const std::string& id)
 				}
 				else
 				{
-					std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << "An error occured when gathering station data!" << std::endl;
+					logger::log_error("An error occured when gathering station data!");
 				}
 			}
 		}).detach();
@@ -215,12 +211,12 @@ std::string api::get_final_redirect(const std::string& entry_url)
 
 	if(httplib::Result res = cli.Get(&access[0]))
 	{
-		std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing " << domain << access << std::endl;
+		logger::log_info(logger::va("Accessing %s%s", domain, access));
 
 		cli.set_follow_location(true);
 		if(res = cli.Get("/"))
 		{
-			std::cout << "Status" << res->status << std::endl;
+			logger::log_debug(logger::va("Status %i", res->status));
 		}
 	}
 

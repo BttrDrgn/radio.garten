@@ -87,8 +87,7 @@ void CALLBACK free_sync(HSYNC handle, DWORD channel, DWORD data, void *user)
 
 void open_url(const char* url)
 {
-	std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing Stream " << url << std::endl;
-	std::cout << api::get_final_redirect(std::string(url)) << std::endl;
+	logger::log_info(logger::va("Accessing Stream %s", url));
 
 	std::uint32_t c, r;
 
@@ -105,7 +104,7 @@ void open_url(const char* url)
 	audio::chan = c;
 	if (!audio::chan)
 	{
-		std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << BASS_ErrorGetCode() << std::endl;
+		logger::log_error(logger::va("ErrorCode %i", BASS_ErrorGetCode()));
 		SDL_ShowSimpleMessageBox(0, "Radio.Garten Streamer", "Can't play the stream", global::window);
 	}
 	else

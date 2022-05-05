@@ -5,6 +5,33 @@
 class logger
 {
 public:
+	static void log(const std::string& type, const std::string& text)
+	{
+		std::cout << "[ " << type << " ] " << text << std::endl;
+	}
+
+	static void log_info(const std::string& text)
+	{
+		log("INFO", text);
+	}
+
+	static void log_error(const std::string& text)
+	{
+		log("ERROR", text);
+	}
+
+	static void log_warning(const std::string& text)
+	{
+		log("WARNING", text);
+	}
+
+	static void log_debug(const std::string& text)
+	{
+#ifdef DEBUG
+		log("DEBUG", text);
+#endif
+	}
+
 	static std::string va(const char* fmt, ...)
 	{
 		va_list va;
