@@ -33,10 +33,12 @@ void audio::init()
 
 void audio::play(const std::string& url)
 {
-	std::string final_url = logger::va("%s%s", API_URL, AUDIO_ENDPOINT(&url[0]));
-	LOG_DEBUG("Playing: %s", &final_url[0]);
-	audio::currently_playing.title = "N/A";
-	open_url(&final_url[0]);
+	std::thread([url]
+	{
+		std::string final_url = logger::va("%s%s", API_URL, AUDIO_ENDPOINT(&url[0]));
+		audio::currently_playing.title = "N/A";
+		open_url(&final_url[0]);
+	}).detach();
 }
 
 std::int32_t audio::req;

@@ -12,7 +12,6 @@
 void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 {
 	const char *meta = BASS_ChannelGetTags(audio::chan, BASS_TAG_META);
-	LOG_DEBUG("Getting metadata");
 	if (meta)
 	{
 		const char *p = strstr(meta, "StreamTitle='");
@@ -24,11 +23,6 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 				char *t = strdup(p + 13);
 				t[p2 - (p + 13)] = 0;
 				audio::currently_playing.title = std::string(t);
-
-				LOG_DEBUG("Song: %s | Station: %s | Country: %s | City: %s",
-					&audio::currently_playing.title[0], &audio::currently_playing.station.title[0],
-					&audio::currently_playing.region.country[0], &audio::currently_playing.region.city[0]);
-
 				free(t);
 			}
 		}
@@ -62,12 +56,10 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 #else
 					snprintf(text, sizeof(text), "%s - %s", artist, title);
 #endif
-					LOG_DEBUG("Text: %s", text);
 					audio::currently_playing.title = std::string(text);
 				}
 				else
 				{
-					LOG_DEBUG("Title: %s", title);
 					audio::currently_playing.title = std::string(title);
 				}
 			}
@@ -79,7 +71,6 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 			if (meta)
 			{
 				const char *p = strchr(meta, ',');
-				LOG_DEBUG("Meta: %s", p + 1);
 			}
 		}
 	}
@@ -96,7 +87,10 @@ void CALLBACK free_sync(HSYNC handle, DWORD channel, DWORD data, void *user)
 
 void open_url(const char* url)
 {
-	DWORD c, r;
+	std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing Stream " << url << std::endl;
+	std::cout << api::get_final_redirect(std::string(url)) << std::endl;
+
+	std::uint32_t c, r;
 
 	r = ++audio::req;
 	if (audio::chan) BASS_StreamFree(audio::chan);
@@ -111,6 +105,7 @@ void open_url(const char* url)
 	audio::chan = c;
 	if (!audio::chan)
 	{
+		std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << BASS_ErrorGetCode() << std::endl;
 		SDL_ShowSimpleMessageBox(0, "Radio.Garten Streamer", "Can't play the stream", global::window);
 	}
 	else

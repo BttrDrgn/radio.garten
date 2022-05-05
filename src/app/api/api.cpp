@@ -18,7 +18,7 @@ void api::get_places()
 
 		if (httplib::Result res = cli.Get(PLACES_ENDPOINT))
 		{
-			LOG_DEBUG("Accessing %s%s", API_URL, PLACES_ENDPOINT);
+			std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing " << API_URL << PLACES_ENDPOINT << std::endl;
 
 			if (res->status == 200)
 			{
@@ -35,7 +35,8 @@ void api::get_places()
 				std::string version_hash = api::places["version"].dump();
 				if (std::strcmp(VERSION_HASH, &version_hash[0]))
 				{
-					LOG_DEBUG("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
+					std::cout << "[ WARNING ] [ " << __FUNCNAME__ << " ] " <<
+					"Hash was expected to be " << VERSION_HASH << " (got " << &version_hash[0] << ")" << std::endl;
 				}
 
 				nl::json data = nl::json::parse(api::places["data"].dump());
@@ -81,7 +82,7 @@ void api::get_places()
 			}
 			else
 			{
-				LOG_ERROR("%s", "An error occured when gathering places data!");
+				std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << "An error occured when gathering places data!" << std::endl;
 			}
 		}
 	}).detach();
@@ -94,58 +95,59 @@ void api::get_details(const place_t& place_in)
 	api::station = {};
 
 	std::thread([place_in]
+	{
+		httplib::Client cli(API_URL);
+
+		if (httplib::Result res = cli.Get(PLACE_DETAIL_ENDPOINT(&place_in.id[0])))
 		{
-			httplib::Client cli(API_URL);
+			std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing " << API_URL << PLACE_DETAIL_ENDPOINT(&place_in.id[0]) << std::endl;
 
-			if (httplib::Result res = cli.Get(PLACE_DETAIL_ENDPOINT(&place_in.id[0])))
+			if (res->status == 200)
 			{
-				LOG_DEBUG("Accessing %s%s", API_URL, PLACE_DETAIL_ENDPOINT(&place_in.id[0]));
+				api::details = nl::json::parse(res->body);
 
-				if (res->status == 200)
+				//Check version matching for future updates
+				std::int32_t version = api::details["apiVersion"].get<std::int32_t>();
+				if (version != 1)
 				{
-					api::details = nl::json::parse(res->body);
-
-					//Check version matching for future updates
-					std::int32_t version = api::details["apiVersion"].get<std::int32_t>();
-					if (version != 1)
-					{
-						SDL_ShowSimpleMessageBox(0, "Radio.Garten Details", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
-						global::shutdown = true;
-					}
-
-					std::string version_hash = api::details["version"].dump();
-					if (std::strcmp(VERSION_HASH, &version_hash[0]))
-					{
-						LOG_DEBUG("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
-					}
-
-					nl::json data = nl::json::parse(api::details["data"].dump());
-
-					for (auto& i : data["content"][0]["items"])
-					{
-						std::string id = i["href"].dump();
-						std::string title = i["title"].dump();
-
-						id.erase(std::remove(id.begin(), id.end(), '\"'), id.end());
-						title.erase(std::remove(title.begin(), title.end(), '\"'), title.end());
-
-						if (std::strcmp(&id[0], "null"))
-						{
-							api::station.emplace_back(station_t{ title, id.substr(id.size() - 8), place_in });
-						}
-
-					}
-
-					//Finish
-					api::detail_done = true;
-					api::details = {};
+					SDL_ShowSimpleMessageBox(0, "Radio.Garten Details", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
+					global::shutdown = true;
 				}
-				else
+
+				std::string version_hash = api::details["version"].dump();
+				if (std::strcmp(VERSION_HASH, &version_hash[0]))
 				{
-					LOG_ERROR("%s", "An error occured when gathering station data!");
+					std::cout << "[ WARNING ] [ " << __FUNCNAME__ << " ] " <<
+					"Hash was expected to be " << VERSION_HASH << " (got " << &version_hash[0] << ")" << std::endl;
 				}
+
+				nl::json data = nl::json::parse(api::details["data"].dump());
+
+				for (auto& i : data["content"][0]["items"])
+				{
+					std::string id = i["href"].dump();
+					std::string title = i["title"].dump();
+
+					id.erase(std::remove(id.begin(), id.end(), '\"'), id.end());
+					title.erase(std::remove(title.begin(), title.end(), '\"'), title.end());
+
+					if (std::strcmp(&id[0], "null"))
+					{
+						api::station.emplace_back(station_t{ title, id.substr(id.size() - 8), place_in });
+					}
+
+				}
+
+				//Finish
+				api::detail_done = true;
+				api::details = {};
 			}
-		}).detach();
+			else
+			{
+				std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << "An error occured when gathering station data!" << std::endl;
+			}
+		}
+	}).detach();
 }
 
 void api::get_station(const std::string& id)
@@ -158,8 +160,7 @@ void api::get_station(const std::string& id)
 
 			if (httplib::Result res = cli.Get(STATION_ENDPOINT(&id[0])))
 			{
-				LOG_DEBUG("Accessing %s%s", API_URL, STATION_ENDPOINT(&id[0]));
-
+				std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing " << API_URL << STATION_ENDPOINT(&id[0]) << std::endl;
 				if (res->status == 200)
 				{
 					api::stations = nl::json::parse(res->body);
@@ -175,7 +176,8 @@ void api::get_station(const std::string& id)
 					std::string version_hash = api::stations["version"].dump();
 					if (std::strcmp(VERSION_HASH, &version_hash[0]))
 					{
-						LOG_DEBUG("version was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]);
+						std::cout << "[ WARNING ] [ " << __FUNCNAME__ << " ] " <<
+						"Hash was expected to be " << VERSION_HASH << " (got " << &version_hash[0] << ")" << std::endl;
 					}
 
 					//Finish
@@ -184,7 +186,7 @@ void api::get_station(const std::string& id)
 				}
 				else
 				{
-					LOG_ERROR("%s", "An error occured when gathering station data!");
+					std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << "An error occured when gathering station data!" << std::endl;
 				}
 			}
 		}).detach();
@@ -202,6 +204,27 @@ void api::filter_place(const std::string& key)
 			api::filtered_place.emplace_back(place);
 		}
 	}
+}
+
+std::string api::get_final_redirect(const std::string& entry_url)
+{
+	std::string domain = entry_url.substr(0, strlen("http://radio.garden"));
+	std::string access = entry_url.substr(strlen("http://radio.garden"), entry_url.length() - strlen("http://radio.garden"));
+	
+	httplib::Client cli(&domain[0]);/*  */
+
+	if(httplib::Result res = cli.Get(&access[0]))
+	{
+		std::cout << "[ INFO ] [ " << __FUNCNAME__ << " ] " << "Accessing " << domain << access << std::endl;
+
+		cli.set_follow_location(true);
+		if(res = cli.Get("/"))
+		{
+			std::cout << "Status" << res->status << std::endl;
+		}
+	}
+
+	return std::string("");
 }
 
 nl::json api::places;

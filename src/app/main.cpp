@@ -20,7 +20,7 @@ void init()
 
 	if (SDL_SetWindowHitTest(global::window, input::hit_test_callback, 0) != 0)
 	{
-		LOG_ERROR("%s", "Failed to init hit test!");
+		std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << "Failed to init hit test!" << std::endl;
 		global::shutdown = true;
 	}
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 
 	if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0)
 	{
-		LOG_ERROR("%s", SDL_GetError());
+		std::cout << "[ ERROR ] [ " << __FUNCNAME__ << " ] " << SDL_GetError() << std::endl;
 		global::shutdown = true;
 	}
 

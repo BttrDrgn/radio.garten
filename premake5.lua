@@ -1,8 +1,8 @@
 workspace "Radio.Garten"
-	location ".\\build\\"
-	targetdir "%{wks.location}\\bin\\%{cfg.buildcfg}-%{cfg.platform}\\"
-	objdir "%{wks.location}\\obj\\%{prj.name}\\%{cfg.buildcfg}-%{cfg.platform}\\"
-	buildlog "%{wks.location}\\obj\\%{cfg.platform}\\%{cfg.buildcfg}-%{prj.name}.log"
+	location "./build/"
+	targetdir "%{wks.location}/bin/%{cfg.buildcfg}-%{cfg.platform}/"
+	objdir "%{wks.location}/obj/%{prj.name}/%{cfg.buildcfg}-%{cfg.platform}/"
+	buildlog "%{wks.location}/obj/%{cfg.platform}/%{cfg.buildcfg}-%{prj.name}.log"
 
 	largeaddressaware "on"
 	editandcontinue "off"
@@ -13,8 +13,8 @@ workspace "Radio.Garten"
 	warnings "extra"
 
 	includedirs {
-		".\\src\\",
-		".\\deps\\imgui\\",
+		"./src/",
+		"./deps/imgui/",
 	}
 
 	flags {
@@ -40,22 +40,22 @@ workspace "Radio.Garten"
 		}
 		
 		includedirs {
-			".\\deps\\SDL2-2.0.22\\MSVC\\include\\",
+			"./deps/SDL2-2.0.22/MSVC/include/",
 		}
 
 		filter "platforms:Win-x86"	
 			architecture "x86"
 
 			syslibdirs {
-				".\\deps\\bass\\Win32\\Win32\\c\\",
-				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\",
-				".\\deps\\discord\\lib\\x86\\",
+				"./deps/bass/Win32/Win32/c/",
+				"./deps/SDL2-2.0.22/MSVC/lib/x86/",
+				"./deps/discord/lib/x86/",
 			}
 
 			postbuildcommands {
-				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\SDL2.dll\" \"$(OutDir)\"",
-				"copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"",
-				"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"",
+				"copy /y \"../deps/SDL2-2.0.22/MSVC/lib/x86/SDL2.dll\" \"$(OutDir)\"",
+				"copy /y \"../deps/bass/Win32/bass.dll\" \"$(OutDir)\"",
+				"copy /y \"../deps/discord/lib/x86/discord_game_sdk.dll\" \"$(OutDir)\"",
 			}
 		filter ""
 
@@ -64,15 +64,15 @@ workspace "Radio.Garten"
 			architecture "x86_64"
 
 			syslibdirs {
-				".\\deps\\bass\\Win32\\c\\x64\\",
-				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\",
-				".\\deps\\discord\\lib\\x86_64\\",
+				"./deps/bass/Win32/c/x64/",
+				"./deps/SDL2-2.0.22/MSVC/lib/x64/",
+				"./deps/discord/lib/x86_64/",
 			}
 
 			postbuildcommands {
-				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\SDL2.dll\" \"$(OutDir)\"",
-				"copy /y \"..\\deps\\bass\\Win32\\x64\\bass.dll\" \"$(OutDir)\"",
-				"copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"",
+				"copy /y \"../deps/SDL2-2.0.22/MSVC/lib/x64/SDL2.dll\" \"$(OutDir)\"",
+				"copy /y \"../deps/bass/Win32/x64/bass.dll\" \"$(OutDir)\"",
+				"copy /y \"../deps/discord/lib/x86_64/discord_game_sdk.dll\" \"$(OutDir)\"",
 			}
 		filter ""
 	end
@@ -138,7 +138,7 @@ workspace "Radio.Garten"
 			}
 
 			syslibdirs {
-				".\\deps\\bass\\Linux\\x64",
+				"./deps/bass/Linux/x64",
 			}
 		end
 
@@ -157,52 +157,52 @@ workspace "Radio.Garten"
 		end
 
 		files {
-			".\\src\\app\\stdafx.hpp",
-			".\\src\\app\\stdafx.cpp",
-			".\\src\\app\\main.cpp",
-			".\\src\\app\\global.hpp",
-			".\\src\\app\\api\\**",
-			".\\src\\app\\audio\\**",
-			".\\src\\app\\gfx\\**",
-			".\\src\\app\\input\\**",
-			".\\src\\app\\menus\\**",
-			".\\src\\app\\window\\**",
+			"./src/app/stdafx.hpp",
+			"./src/app/stdafx.cpp",
+			"./src/app/main.cpp",
+			"./src/app/global.hpp",
+			"./src/app/api/**",
+			"./src/app/audio/**",
+			"./src/app/gfx/**",
+			"./src/app/input/**",
+			"./src/app/menus/**",
+			"./src/app/window/**",
 
-			".\\src\\utils\\**",	
+			"./src/utils/**",	
 		}
 
 		if string.contains(_ACTION, "vs") then
 			files {
-				".\\src\\app\\resource\\**",
-				".\\src\\app\\drpc\\**",
-				".\\deps\\bass\\Win32\\c\\bass.h",
+				"./src/app/resource/**",
+				"./src/app/drpc/**",
+				"./deps/bass/Win32/c/bass.h",
 			}
 		end
 
 		if string.contains(_ACTION, "gmake") then
 			files {
-				".\\deps\\bass\\Linux\\bass.h",
+				"./deps/bass/Linux/bass.h",
 			}
 		end
 
 		includedirs {
-			".\\src\\app\\",
-			".\\src\\utils\\",
-			".\\deps\\json\\include\\",
-			".\\deps\\cpp-httplib\\",
-			".\\deps\\imgui\\backends\\",
+			"./src/app/",
+			"./src/utils/",
+			"./deps/json/include/",
+			"./deps/cpp-httplib/",
+			"./deps/imgui/backends/",
 		}
 
 		if string.contains(_ACTION, "vs") then
 			includedirs {
-				".\\deps\\discord\\cpp\\",
-				".\\deps\\bass\\Win32\\c\\",
+				"./deps/discord/cpp/",
+				"./deps/bass/Win32/c/",
 			}
 		end
 
 		if string.contains(_ACTION, "gmake") then
 			includedirs {
-				".\\deps\\bass\\Linux\\",
+				"./deps/bass/Linux/",
 			}
 		end
 
@@ -220,17 +220,17 @@ workspace "Radio.Garten"
 		}
 		
 		files {
-			".\\deps\\imgui\\*.h",
-			".\\deps\\imgui\\*.cpp",
-			".\\deps\\imgui\\backends\\imgui_impl_sdl.h",
-			".\\deps\\imgui\\backends\\imgui_impl_sdl.cpp",
-			".\\deps\\imgui\\backends\\imgui_impl_sdlrenderer.h",
-			".\\deps\\imgui\\backends\\imgui_impl_sdlrenderer.cpp",
+			"./deps/imgui/*.h",
+			"./deps/imgui/*.cpp",
+			"./deps/imgui/backends/imgui_impl_sdl.h",
+			"./deps/imgui/backends/imgui_impl_sdl.cpp",
+			"./deps/imgui/backends/imgui_impl_sdlrenderer.h",
+			"./deps/imgui/backends/imgui_impl_sdlrenderer.cpp",
 		}
 
 		includedirs {
-			".\\deps\\imgui\\",
-			".\\deps\\imgui\\backends\\",
+			"./deps/imgui/",
+			"./deps/imgui/backends/",
 		}
 	
 	if string.contains(_ACTION, "vs") then
@@ -241,10 +241,10 @@ workspace "Radio.Garten"
 			kind "staticlib"
 
 			files {
-				".\\deps\\discord\\cpp\\**",
+				"./deps/discord/cpp/**",
 			}
 
 			includedirs {
-				".\\deps\\discord\\cpp\\",
+				"./deps/discord/cpp/",
 			}
 	end
