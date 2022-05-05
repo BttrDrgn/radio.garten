@@ -16,11 +16,11 @@ void init()
 	global::window = SDL_CreateWindow("Radio.Garten", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		global::resolution.x, global::resolution.y, SDL_WINDOW_BORDERLESS);
 
-	global::renderer = SDL_CreateRenderer(global::window, 0, SDL_RENDERER_SOFTWARE);
+	global::renderer = SDL_CreateRenderer(global::window, 0, 0);
 
 	if (SDL_SetWindowHitTest(global::window, input::hit_test_callback, 0) != 0)
 	{
-		LOG_ERROR("Failed to init hit test!");
+		LOG_ERROR("%s", "Failed to init hit test!");
 		global::shutdown = true;
 	}
 

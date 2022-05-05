@@ -81,7 +81,7 @@ void api::get_places()
 			}
 			else
 			{
-				LOG_ERROR("An error occured when gathering places data!");
+				LOG_ERROR("%s", "An error occured when gathering places data!");
 			}
 		}
 	}).detach();
@@ -142,7 +142,7 @@ void api::get_details(const place_t& place_in)
 				}
 				else
 				{
-					LOG_ERROR("An error occured when gathering station data!");
+					LOG_ERROR("%s", "An error occured when gathering station data!");
 				}
 			}
 		}).detach();
@@ -184,7 +184,7 @@ void api::get_station(const std::string& id)
 				}
 				else
 				{
-					LOG_ERROR("An error occured when gathering station data!");
+					LOG_ERROR("%s", "An error occured when gathering station data!");
 				}
 			}
 		}).detach();

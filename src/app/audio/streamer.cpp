@@ -43,8 +43,13 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 
 			for (; *p; p += strlen(p) + 1)
 			{
+#ifdef _WIN32
 				if (!strnicmp(p, "artist=", 7)) artist = p + 7;
 				if (!strnicmp(p, "title=", 6)) title = p + 6;
+#else
+				if (!strncasecmp(p, "artist=", 7)) artist = p + 7;
+				if (!strncasecmp(p, "title=", 6)) title = p + 6;
+#endif
 			}
 
 			if (title)
@@ -52,7 +57,11 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 				if (artist)
 				{
 					char text[100];
+#ifdef _WIN32
 					_snprintf(text, sizeof(text), "%s - %s", artist, title);
+#else
+					snprintf(text, sizeof(text), "%s - %s", artist, title);
+#endif
 					LOG_DEBUG("Text: %s", text);
 					audio::currently_playing.title = std::string(text);
 				}

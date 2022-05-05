@@ -13,11 +13,17 @@ void audio::init()
 		global::shutdown = true;
 	}
 
+#ifdef _WIN32
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(global::window, &wmInfo);
+	
 	if (!BASS_Init(-1, 44100, 0, wmInfo.info.win.window, NULL))
 	{
+#else
+	if (!BASS_Init(-1, 44100, 0, NULL, NULL))
+	{
+#endif
 		SDL_ShowSimpleMessageBox(0, "Radio.Garten BASS", "Can't initialize device", global::window);
 		global::shutdown = true;
 	}

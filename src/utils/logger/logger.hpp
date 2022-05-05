@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iostream>
+#include <cstdio>
 
 #ifdef DEBUG
 #define LOG(__FMT__, ...) std::printf("[ INFO ][" __FUNCTION__ "]: " __FMT__ "\n", __VA_ARGS__)
@@ -19,7 +19,11 @@ class logger
 public:
 	static std::string va(const char* fmt, ...)
 	{
-		char* va = ::va_list();
+#ifdef __WIN32
+		char* va = va_list();
+#else
+		va_list va;
+#endif
 		va_start(va, fmt);
 		char result[512]{};
 		std::vsprintf(result, fmt, va);

@@ -4,9 +4,9 @@
 #include "api/api.hpp"
 #include "audio/audio.hpp"
 #include "gfx/gfx.hpp"
-#include "drpc/drpc.hpp"
 
 #ifdef _WIN32
+#include "drpc/drpc.hpp"
 #include <shellapi.h>
 #endif
 
@@ -97,6 +97,7 @@ void menus::actions()
 
 		ImGui::NewLine();
 
+#ifdef _WIN32
 		if (ImGui::Button(&logger::va("Toggle Discord RPC [%s]", &logger::get_toggle(menus::show_drpc)[0])[0]))
 		{
 			menus::show_drpc = !menus::show_drpc;
@@ -110,6 +111,7 @@ void menus::actions()
 				break;
 			}
 		}
+#endif
 
 		if (ImGui::Button(&logger::va("Toggle Snow [%s]", &logger::get_toggle(menus::show_snow)[0])[0]))
 		{

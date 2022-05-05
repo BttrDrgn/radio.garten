@@ -47,14 +47,14 @@ workspace "Radio.Garten"
 			architecture "x86"
 
 			syslibdirs {
-				".\\deps\\bass\\c\\",
+				".\\deps\\bass\\Win32\\Win32\\c\\",
 				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\",
 				".\\deps\\discord\\lib\\x86\\",
 			}
 
 			postbuildcommands {
 				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\SDL2.dll\" \"$(OutDir)\"",
-				"copy /y \"..\\deps\\bass\\bass.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"",
 				"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"",
 			}
 		filter ""
@@ -64,16 +64,37 @@ workspace "Radio.Garten"
 			architecture "x86_64"
 
 			syslibdirs {
-				".\\deps\\bass\\c\\x64\\",
+				".\\deps\\bass\\Win32\\c\\x64\\",
 				".\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\",
 				".\\deps\\discord\\lib\\x86_64\\",
 			}
 
 			postbuildcommands {
 				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\SDL2.dll\" \"$(OutDir)\"",
-				"copy /y \"..\\deps\\bass\\x64\\bass.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\bass\\Win32\\x64\\bass.dll\" \"$(OutDir)\"",
 				"copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"",
 			}
+		filter ""
+	end
+
+	if string.contains(_ACTION, "gmake") then
+		printf("Building for Debian in Makefile..");
+
+		platforms {
+			"Deb-x64",
+		}
+
+		configurations {
+			"Release",
+			"Debug",
+		}
+
+		buildoptions {
+			"`sdl2-config --cflags --libs`",
+		}
+
+		filter "platforms:Deb-x64"
+			architecture "x86_64"
 		filter ""
 	end
 
@@ -111,11 +132,21 @@ workspace "Radio.Garten"
 			}
 		end
 
+		if string.contains(_ACTION, "gmake") then
+			runpathdirs {
+				"./bins/",
+			}
+
+			syslibdirs {
+				".\\deps\\bass\\Linux\\x64",
+			}
+		end
+
 		links {
 			"imgui",
-			"bass",
 			"SDL2",
 			"SDL2main",
+			"bass",
 		}
 		
 		if string.contains(_ACTION, "vs") then
@@ -137,15 +168,20 @@ workspace "Radio.Garten"
 			".\\src\\app\\menus\\**",
 			".\\src\\app\\window\\**",
 
-			".\\src\\utils\\**",
-
-			".\\deps\\bass\\c\\bass.h",
+			".\\src\\utils\\**",	
 		}
 
 		if string.contains(_ACTION, "vs") then
 			files {
 				".\\src\\app\\resource\\**",
 				".\\src\\app\\drpc\\**",
+				".\\deps\\bass\\Win32\\c\\bass.h",
+			}
+		end
+
+		if string.contains(_ACTION, "gmake") then
+			files {
+				".\\deps\\bass\\Linux\\bass.h",
 			}
 		end
 
@@ -155,12 +191,18 @@ workspace "Radio.Garten"
 			".\\deps\\json\\include\\",
 			".\\deps\\cpp-httplib\\",
 			".\\deps\\imgui\\backends\\",
-			".\\deps\\bass\\c\\",
 		}
 
 		if string.contains(_ACTION, "vs") then
 			includedirs {
 				".\\deps\\discord\\cpp\\",
+				".\\deps\\bass\\Win32\\c\\",
+			}
+		end
+
+		if string.contains(_ACTION, "gmake") then
+			includedirs {
+				".\\deps\\bass\\Linux\\",
 			}
 		end
 
