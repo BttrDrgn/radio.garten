@@ -10,11 +10,12 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 
-#include <imgui.h>
+#include <imgui_freetype.h>
+
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_sdlrenderer.h>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json.hpp>	
 
 #include <bass.h>
 

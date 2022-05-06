@@ -1,5 +1,6 @@
 #include "global.hpp"
 #include "logger/logger.hpp"
+#include "fs/fs.hpp"
 #include "menus.hpp"
 #include "api/api.hpp"
 #include "audio/audio.hpp"
@@ -14,6 +15,9 @@ void menus::init()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+
+	menus::build_font(ImGui::GetIO());
+
 	ImGui_ImplSDL2_InitForSDLRenderer(global::window, global::renderer);
 	ImGui_ImplSDLRenderer_Init(global::renderer);
 }
@@ -257,8 +261,6 @@ void menus::stations()
 
 void menus::render_snow()
 {
-	ImGuiIO& io = ImGui::GetIO();
-
 	std::int32_t gravity = (std::int32_t)std::ceil(global::get_timestep() * 1.0f);
 	for (std::int32_t i = 0; i < menus::snow.size(); i++)
 	{
@@ -287,6 +289,37 @@ void menus::enumerate_snow()
 		snow_t snow;
 		snow.pos = SDL_Point{ x_pos(mt), y_pos(mt) };
 		menus::snow.emplace_back(snow);
+	}
+}
+
+void menus::build_font(ImGuiIO& io)
+{
+	std::string font = "fonts/NotoSans-Regular.ttf";
+	std::string font_jp = "fonts/NotoSansJP-Regular.ttf";
+	std::string emoji = "fonts/NotoEmoji-Regular.ttf";
+
+	if (fs::exists(font))
+	{
+		io.Fonts->AddFontFromFileTTF(&font[0], 18.0f);
+
+		static ImFontConfig cfg;
+		static ImWchar emoji_ranges[] = { 0x1, 0x1FFFF, 0 };
+
+		if (fs::exists(emoji))
+		{
+			cfg.MergeMode = true;
+			cfg.OversampleH = cfg.OversampleV = 1;
+			//cfg.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_LoadColor;	//Noto doesnt have color
+			io.Fonts->AddFontFromFileTTF(&emoji[0], 12.0f, &cfg, emoji_ranges);
+		}
+
+		if (fs::exists(font_jp))
+		{
+			ImFontConfig cfg;
+			cfg.OversampleH = cfg.OversampleV = 1;
+			cfg.MergeMode = true;
+			io.Fonts->AddFontFromFileTTF(&font_jp[0], 18.0f, &cfg, io.Fonts->GetGlyphRangesJapanese());
+		}
 	}
 }
 

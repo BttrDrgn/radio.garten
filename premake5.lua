@@ -37,6 +37,10 @@ workspace "Radio.Garten"
 			"Release",
 			"Debug",
 		}
+
+		defines {
+			"_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING",
+		}
 		
 		includedirs {
 			"./deps/SDL2-2.0.22/MSVC/include/",
@@ -127,13 +131,18 @@ workspace "Radio.Garten"
 		pchheader "stdafx.hpp"
 		pchsource "src/app/stdafx.cpp"
 		forceincludes "stdafx.hpp"
-		
+
+		defines {
+			"IMGUI_USER_CONFIG=\"menus/config.h\""
+		}
+
 		--Windows (Visual Studio)
 		filter "action:vs*"
 
 			dependson {
 				"Discord",
 				"ImGui",
+				"FT2",
 			}
 
 			links {
@@ -142,6 +151,7 @@ workspace "Radio.Garten"
 				"SDL2main",
 				"bass",
 				"Discord",
+				"ft2",
 				"discord_game_sdk.dll.lib",
 			}
 
@@ -151,8 +161,10 @@ workspace "Radio.Garten"
 				"./deps/json/include/",
 				"./deps/cpp-httplib/",
 				"./deps/imgui/backends/",
+				"./deps/imgui/misc/freetype/",
 				"./deps/discord/cpp/",
 				"./deps/bass/Win32/c/",
+				"./deps/freetype-2.12.1/include/",
 			}
 
 			files {
@@ -294,8 +306,17 @@ workspace "Radio.Garten"
 		language "c++"
 		kind "staticlib"
 
+		dependson {
+			"FT2",
+		}
+
+		defines {
+			"IMGUI_USER_CONFIG=\"../src/app/menus/config.h\""
+		}
+	
 		links {
 			"SDL2",
+			"ft2",
 		}
 		
 		files {
@@ -305,11 +326,16 @@ workspace "Radio.Garten"
 			"./deps/imgui/backends/imgui_impl_sdl.cpp",
 			"./deps/imgui/backends/imgui_impl_sdlrenderer.h",
 			"./deps/imgui/backends/imgui_impl_sdlrenderer.cpp",
+
+			"./deps/imgui/misc/freetype/imgui_freetype.cpp",
+			"./deps/imgui/misc/freetype/imgui_freetype.h",
 		}
 
 		includedirs {
 			"./deps/imgui/",
 			"./deps/imgui/backends/",
+			"./deps/imgui/misc/freetype/",
+			"./deps/freetype-2.12.1/include/",
 		}
 	
 	--Windows (Visual Studip)

@@ -27,6 +27,8 @@ public:
 	static std::string currently_playing;
 
 private:
+	static void build_font(ImGuiIO& io);
+
 	static void main_menu_bar();
 	static void actions();
 	static void places();
