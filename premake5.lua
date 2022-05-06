@@ -22,9 +22,8 @@ workspace "Radio.Garten"
 		"undefinedidentifiers",
 	}
 
-	if string.contains(_ACTION, "vs") then
-		printf("Building for Windows in Visual Studio..");
-
+	--Windows (Visual Studio)
+	filter "action:vs*"
 		flags {
 			"multiprocessorcompile",
 		}
@@ -43,23 +42,24 @@ workspace "Radio.Garten"
 			"./deps/SDL2-2.0.22/MSVC/include/",
 		}
 
+		--x86
 		filter "platforms:Win-x86"	
 			architecture "x86"
 
 			syslibdirs {
-				"./deps/bass/Win32/Win32/c/",
+				"./deps/bass/Win32/c/",
 				"./deps/SDL2-2.0.22/MSVC/lib/x86/",
 				"./deps/discord/lib/x86/",
 			}
 
 			postbuildcommands {
-				"copy /y \"../deps/SDL2-2.0.22/MSVC/lib/x86/SDL2.dll\" \"$(OutDir)\"",
-				"copy /y \"../deps/bass/Win32/bass.dll\" \"$(OutDir)\"",
-				"copy /y \"../deps/discord/lib/x86/discord_game_sdk.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x86\\SDL2.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"",
 			}
-		filter ""
+		--end
 
-
+		--x64
 		filter "platforms:Win-x64"
 			architecture "x86_64"
 
@@ -70,16 +70,16 @@ workspace "Radio.Garten"
 			}
 
 			postbuildcommands {
-				"copy /y \"../deps/SDL2-2.0.22/MSVC/lib/x64/SDL2.dll\" \"$(OutDir)\"",
-				"copy /y \"../deps/bass/Win32/x64/bass.dll\" \"$(OutDir)\"",
-				"copy /y \"../deps/discord/lib/x86_64/discord_game_sdk.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\SDL2-2.0.22\\MSVC\\lib\\x64\\SDL2.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\bass\\Win32\\x64\\bass.dll\" \"$(OutDir)\"",
+				"copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"",
 			}
-		filter ""
-	end
+		--end
+	--end
 
-	if string.contains(_ACTION, "gmake") then
-		printf("Building for Debian in Makefile..");
 
+	--Linux (GCC Make)
+	filter "action:gmake2"
 		platforms {
 			"Deb-x64",
 		}
@@ -93,24 +93,23 @@ workspace "Radio.Garten"
 			"`sdl2-config --cflags --libs`",
 		}
 
+		--x64
 		filter "platforms:Deb-x64"
 			architecture "x86_64"
-		filter ""
-	end
+		--end
+	--end
 
 	filter "Release"
 		defines "NDEBUG"
 		optimize "full"
 		runtime "release"
 		symbols "off"
-	filter ""
 
 	filter "Debug"
 		defines "DEBUG"
 		optimize "debug"
 		runtime "debug"
 		symbols "on"
-	filter ""
 
 	project "App"
 		targetname "radio.garten"
@@ -122,17 +121,56 @@ workspace "Radio.Garten"
 		pchsource "src/app/stdafx.cpp"
 		forceincludes "stdafx.hpp"
 		
-		dependson {
-			"ImGui",
-		}
+		--Windows (Visual Studio)
+		filter "action:vs*"
 
-		if string.contains(_ACTION, "vs") then
 			dependson {
 				"Discord",
+				"ImGui",
 			}
-		end
 
-		if string.contains(_ACTION, "gmake") then
+			links {
+				"imgui",
+				"SDL2",
+				"SDL2main",
+				"bass",
+				"Discord",
+				"discord_game_sdk.dll.lib",
+			}
+
+			includedirs {
+				"./src/app/",
+				"./src/utils/",
+				"./deps/json/include/",
+				"./deps/cpp-httplib/",
+				"./deps/imgui/backends/",
+				"./deps/discord/cpp/",
+				"./deps/bass/Win32/c/",
+			}
+
+			files {
+				"./src/app/stdafx.hpp",
+				"./src/app/stdafx.cpp",
+				"./src/app/main.cpp",
+				"./src/app/global.hpp",
+				"./src/app/api/**",
+				"./src/app/audio/**",
+				"./src/app/gfx/**",
+				"./src/app/input/**",
+				"./src/app/menus/**",
+				"./src/app/window/**",
+
+				"./src/utils/**",
+
+				"./src/app/resource/**",
+				"./src/app/drpc/**",
+				"./deps/bass/Win32/c/bass.h",
+			}
+		--end
+
+		--Linux (GCC Make)
+		filter "action:gmake*"
+
 			runpathdirs {
 				"./bins/",
 			}
@@ -140,72 +178,40 @@ workspace "Radio.Garten"
 			syslibdirs {
 				"./deps/bass/Linux/x64",
 			}
-		end
 
-		links {
-			"imgui",
-			"SDL2",
-			"SDL2main",
-			"bass",
-		}
-		
-		if string.contains(_ACTION, "vs") then
 			links {
-				"Discord",
-				"discord_game_sdk.dll.lib",
+				"imgui",
+				"SDL2",
+				"SDL2main",
+				"bass",
 			}
-		end
 
-		files {
-			"./src/app/stdafx.hpp",
-			"./src/app/stdafx.cpp",
-			"./src/app/main.cpp",
-			"./src/app/global.hpp",
-			"./src/app/api/**",
-			"./src/app/audio/**",
-			"./src/app/gfx/**",
-			"./src/app/input/**",
-			"./src/app/menus/**",
-			"./src/app/window/**",
-
-			"./src/utils/**",	
-		}
-
-		if string.contains(_ACTION, "vs") then
-			files {
-				"./src/app/resource/**",
-				"./src/app/drpc/**",
-				"./deps/bass/Win32/c/bass.h",
-			}
-		end
-
-		if string.contains(_ACTION, "gmake") then
-			files {
-				"./deps/bass/Linux/bass.h",
-			}
-		end
-
-		includedirs {
-			"./src/app/",
-			"./src/utils/",
-			"./deps/json/include/",
-			"./deps/cpp-httplib/",
-			"./deps/imgui/backends/",
-		}
-
-		if string.contains(_ACTION, "vs") then
 			includedirs {
-				"./deps/discord/cpp/",
-				"./deps/bass/Win32/c/",
-			}
-		end
-
-		if string.contains(_ACTION, "gmake") then
-			includedirs {
+				"./src/app/",
+				"./src/utils/",
+				"./deps/json/include/",
+				"./deps/cpp-httplib/",
+				"./deps/imgui/backends/",
 				"./deps/bass/Linux/",
 			}
-		end
 
+			files {
+				"./src/app/stdafx.hpp",
+				"./src/app/stdafx.cpp",
+				"./src/app/main.cpp",
+				"./src/app/global.hpp",
+				"./src/app/api/**",
+				"./src/app/audio/**",
+				"./src/app/gfx/**",
+				"./src/app/input/**",
+				"./src/app/menus/**",
+				"./src/app/window/**",
+
+				"./src/utils/**",
+
+				"./deps/bass/Linux/bass.h",
+			}
+		--end
 
 	group "Dependencies"
 	
@@ -233,18 +239,19 @@ workspace "Radio.Garten"
 			"./deps/imgui/backends/",
 		}
 	
-	if string.contains(_ACTION, "vs") then
-		project "Discord"
-			targetname "discord"
+		--Windows (Visual Studip)
+		filter "action:vs*"
+			project "Discord"
+				targetname "discord"
 
-			language "c++"
-			kind "staticlib"
+				language "c++"
+				kind "staticlib"
 
-			files {
-				"./deps/discord/cpp/**",
-			}
+				files {
+					"./deps/discord/cpp/**",
+				}
 
-			includedirs {
-				"./deps/discord/cpp/",
-			}
-	end
+				includedirs {
+					"./deps/discord/cpp/",
+				}
+		--end
