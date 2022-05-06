@@ -106,7 +106,14 @@ workspace "Radio.Garten"
 		symbols "off"
 
 	filter "Debug"
-		defines "DEBUG"
+		defines {
+			"DEBUG",
+
+			--FT2 uses _DEBUG rather than just DEBUG
+			"_DEBUG",
+			"FT_DEBUG_LEVEL_ERROR",
+			"FT_DEBUG_LEVEL_TRACE",
+		}
 		optimize "debug"
 		runtime "debug"
 		symbols "on"
@@ -215,6 +222,72 @@ workspace "Radio.Garten"
 
 	group "Dependencies"
 	
+	project "FT2"
+		targetname "ft2"
+
+		language "c++"
+		kind "staticlib"
+
+		defines {
+			"FT2_BUILD_LIBRARY",
+		}
+		
+		--Windows (Visual Studio)
+		filter "action:vs*"
+			files {
+				--FT_MODULES
+				"./deps/freetype-2.12.1/src/base/ftbbox.c",
+				"./deps/freetype-2.12.1/src/base/ftbdf.c",
+				"./deps/freetype-2.12.1/src/base/ftbitmap.c",
+				"./deps/freetype-2.12.1/src/base/ftcid.c",
+				"./deps/freetype-2.12.1/src/base/ftfstype.c",
+				"./deps/freetype-2.12.1/src/base/ftgasp.c",
+				"./deps/freetype-2.12.1/src/base/ftglyph.c",
+				"./deps/freetype-2.12.1/src/base/ftgxval.c",
+				"./deps/freetype-2.12.1/src/base/ftmm.c",
+				"./deps/freetype-2.12.1/src/base/ftotval.c",
+				"./deps/freetype-2.12.1/src/base/ftpatent.c",
+				"./deps/freetype-2.12.1/src/base/ftpfr.c",
+				"./deps/freetype-2.12.1/src/base/ftstroke.c",
+				"./deps/freetype-2.12.1/src/base/ftsynth.c",
+				"./deps/freetype-2.12.1/src/base/fttype1.c",
+				"./deps/freetype-2.12.1/src/base/ftwinfnt.c",
+				"./deps/freetype-2.12.1/src/base/ftbase.c",
+				"./deps/freetype-2.12.1/src/base/ftdebug.c",
+				"./deps/freetype-2.12.1/src/base/ftinit.c",
+				"./deps/freetype-2.12.1/src/base/ftsystem.c",
+				"./deps/freetype-2.12.1/src/base/ftver.rc",
+				
+				--root
+				"./deps/freetype-2.12.1/src/autofit/autofit.c",
+				"./deps/freetype-2.12.1/src/bdf/bdf.c",
+				"./deps/freetype-2.12.1/src/cff/cff.c",
+				"./deps/freetype-2.12.1/src/dlg/dlgwrap.c",
+				"./deps/freetype-2.12.1/src/cache/ftcache.c",
+				"./deps/freetype-2.12.1/src/gzip/ftgzip.c",
+				"./deps/freetype-2.12.1/src/lzw/ftlzw.c",
+				"./deps/freetype-2.12.1/src/pcf/pcf.c",
+				"./deps/freetype-2.12.1/src/pfr/pfr.c",
+				"./deps/freetype-2.12.1/src/psaux/psaux.c",
+				"./deps/freetype-2.12.1/src/pshinter/pshinter.c",
+				"./deps/freetype-2.12.1/src/psnames/psmodule.c",
+				"./deps/freetype-2.12.1/src/raster/raster.c",
+				"./deps/freetype-2.12.1/src/sdf/sdf.c",
+				"./deps/freetype-2.12.1/src/sfnt/sfnt.c",
+				"./deps/freetype-2.12.1/src/smooth/smooth.c",
+				"./deps/freetype-2.12.1/src/svg/svg.c",
+				"./deps/freetype-2.12.1/src/truetype/truetype.c",
+				"./deps/freetype-2.12.1/src/type1/type1.c",
+				"./deps/freetype-2.12.1/src/cid/type1cid.c",
+				"./deps/freetype-2.12.1/src/type42/type42.c",
+				"./deps/freetype-2.12.1/src/winfonts/winfnt.c",
+			}
+		--end
+
+		includedirs {
+			"./deps/freetype-2.12.1/include/",
+		}
+
 	project "ImGui"
 		targetname "imgui"
 
@@ -239,19 +312,19 @@ workspace "Radio.Garten"
 			"./deps/imgui/backends/",
 		}
 	
-		--Windows (Visual Studip)
-		filter "action:vs*"
-			project "Discord"
-				targetname "discord"
+	--Windows (Visual Studip)
+	filter "action:vs*"
+		project "Discord"
+			targetname "discord"
 
-				language "c++"
-				kind "staticlib"
+			language "c++"
+			kind "staticlib"
 
-				files {
-					"./deps/discord/cpp/**",
-				}
+			files {
+				"./deps/discord/cpp/**",
+			}
 
-				includedirs {
-					"./deps/discord/cpp/",
-				}
-		--end
+			includedirs {
+				"./deps/discord/cpp/",
+			}
+	--end
