@@ -262,6 +262,10 @@ workspace "Radio.Garten"
 			language "c"
 			kind "staticlib"
 
+			defines {
+				"HAVE_LIBC=1",
+			}
+
 			links {
 				"setupapi.lib",
 				"winmm.lib",
