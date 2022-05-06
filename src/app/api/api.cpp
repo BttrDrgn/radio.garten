@@ -4,13 +4,13 @@
 
 void api::get_places()
 {
-	api::places = {};
-	api::details = {};
+	api::places_json = {};
+	api::details_json = {};
 	api::places_done = false;
-	api::place = {};
+	api::places = {};
 	api::all_countries = {};
-	api::station = {};
-	api::station = {};
+	api::stations = {};
+	api::stations = {};
 
 	std::thread([]
 	{
@@ -22,23 +22,23 @@ void api::get_places()
 
 			if (res->status == 200)
 			{
-				api::places = nl::json::parse(res->body);
+				api::places_json = nl::json::parse(res->body);
 
 				//Check version matching for future updates
-				std::int32_t version = api::places["apiVersion"].get<std::int32_t>();
+				std::int32_t version = api::places_json["apiVersion"].get<std::int32_t>();
 				if (version != 1)
 				{
 					SDL_ShowSimpleMessageBox(0, "Radio.Garten Places", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
 					global::shutdown = true;
 				}
 
-				std::string version_hash = api::places["version"].dump();
+				std::string version_hash = api::places_json["version"].dump();
 				if (std::strcmp(VERSION_HASH, &version_hash[0]))
 				{
 					logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
 				}
 
-				nl::json data = nl::json::parse(api::places["data"].dump());
+				nl::json data = nl::json::parse(api::places_json["data"].dump());
 				for (nl::detail::iteration_proxy_value<nl::detail::iter_impl<nl::json>>& i : data["list"].items())
 				{
 					//Get string
@@ -69,7 +69,7 @@ void api::get_places()
 					}
 
 					//Add
-					api::place.emplace_back(place_t{ country, city, id });
+					api::places.emplace_back(place_t{ country, city, id });
 				}
 
 				//Sort alphabetically
@@ -77,7 +77,7 @@ void api::get_places()
 
 				//Finish
 				api::places_done = true;
-				api::places = {};
+				api::places_json = {};
 			}
 			else
 			{
@@ -89,9 +89,9 @@ void api::get_places()
 
 void api::get_details(const place_t& place_in)
 {
-	api::details = {};
+	api::details_json = {};
 	api::detail_done = false;
-	api::station = {};
+	api::stations = {};
 
 	std::thread([place_in]
 	{
@@ -102,23 +102,23 @@ void api::get_details(const place_t& place_in)
 			logger::log_info(logger::va("Accessing %s%s", API_URL, PLACE_DETAIL_ENDPOINT(&place_in.id[0])));
 			if (res->status == 200)
 			{
-				api::details = nl::json::parse(res->body);
+				api::details_json = nl::json::parse(res->body);
 
 				//Check version matching for future updates
-				std::int32_t version = api::details["apiVersion"].get<std::int32_t>();
+				std::int32_t version = api::details_json["apiVersion"].get<std::int32_t>();
 				if (version != 1)
 				{
 					SDL_ShowSimpleMessageBox(0, "Radio.Garten Details", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
 					global::shutdown = true;
 				}
 
-				std::string version_hash = api::details["version"].dump();
+				std::string version_hash = api::details_json["version"].dump();
 				if (std::strcmp(VERSION_HASH, &version_hash[0]))
 				{
 					logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
 				}
 
-				nl::json data = nl::json::parse(api::details["data"].dump());
+				nl::json data = nl::json::parse(api::details_json["data"].dump());
 
 				for (auto& i : data["content"][0]["items"])
 				{
@@ -130,14 +130,14 @@ void api::get_details(const place_t& place_in)
 
 					if (std::strcmp(&id[0], "null"))
 					{
-						api::station.emplace_back(station_t{ title, id.substr(id.size() - 8), place_in });
+						api::stations.emplace_back(station_t{ title, id.substr(id.size() - 8), place_in });
 					}
 
 				}
 
 				//Finish
 				api::detail_done = true;
-				api::details = {};
+				api::details_json = {};
 			}
 			else
 			{
@@ -160,17 +160,17 @@ void api::get_station(const std::string& id)
 				logger::log_info(logger::va("Accessing %s%s", API_URL, STATION_ENDPOINT(&id[0])));
 				if (res->status == 200)
 				{
-					api::stations = nl::json::parse(res->body);
+					api::stations_json = nl::json::parse(res->body);
 
 					//Check version matching for future updates
-					std::int32_t version = api::stations["apiVersion"].get<std::int32_t>();
+					std::int32_t version = api::stations_json["apiVersion"].get<std::int32_t>();
 					if (version != 1)
 					{
 						SDL_ShowSimpleMessageBox(0, "Radio.Garten Station", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
 						global::shutdown = true;
 					}
 
-					std::string version_hash = api::stations["version"].dump();
+					std::string version_hash = api::stations_json["version"].dump();
 					if (std::strcmp(VERSION_HASH, &version_hash[0]))
 					{
 						logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
@@ -178,7 +178,7 @@ void api::get_station(const std::string& id)
 
 					//Finish
 					api::stations_done = true;
-					api::stations = {};
+					api::stations_json = {};
 				}
 				else
 				{
@@ -190,14 +190,14 @@ void api::get_station(const std::string& id)
 
 void api::filter_place(const std::string& key)
 {
-	api::filtered_place = {};
+	api::filtered_places = {};
 
-	for (auto place : api::place)
+	for (auto place : api::places)
 	{
 		//Look for city, country, or id with this string
 		if (place.city.find(key) != std::string::npos || place.country.find(key) != std::string::npos || place.id.find(key) != std::string::npos)
 		{
-			api::filtered_place.emplace_back(place);
+			api::filtered_places.emplace_back(place);
 		}
 	}
 }
@@ -223,17 +223,19 @@ std::string api::get_final_redirect(const std::string& entry_url)
 	return std::string("");
 }
 
-nl::json api::places;
-std::vector<place_t> api::place;
-std::vector<place_t> api::filtered_place;
+nl::json api::places_json;
+std::vector<place_t> api::places;
+std::vector<place_t> api::filtered_places;
 bool api::places_done = true;
 
-nl::json api::details;
+nl::json api::details_json;
 bool api::detail_done = true;
 
-nl::json api::stations;
-std::vector<station_t> api::station;
+nl::json api::stations_json;
+std::vector<station_t> api::stations;
 bool api::stations_done = true;
+
+std::vector<station_t> api::favorite_stations;
 
 std::string api::current_place_id = "N/A";
 

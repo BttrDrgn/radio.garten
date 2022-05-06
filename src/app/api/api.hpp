@@ -28,17 +28,18 @@ public:
 	static void get_station(const std::string& id);
 	static std::string get_final_redirect(const std::string& entry_url);
 
-	static nl::json places;
-	static std::vector<place_t> place;
-	static std::vector<place_t> filtered_place;
+	static nl::json places_json;
+	static std::vector<place_t> places;
+	static std::vector<place_t> filtered_places;
 	static bool places_done;
 
-	static nl::json details;
+	static nl::json details_json;
 	static bool detail_done;
 
-	static nl::json stations;
-	static std::vector<station_t> station;
+	static nl::json stations_json;
+	static std::vector<station_t> stations;
 	static bool stations_done;
+	static std::vector<station_t> favorite_stations;
 
 	static std::string current_place_id;
 

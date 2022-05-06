@@ -33,6 +33,7 @@ private:
 	static void actions();
 	static void places();
 	static void stations();
+	static void favorites();
 	static bool filtering;
 
 	static void render_snow();

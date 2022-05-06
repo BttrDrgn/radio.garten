@@ -85,6 +85,7 @@ void menus::main_menu_bar()
 		menus::actions();
 		menus::places();
 		menus::stations();
+		menus::favorites();
 		ImGui::Text("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station.title[0]);
 		ImGui::EndMainMenuBar();
 	}
@@ -96,6 +97,7 @@ void menus::actions()
 	{
 		if (ImGui::Button("Refresh Places"))
 		{
+			memset(menus::search_buffer, 0, sizeof(menus::search_buffer));
 			api::get_places();
 		}
 
@@ -160,34 +162,62 @@ void menus::places()
 
 		if (ImGui::BeginMenu("Locations"))
 		{
-			if (api::places_done)
+			ImVec2 size = { 360, 500 };
+
+			if ((!menus::show_all_stations && !menus::filtering) || menus::filtering && api::filtered_places.empty())
 			{
-				if (!menus::filtering)
+				size.y = 75;
+			}
+
+			if (ImGui::BeginChild(ImGui::GetID("locations_frame"), size))
+			{
+				if (api::places_done)
 				{
-					if (api::place.empty())
+					if (!menus::filtering)
 					{
-						ImGui::Text("Places are empty!\nYou might need to refresh\n\nPlease click Actions -> Refresh Places.");
-					}
-					else
-					{
-						if (!menus::show_all_stations)
+						if (api::places.empty())
 						{
-							ImGui::Text("There are %i places, hidden by default for performance.\nClick the button to show all stations", api::place.size());
-							if (ImGui::Button("Show All"))
+							ImGui::Text("Places are empty!\nYou might need to refresh\n\nPlease click Actions -> Refresh Places.");
+						}
+						else
+						{
+							if (!menus::show_all_stations)
 							{
-								menus::show_all_stations = true;
+								ImGui::Text("There are %i places, hidden by default for performance.\nClick the button to show all stations", api::places.size());
+								if (ImGui::Button("Show All"))
+								{
+									menus::show_all_stations = true;
+								}
+							}
+							else if (menus::show_all_stations)
+							{
+								if (ImGui::Button("Hide All"))
+								{
+									menus::show_all_stations = false;
+								}
+
+								ImGui::NewLine();
+
+								for (auto place : api::places)
+								{
+									if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
+									{
+										api::get_details(place);
+										ImGui::CloseCurrentPopup();
+									}
+								}
 							}
 						}
-						else if (menus::show_all_stations)
+					}
+					else if (menus::filtering)
+					{
+						if (api::filtered_places.empty())
 						{
-							if (ImGui::Button("Hide All"))
-							{
-								menus::show_all_stations = false;
-							}
-
-							ImGui::NewLine();
-
-							for (auto place : api::place)
+							ImGui::Text("No results found with the search term\n%s", menus::search_buffer);
+							ImGui::Text("Tip: Search filters country, city, and place ID; case sensitive");
+						}
+						{
+							for (auto place : api::filtered_places)
 							{
 								if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
 								{
@@ -198,23 +228,7 @@ void menus::places()
 						}
 					}
 				}
-				else if (menus::filtering)
-				{
-					if (api::filtered_place.empty())
-					{
-						ImGui::Text("Places are empty!\nYou might need to refresh\n\nPlease click Actions -> Refresh Places.");
-					}
-					{
-						for (auto place : api::filtered_place)
-						{
-							if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
-							{
-								api::get_details(place);
-								ImGui::CloseCurrentPopup();
-							}
-						}
-					}
-				}
+				ImGui::EndChild();
 			}
 			ImGui::EndMenu();
 		}
@@ -226,16 +240,14 @@ void menus::stations()
 {
 	if (ImGui::BeginMenu("Stations"))
 	{
-		if (api::station.empty())
+		if (api::stations.empty())
 		{
 			ImGui::Text("Stations are empty!\nYou might need to select a place.");
 		}
 		else
 		{
-			for (station_t station : api::station)
+			for (station_t station : api::stations)
 			{
-				int count = 0;
-
 				if (ImGui::Button(&logger::va("%s", &station.title[0])[0]))
 				{
 					audio::currently_playing.station.title = station.title;
@@ -247,12 +259,50 @@ void menus::stations()
 
 				ImGui::SameLine();
 
-				//Favorite button for later
-				if (ImGui::Button(&logger::va("*##%i", count)[0]))
+				if (ImGui::Button(&logger::va("*##%s", &station.id[0])[0]))
 				{
-
+					bool has = false;
+					for (station_t favorite : api::favorite_stations)
+					{
+						if (favorite.id == station.id)
+						{
+							has = true;
+							break;
+						}
+					}
+					
+					if (!has)
+					{
+						api::favorite_stations.emplace_back(station);
+					}
 				}
-				count++;
+			}
+		}
+		ImGui::EndMenu();
+	}
+}
+
+void menus::favorites()
+{
+	if (ImGui::BeginMenu("Favorites"))
+	{
+		if (api::favorite_stations.empty())
+		{
+			ImGui::Text("Favorites are empty!");
+			ImGui::Text("Click the [*] button next to a station!");
+		}
+		else
+		{
+			for (station_t station : api::favorite_stations)
+			{
+				if (ImGui::Button(&logger::va("%s ##favorite", &station.title[0])[0]))
+				{
+					audio::currently_playing.station.title = station.title;
+					audio::currently_playing.station.id = station.id;
+					audio::currently_playing.region.city = station.place.city;
+					audio::currently_playing.region.country = station.place.country;
+					audio::play(station.id);
+				}
 			}
 		}
 		ImGui::EndMenu();
