@@ -32,3 +32,4 @@ For license information, please check the containing depedency folder in `./deps
 - [freetype2 (2.12.1)](https://sourceforge.net/projects/freetype/files/freetype2/2.12.1/) - For FreeType fonts in ImGui
 - [cpp-httplib](https://github.com/yhirose/cpp-httplib) - Single header http(s) request library
 - [Nlohmann](https://github.com/nlohmann/json) - C++ JSON parser
+- [ini_rw](https://github.com/nightmareci/ini_rw) - INI reader/writer
