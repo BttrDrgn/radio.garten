@@ -16,7 +16,16 @@ void init()
 	global::window = SDL_CreateWindow("Radio.Garten", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		global::resolution.x, global::resolution.y, SDL_WINDOW_BORDERLESS);
 
-	global::renderer = SDL_CreateRenderer(global::window, 0, 0);
+	//Use hardware
+	if (!global::use_hardware)
+	{
+		global::surface = SDL_GetWindowSurface(global::window);
+		global::renderer = SDL_CreateSoftwareRenderer(global::surface);
+	}
+	else if (global::use_hardware)
+	{
+		global::renderer = SDL_CreateRenderer(global::window, 0, SDL_RENDERER_ACCELERATED);
+	}
 
 	if (SDL_SetWindowHitTest(global::window, input::hit_test_callback, 0) != 0)
 	{
@@ -72,8 +81,10 @@ int main(int argc, char* argv[])
 bool global::shutdown = false;
 SDL_Window* global::window = 0;
 SDL_Renderer* global::renderer = 0;
+SDL_Surface* global::surface = 0;
 ImVec2 global::resolution = {800, 600};
 bool global::always_on_top = false;
+bool global::use_hardware = false;
 std::float_t global::framerate = 0.0f;
 std::uint32_t  global::desired_framerate;
 std::uint32_t global::framelimit;

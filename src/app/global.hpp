@@ -6,8 +6,10 @@ public:
 	static bool shutdown;
 	static SDL_Window* window;
 	static SDL_Renderer* renderer;
+	static SDL_Surface* surface;
 	static ImVec2 resolution;
 	static bool always_on_top;
+	static bool use_hardware;
 	static std::float_t framerate;
 	static std::uint32_t  desired_framerate;
 	static std::uint32_t framelimit;

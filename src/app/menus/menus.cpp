@@ -64,7 +64,16 @@ void menus::present()
 {
 	ImGui::Render();
 	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-	SDL_RenderPresent(global::renderer);
+
+	if (!global::use_hardware)
+	{
+		SDL_UpdateWindowSurface(global::window);
+
+	}
+	else if(global::use_hardware)
+	{
+		SDL_RenderPresent(global::renderer);
+	}
 }
 
 void menus::cleanup()
