@@ -19,7 +19,6 @@ Windows:
 Linux:
 - Install `gcc`
 - [Setup SDL2](https://wiki.libsdl.org/Installation#linuxunix) with the SDL2 submodule at `./deps/SDL2`
-
 - Run `./generate.sh` for a GNU Makefile
 - `cd` to `./build`
 - Run `make`
