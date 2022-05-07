@@ -171,7 +171,8 @@ void menus::places()
 
 		if (ImGui::BeginMenu("Locations"))
 		{
-			ImVec2 size = { 360, 500 };
+			std::string performance_text = logger::va("There are %i places, hidden by default for performance.\nClick the button to show all stations", api::places.size());
+			ImVec2 size = { ImGui::CalcTextSize(&performance_text[0]).x, 500};
 
 			if ((!menus::show_all_stations && !menus::filtering) || menus::filtering && api::filtered_places.empty())
 			{
@@ -192,7 +193,7 @@ void menus::places()
 						{
 							if (!menus::show_all_stations)
 							{
-								ImGui::Text("There are %i places, hidden by default for performance.\nClick the button to show all stations", api::places.size());
+								ImGui::Text(&performance_text[0]);
 								if (ImGui::Button("Show All"))
 								{
 									menus::show_all_stations = true;
