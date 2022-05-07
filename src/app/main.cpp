@@ -5,11 +5,14 @@
 #include "window/window.hpp"
 #include "menus/menus.hpp"
 #include "audio/audio.hpp"
+#include "settings/settings.hpp"
 
 //Main app init
 
 void init()
 {
+	settings::init();
+
 	global::desired_framerate = 60;
 	global::framelimit = 1000 / global::desired_framerate;
 

@@ -107,16 +107,13 @@ workspace "Radio.Garten"
 			"IMGUI_USER_CONFIG=\"menus/config.h\""
 		}
 
-		undefines {
-			"memcpy",
-		}
-
 		dependson {
 			"Discord",
 			"ImGui",
 			"FT2",
 			"SDL2",
-			"SDL2main"
+			"SDL2main",
+			"ini_rw",
 		}
 
 		links {
@@ -127,6 +124,7 @@ workspace "Radio.Garten"
 			"Discord",
 			"ft2",
 			"discord_game_sdk.dll.lib",
+			"ini_rw",
 		}
 
 		includedirs {
@@ -140,6 +138,7 @@ workspace "Radio.Garten"
 			"../deps/discord/cpp/",
 			"../deps/bass/Win32/c/",
 			"../deps/freetype-2.12.1/include/",
+			"../deps/ini_rw/src/",
 		}
 
 		files {
@@ -153,6 +152,7 @@ workspace "Radio.Garten"
 			"../src/app/input/**",
 			"../src/app/menus/**",
 			"../src/app/window/**",
+			"../src/app/settings/**",
 
 			"../src/utils/**",
 
@@ -626,4 +626,16 @@ workspace "Radio.Garten"
 
 		includedirs {
 			"../deps/discord/cpp/",
+		}
+
+	project "ini_rw"
+		language "c"
+		kind "staticlib"
+
+		files {
+			"../deps/ini_rw/src/**",
+		}
+
+		includedirs {
+			"../deps/ini_rw/src/",
 		}
