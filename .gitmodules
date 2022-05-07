@@ -7,3 +7,6 @@
 [submodule "deps/SDL"]
 	path = deps/SDL
 	url = https://github.com/libsdl-org/SDL
+[submodule "deps/ini_rw"]
+	path = deps/ini_rw
+	url = https://www.github.com/BttrDrgn/ini_rw
