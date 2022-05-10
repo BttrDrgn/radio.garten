@@ -210,6 +210,7 @@ workspace "Radio.Garten"
 			"../deps/bass/Win32/c/",
 			"../deps/ini_rw/src/",
 			"../deps/kiero/",
+			"../deps/minhook/include/",
 		}
 
 		files {
