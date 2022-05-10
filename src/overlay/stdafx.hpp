@@ -15,6 +15,7 @@
 #define KIERO_INCLUDE_D3D9 1
 #define KIERO_INCLUDE_D3D10 1
 #define KIERO_INCLUDE_D3D11 1
+#define KIERO_INCLUDE_OPENGL 1
 #define KIERO_USE_MINHOOK 1
 
 #include <nlohmann/json.hpp>	

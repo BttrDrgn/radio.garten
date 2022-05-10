@@ -37,7 +37,7 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	impl::showExampleWindow("D3D11");
+	menus::update();
 
 	ImGui::EndFrame();
 	ImGui::Render();

@@ -6,9 +6,10 @@
 #include "settings/settings.hpp"
 
 //Overlay G-API implementations
-#include "directx/impl/d3d9_impl.h"
-#include "directx/impl/d3d10_impl.h"
-#include "directx/impl/d3d11_impl.h"
+#include "hook/impl/d3d9_impl.h"
+#include "hook/impl/d3d10_impl.h"
+#include "hook/impl/d3d11_impl.h"
+#include "hook/impl/opengl3_impl.h"
 
 //Main app init
 
@@ -37,6 +38,12 @@ void init()
 			impl::d3d11::init();
 			break;
 #endif
+
+#if KIERO_INCLUDE_OPENGL
+		case kiero::RenderType::OpenGL:
+			impl::opengl3::init();
+			break;
+#endif
 		}
 	}
 }
@@ -54,7 +61,8 @@ bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
 		logger::log_info("Attached!");
 #endif
 		DisableThreadLibraryCalls(hmod);
-		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init, 0, 0, 0);
+		//CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init, 0, 0, 0);
+		init();
 
 		return true;
 	}

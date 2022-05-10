@@ -163,7 +163,7 @@ workspace "Radio.Garten"
 		}
 
 	project "Overlay"
-		targetname "overlay.radio.garten"
+		targetname "overlay.radio.garten.%{cfg.architecture}"
 		language "c++"
 		kind "sharedlib"
 		warnings "off"
@@ -217,9 +217,10 @@ workspace "Radio.Garten"
 			"../src/overlay/stdafx.**",
 			"../src/overlay/main.cpp",
 			"../src/overlay/global.**",
-			"../src/overlay/directx/**",
+			"../src/overlay/hook/**",
 			"../src/overlay/api/**",
 			"../src/overlay/menus/**",
+			"../src/overlay/input/**",
 			"../src/overlay/audio/**",
 			"../src/overlay/settings/**",
 			"../src/overlay/drpc/**",
@@ -682,6 +683,7 @@ workspace "Radio.Garten"
 			"../deps/imgui/backends/imgui_impl_dx9.*",
 			"../deps/imgui/backends/imgui_impl_dx10.*",
 			"../deps/imgui/backends/imgui_impl_dx11.*",
+			"../deps/imgui/backends/imgui_impl_opengl3.*",
 
 			"../deps/imgui/misc/freetype/imgui_freetype.*",
 		}
