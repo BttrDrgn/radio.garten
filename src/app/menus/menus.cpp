@@ -5,6 +5,7 @@
 #include "api/api.hpp"
 #include "audio/audio.hpp"
 #include "gfx/gfx.hpp"
+#include "hook/hook.hpp"
 
 #ifdef _WIN32
 #include "drpc/drpc.hpp"
@@ -95,6 +96,7 @@ void menus::main_menu_bar()
 		menus::places();
 		menus::stations();
 		menus::favorites();
+		menus::overlay();
 		ImGui::Text("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station.title[0]);
 		ImGui::EndMainMenuBar();
 	}
@@ -315,6 +317,28 @@ void menus::favorites()
 				}
 			}
 		}
+		ImGui::EndMenu();
+	}
+}
+
+void menus::overlay()
+{
+	if (ImGui::BeginMenu("Overlay"))
+	{
+		if (ImGui::Button("Refresh"))
+		{
+			hook::get_procs();
+		}
+
+		for (process_t proc : hook::processes)
+		{
+			if (ImGui::Button(&logger::va("%s [%s]", &proc.title[0], &proc.arch[0])[0]))
+			{
+				logger::log("HOOK", logger::va("Loading overlay into %s [%u]", &proc.title[0], proc.pid));
+				hook::load(proc.pid);
+			}
+		}
+
 		ImGui::EndMenu();
 	}
 }

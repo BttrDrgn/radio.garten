@@ -6,6 +6,7 @@
 #include "menus/menus.hpp"
 #include "audio/audio.hpp"
 #include "settings/settings.hpp"
+#include "hook/hook.hpp"
 
 //Main app init
 
@@ -38,6 +39,7 @@ void init()
 
 	audio::init();
 	menus::init();
+	hook::get_procs();
 
 	while (!global::shutdown)
 	{

@@ -61,10 +61,7 @@ bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
 		logger::log_info("Attached!");
 #endif
 		DisableThreadLibraryCalls(hmod);
-		//CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init, 0, 0, 0);
-		init();
-
-		return true;
+		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init, 0, 0, 0);
 	}
-	return false;
+	return true;
 }

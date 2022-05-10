@@ -147,6 +147,7 @@ workspace "Radio.Garten"
 			"../src/app/global.hpp",
 			"../src/app/global.cpp",
 			"../src/app/api/**",
+			"../src/app/hook/**",
 			"../src/app/audio/**",
 			"../src/app/gfx/**",
 			"../src/app/input/**",
