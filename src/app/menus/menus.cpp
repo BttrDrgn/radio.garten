@@ -387,8 +387,8 @@ std::vector<snow_t> menus::snow;
 std::int32_t menus::max_points = 255;
 
 bool menus::show_all_stations = false;
-bool menus::show_snow = false;
-bool menus::show_drpc = false;
+bool menus::show_snow;
+bool menus::show_drpc;
 
 bool menus::filtering = false;
 char menus::search_buffer[64];
