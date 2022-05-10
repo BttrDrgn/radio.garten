@@ -104,8 +104,7 @@ void open_url(const char* url)
 	audio::chan = c;
 	if (!audio::chan)
 	{
-		logger::log_error(logger::va("ErrorCode %i", BASS_ErrorGetCode()));
-		SDL_ShowSimpleMessageBox(0, "Radio.Garten Streamer", "Can't play the stream", global::window);
+		global::msg_box("Radio.Garten Streamer", logger::va("Can't play the stream (ErrorCode %i)", BASS_ErrorGetCode()));
 	}
 	else
 	{

@@ -21,7 +21,7 @@ long __stdcall hkPresent10(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		pSwapChain->GetDevice(__uuidof(ID3D10Device), (void**)&device);
 
 		impl::win32::init(desc.OutputWindow);
-		audio::init(desc.OutputWindow);
+		audio::init_overlay(desc.OutputWindow);
 
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(desc.OutputWindow);

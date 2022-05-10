@@ -6,6 +6,7 @@
 
 void input::update()
 {
+#ifndef OVERLAY
 	SDL_Event evt;
 	while (SDL_PollEvent(&evt))
 	{
@@ -18,8 +19,10 @@ void input::update()
 
 		ImGui_ImplSDL2_ProcessEvent(&evt);
 	}
+#endif
 }
 
+#ifndef OVERLAY
 SDL_HitTestResult input::hit_test_callback(SDL_Window* window, const SDL_Point* p, void* data)
 {
 	SDL_HitTestResult report = SDL_HITTEST_NORMAL;
@@ -35,3 +38,4 @@ SDL_HitTestResult input::hit_test_callback(SDL_Window* window, const SDL_Point* 
 
 	return report;
 }
+#endif

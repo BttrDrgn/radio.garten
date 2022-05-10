@@ -1,9 +1,25 @@
 #pragma once
 
+struct vec2
+{
+	int x, y;
+};
+
 class global
 {
 public:
 	static bool shutdown;
+
+	static void msg_box(std::string title, std::string message)
+	{
+#ifdef OVERLAY
+		MessageBoxA(global::hwnd, &message[0], &title[0], 0);
+#else
+		SDL_ShowSimpleMessageBox(0, &title[0], &message[0], global::window);
+#endif
+	}
+
+#ifndef OVERLAY
 	static SDL_Window* window;
 	static SDL_Renderer* renderer;
 	static SDL_Surface* surface;
@@ -37,4 +53,7 @@ public:
 	{
 		return (global::desired_framerate / global::framerate);
 	}
+#else
+	static HWND hwnd;
+#endif
 };

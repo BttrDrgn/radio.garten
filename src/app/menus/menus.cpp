@@ -4,14 +4,18 @@
 #include "menus.hpp"
 #include "api/api.hpp"
 #include "audio/audio.hpp"
-#include "gfx/gfx.hpp"
 #include "hook/hook.hpp"
+
+#ifndef OVERLAY
+#include "gfx/gfx.hpp"
+#endif
 
 #ifdef _WIN32
 #include "drpc/drpc.hpp"
 #include <shellapi.h>
 #endif
 
+#ifndef OVERLAY
 void menus::init()
 {
 	IMGUI_CHECKVERSION();
@@ -22,9 +26,11 @@ void menus::init()
 	ImGui_ImplSDL2_InitForSDLRenderer(global::window, global::renderer);
 	ImGui_ImplSDLRenderer_Init(global::renderer);
 }
+#endif
 
 void menus::update()
 {
+#ifndef OVERLAY
 	if (menus::show_snow)
 	{
 		if (menus::snow.empty())
@@ -40,9 +46,12 @@ void menus::update()
 			menus::snow = {};
 		}
 	}
+#endif
 
 	ImGui::SetNextWindowPos({0, 0});
+#ifndef OVERLAY
 	ImGui::SetNextWindowSize(global::resolution);
+#endif
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
 		ImGuiWindowFlags_NoBringToFrontOnFocus| ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
 	if(ImGui::Begin("Radio.Garten", nullptr, flags))
@@ -52,6 +61,7 @@ void menus::update()
 	}
 }
 
+#ifndef OVERLAY
 void menus::prepare()
 {
 	ImGui_ImplSDLRenderer_NewFrame();
@@ -87,6 +97,7 @@ void menus::cleanup()
 	SDL_DestroyWindow(global::window);
 	SDL_Quit();
 }
+#endif
 
 void menus::main_menu_bar()
 {
@@ -96,7 +107,9 @@ void menus::main_menu_bar()
 		menus::places();
 		menus::stations();
 		menus::favorites();
+#ifndef OVERLAY
 		menus::overlay();
+#endif
 		ImGui::Text("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station.title[0]);
 		ImGui::EndMainMenuBar();
 	}
@@ -130,22 +143,31 @@ void menus::actions()
 		}
 #endif
 
+#ifndef OVERLAY
 		if (ImGui::Button(&logger::va("Toggle Snow [%s]", &logger::get_toggle(menus::show_snow)[0])[0]))
 		{
 			menus::show_snow = !menus::show_snow;
 		}
+#endif
 
 		ImGui::NewLine();
 
+
 		if (ImGui::Button("Minimize"))
 		{
+#ifndef OVERLAY
 			SDL_MinimizeWindow(global::window);
+#else
+			//Hide overlay
+#endif
 		}
 
+#ifndef OVERLAY
 		if (ImGui::Button("Exit"))
 		{
 			global::shutdown = true;
 		}
+#endif
 		ImGui::EndMenu();
 	}
 }
@@ -321,6 +343,7 @@ void menus::favorites()
 	}
 }
 
+#ifndef OVERLAY
 void menus::overlay()
 {
 	if (ImGui::BeginMenu("Overlay"))
@@ -348,16 +371,16 @@ void menus::render_snow()
 	std::int32_t gravity = (std::int32_t)std::ceil(global::get_timestep() * 1.0f);
 	for (std::int32_t i = 0; i < menus::snow.size(); i++)
 	{
-		if (menus::snow[i].pos.y > global::resolution.y)
+		if (menus::snow[i].y > global::resolution.y)
 		{
-			menus::snow[i].pos.y = 0;
+			menus::snow[i].y = 0;
 		}
 		else
 		{
-			menus::snow[i].pos.y += gravity;
+			menus::snow[i].y += gravity;
 		}
 
-		gfx::draw_circle(menus::snow[i].pos, 1.0f, { 255, 255, 255, 255 });
+		gfx::draw_circle(menus::snow[i], 1.0f, { 255, 255, 255, 255 });
 	}
 }
 
@@ -370,11 +393,10 @@ void menus::enumerate_snow()
 
 	for (std::int32_t i = 0; i < menus::max_points; i++)
 	{
-		snow_t snow;
-		snow.pos = SDL_Point{ x_pos(mt), y_pos(mt) };
-		menus::snow.emplace_back(snow);
+		menus::snow.emplace_back(vec2{ x_pos(mt), y_pos(mt) });
 	}
 }
+#endif
 
 void menus::build_font(ImGuiIO& io)
 {
@@ -407,11 +429,13 @@ void menus::build_font(ImGuiIO& io)
 	}
 }
 
-std::vector<snow_t> menus::snow;
+#ifndef OVERLAY
+std::vector<vec2> menus::snow;
 std::int32_t menus::max_points = 255;
+bool menus::show_snow;
+#endif
 
 bool menus::show_all_stations = false;
-bool menus::show_snow;
 bool menus::show_drpc;
 
 bool menus::filtering = false;

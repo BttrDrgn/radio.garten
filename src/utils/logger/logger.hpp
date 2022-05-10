@@ -2,6 +2,8 @@
 
 #include <cstdio>
 
+#include "../app/global.hpp"
+
 class logger
 {
 public:

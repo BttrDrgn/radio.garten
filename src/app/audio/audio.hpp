@@ -15,7 +15,11 @@ struct playing_t
 class audio
 {
 public:
+#ifdef OVERLAY
+	static void init_overlay(HWND hwnd);
+#else
 	static void init();
+#endif
 	static void play(const std::string& url);
 
 	static std::int32_t req;

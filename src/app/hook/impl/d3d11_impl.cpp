@@ -24,7 +24,7 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		device->GetImmediateContext(&context);
 
 		impl::win32::init(desc.OutputWindow);
-		audio::init(desc.OutputWindow);
+		audio::init_overlay(desc.OutputWindow);
 
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(desc.OutputWindow);

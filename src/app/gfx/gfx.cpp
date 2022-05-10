@@ -1,7 +1,7 @@
 #include "global.hpp"
 #include "gfx.hpp"
 
-void gfx::draw_circle(SDL_Point center, int radius, SDL_Color col)
+void gfx::draw_circle(vec2 center, int radius, SDL_Color col)
 {
 	int offsetx, offsety, d;
 	int status;

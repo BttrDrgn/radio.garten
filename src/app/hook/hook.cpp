@@ -3,8 +3,7 @@
 
 void hook::load(std::uint32_t pid)
 {
-	char path[] = "overlay.radio.garten.x86.dll";
-	long dll_size = sizeof(path) + 1;
+	wchar_t* path = L"overlay.radio.garten.x86.dll";
 
 	logger::log_info("Hook in progress");
 
@@ -15,22 +14,22 @@ void hook::load(std::uint32_t pid)
 		return;
 	}
 
-	LPVOID alloc = VirtualAllocEx(handle, 0, dll_size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	LPVOID alloc = VirtualAllocEx(handle, 0, lstrlenW(path), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	if (!alloc)
 	{
 		logger::log("HOOK_ERR", "Failed to allocate memory in target");
 		return;
 	}
 
-	if (!WriteProcessMemory(handle, alloc, path, dll_size, 0))
+	if (!WriteProcessMemory(handle, alloc, path, lstrlenW(path), 0))
 	{
 		logger::log("HOOK_ERR", "Failed to write memory in target");
 		return;
 	}
 
 	DWORD thread_id;
-	LPTHREAD_START_ROUTINE loadlib = (LPTHREAD_START_ROUTINE)GetProcAddress(LoadLibraryA("kernel32"), "LoadLibraryA");
-	if (!CreateRemoteThread(handle, 0, 0, loadlib, alloc, 0, &thread_id))
+	LPVOID loadlib = (LPVOID)GetProcAddress(LoadLibraryW(L"kernel32.dll"), "LoadLibraryW");
+	if (!CreateRemoteThread(handle, 0, 0, (LPTHREAD_START_ROUTINE)loadlib, alloc, 0, &thread_id))
 	{
 		logger::log("HOOK_ERR", "Failed to create remote thread");
 		return;

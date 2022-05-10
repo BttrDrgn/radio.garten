@@ -30,9 +30,13 @@ void settings::update()
 		ini_save(settings::config, settings::config_file); 
 	}
 
-	global::use_hardware = settings::get_boolean(ini_get(settings::config, "core", "UseGPU"));
 	menus::show_drpc = settings::get_boolean(ini_get(settings::config, "startup", "Discord"));
+
+#ifndef OVERLAY
+	global::use_hardware = settings::get_boolean(ini_get(settings::config, "core", "UseGPU"));
 	menus::show_snow = settings::get_boolean(ini_get(settings::config, "startup", "Snow"));
+#endif
+
 	if (settings::get_boolean(ini_get(settings::config, "startup", "Refresh")))
 	{
 		api::get_places();

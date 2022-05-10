@@ -5,6 +5,7 @@
 #include "api/api.hpp"
 #include "streamer.hpp"
 
+#ifndef OVERLAY
 void audio::init()
 {
 	if (HIWORD(BASS_GetVersion()) != BASSVERSION)
@@ -29,6 +30,24 @@ void audio::init()
 
 	BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
 }
+#else
+void audio::init_overlay(HWND hwnd)
+{
+	global::hwnd = hwnd;
+	if (HIWORD(BASS_GetVersion()) != BASSVERSION)
+	{
+		global::msg_box("Radio.Garten BASS", "An incorrect version of BASS.DLL was loaded!");
+		global::shutdown = true;
+	}
+
+	if (!BASS_Init(-1, 44100, 0, global::hwnd, 0))
+	{
+		global::msg_box("Radio.Garten BASS", "Can't initialize device!\nNo audio will play for this session!");
+	}
+
+	BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+}
+#endif
 
 void audio::play(const std::string& url)
 {

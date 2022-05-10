@@ -1,6 +1,7 @@
 #include "global.hpp"
 
 bool global::shutdown = false;
+#ifndef OVERLAY
 SDL_Window* global::window = 0;
 SDL_Renderer* global::renderer = 0;
 SDL_Surface* global::surface = 0;
@@ -12,3 +13,6 @@ std::uint32_t  global::desired_framerate;
 std::uint32_t global::framelimit;
 std::uint64_t global::counter;
 std::uint32_t global::start;
+#else
+HWND global::hwnd;
+#endif

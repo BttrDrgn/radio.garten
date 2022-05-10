@@ -28,7 +28,7 @@ void api::get_places()
 				std::int32_t version = api::places_json["apiVersion"].get<std::int32_t>();
 				if (version != 1)
 				{
-					SDL_ShowSimpleMessageBox(0, "Radio.Garten Places", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
+					global::msg_box("Radio.Garten Places", logger::va("apiVersion was expected to be 1 (got %i)", version));
 					global::shutdown = true;
 				}
 
@@ -108,7 +108,7 @@ void api::get_details(const place_t& place_in)
 				std::int32_t version = api::details_json["apiVersion"].get<std::int32_t>();
 				if (version != 1)
 				{
-					SDL_ShowSimpleMessageBox(0, "Radio.Garten Details", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
+					global::msg_box("Radio.Garten Places", logger::va("apiVersion was expected to be 1 (got %i)", version));
 					global::shutdown = true;
 				}
 
@@ -166,7 +166,7 @@ void api::get_station(const std::string& id)
 					std::int32_t version = api::stations_json["apiVersion"].get<std::int32_t>();
 					if (version != 1)
 					{
-						SDL_ShowSimpleMessageBox(0, "Radio.Garten Station", &logger::va("apiVersion was expected to be 1 (got %i)", version)[0], global::window);
+						global::msg_box("Radio.Garten Places", logger::va("apiVersion was expected to be 1 (got %i)", version));
 						global::shutdown = true;
 					}
 

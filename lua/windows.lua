@@ -147,7 +147,7 @@ workspace "Radio.Garten"
 			"../src/app/global.hpp",
 			"../src/app/global.cpp",
 			"../src/app/api/**",
-			"../src/app/hook/**",
+			"../src/app/hook/hook.*",
 			"../src/app/audio/**",
 			"../src/app/gfx/**",
 			"../src/app/input/**",
@@ -172,7 +172,7 @@ workspace "Radio.Garten"
 		defines "OVERLAY"
 
 		pchheader "stdafx.hpp"
-		pchsource "../src/overlay/stdafx.cpp"
+		pchsource "../src/app/stdafx.cpp"
 		forceincludes "stdafx.hpp"
 
 		defines {
@@ -202,33 +202,34 @@ workspace "Radio.Garten"
 		}
 
 		includedirs {
-			"../src/overlay/",
+			"../src/app/",
 			"../src/utils/",
 			"../deps/json/include/",
 			"../deps/cpp-httplib/",
 			"../deps/imgui/backends/",
+			"../deps/imgui/misc/freetype/",
 			"../deps/discord/cpp/",
 			"../deps/bass/Win32/c/",
 			"../deps/ini_rw/src/",
 			"../deps/kiero/",
 			"../deps/minhook/include/",
+			"../deps/freetype-2.12.1/include/",
 		}
 
 		files {
-			"../src/overlay/stdafx.**",
-			"../src/overlay/main.cpp",
-			"../src/overlay/global.**",
-			"../src/overlay/hook/**",
-			"../src/overlay/api/**",
-			"../src/overlay/menus/**",
-			"../src/overlay/input/**",
-			"../src/overlay/audio/**",
-			"../src/overlay/settings/**",
-			"../src/overlay/drpc/**",
+			"../src/app/stdafx.**",
+			"../src/app/main.cpp",
+			"../src/app/global.**",
+			"../src/app/hook/impl/**",
+			"../src/app/api/**",
+			"../src/app/menus/**",
+			"../src/app/input/**",
+			"../src/app/audio/**",
+			"../src/app/settings/**",
+			"../src/app/drpc/**",
 
 			"../src/utils/fs/**",
 			"../src/utils/logger/**",
-			"../src/utils/memory/**",
 
 			"../deps/bass/Win32/c/bass.h",
 
