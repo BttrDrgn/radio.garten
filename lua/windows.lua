@@ -209,7 +209,6 @@ workspace "Radio.Garten"
 			"../deps/discord/cpp/",
 			"../deps/bass/Win32/c/",
 			"../deps/ini_rw/src/",
-			"../deps/minhook/include",
 			"../deps/kiero/",
 		}
 

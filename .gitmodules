@@ -10,9 +10,6 @@
 [submodule "deps/ini_rw"]
 	path = deps/ini_rw
 	url = https://www.github.com/BttrDrgn/ini_rw
-[submodule "deps/minhook"]
-	path = deps/minhook
-	url = https://github.com/TsudaKageyu/minhook
 [submodule "deps/kiero"]
 	path = deps/kiero
 	url = https://github.com/Rebzzel/kiero
