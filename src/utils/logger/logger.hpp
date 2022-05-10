@@ -59,14 +59,19 @@ public:
 		}
 	}
 
-	//https://stackoverflow.com/questions/10178700/c-strip-non-ascii-characters-from-string
-	static bool check_invalid(char c)
+	std::vector<std::string> split(std::string string, const std::string& delimiter)
 	{
-		return !(c >= 0 && c < 128);
-	}
+		std::vector<std::string> out = std::vector<std::string>();
+		std::uint32_t pos = 0u;
 
-	static void strip_unicode(std::string str)
-	{
-		str.erase(remove_if(str.begin(), str.end(), check_invalid), str.end());
+		while ((pos = string.find(delimiter)) != std::string::npos)
+		{
+			out.emplace_back(string.substr(0, pos));
+			string.erase(0, pos + delimiter.size());
+		}
+
+		out.emplace_back(string);
+
+		return out;
 	}
 };
