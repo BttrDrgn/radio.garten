@@ -13,7 +13,6 @@ workspace "Radio.Garten"
 	warnings "extra"
 
 	includedirs {
-		"../src/",
 		"../deps/imgui/",
 	}
 
@@ -146,6 +145,7 @@ workspace "Radio.Garten"
 			"../src/app/stdafx.cpp",
 			"../src/app/main.cpp",
 			"../src/app/global.hpp",
+			"../src/app/global.cpp",
 			"../src/app/api/**",
 			"../src/app/audio/**",
 			"../src/app/gfx/**",
@@ -154,11 +154,84 @@ workspace "Radio.Garten"
 			"../src/app/window/**",
 			"../src/app/settings/**",
 
-			"../src/utils/**",
+			"../src/utils/fs/**",
+			"../src/utils/logger/**",
 
 			"../src/app/resource/**",
 			"../src/app/drpc/**",
 			"../deps/bass/Win32/c/bass.h",
+		}
+
+	project "Overlay"
+		targetname "overlay.radio.garten"
+		language "c++"
+		kind "sharedlib"
+		warnings "off"
+
+		defines "OVERLAY"
+
+		pchheader "stdafx.hpp"
+		pchsource "../src/overlay/stdafx.cpp"
+		forceincludes "stdafx.hpp"
+
+		defines {
+			"IMGUI_USER_CONFIG=\"../app/menus/config.h\""
+		}
+
+		dependson {
+			"Discord",
+			"ImGui",
+			"FT2",
+			"ini_rw",
+			"MinHook",
+		}
+
+		links {
+			"d3d9",
+			"d3d10",
+			"d3d11",
+
+			"imgui",
+			"ft2",
+			"bass",
+			"Discord",
+			"discord_game_sdk.dll.lib",
+			"ini_rw",
+			"MinHook",
+		}
+
+		includedirs {
+			"../src/overlay/",
+			"../src/utils/",
+			"../deps/json/include/",
+			"../deps/cpp-httplib/",
+			"../deps/imgui/backends/",
+			"../deps/discord/cpp/",
+			"../deps/bass/Win32/c/",
+			"../deps/ini_rw/src/",
+			"../deps/minhook/include",
+			"../deps/kiero/",
+		}
+
+		files {
+			"../src/overlay/stdafx.**",
+			"../src/overlay/main.cpp",
+			"../src/overlay/global.**",
+			"../src/overlay/directx/**",
+			"../src/overlay/api/**",
+			"../src/overlay/menus/**",
+			"../src/overlay/audio/**",
+			"../src/overlay/settings/**",
+			"../src/overlay/drpc/**",
+
+			"../src/utils/fs/**",
+			"../src/utils/logger/**",
+			"../src/utils/memory/**",
+
+			"../deps/bass/Win32/c/bass.h",
+
+			"../deps/kiero/*.h",
+			"../deps/kiero/*.cpp",
 		}
 
 	group "Dependencies"
@@ -590,6 +663,10 @@ workspace "Radio.Garten"
 		}
 	
 		links {
+			"d3d9",
+			"d3d10",
+			"d3d11",
+
 			"SDL2",
 			"ft2",
 		}
@@ -597,16 +674,20 @@ workspace "Radio.Garten"
 		files {
 			"../deps/imgui/*.h",
 			"../deps/imgui/*.cpp",
-			"../deps/imgui/backends/imgui_impl_sdl.h",
-			"../deps/imgui/backends/imgui_impl_sdl.cpp",
-			"../deps/imgui/backends/imgui_impl_sdlrenderer.h",
-			"../deps/imgui/backends/imgui_impl_sdlrenderer.cpp",
 
-			"../deps/imgui/misc/freetype/imgui_freetype.cpp",
-			"../deps/imgui/misc/freetype/imgui_freetype.h",
+			"../deps/imgui/backends/imgui_impl_sdl.*",
+			"../deps/imgui/backends/imgui_impl_win32.*",
+
+			"../deps/imgui/backends/imgui_impl_sdlrenderer.*",
+			"../deps/imgui/backends/imgui_impl_dx9.*",
+			"../deps/imgui/backends/imgui_impl_dx10.*",
+			"../deps/imgui/backends/imgui_impl_dx11.*",
+
+			"../deps/imgui/misc/freetype/imgui_freetype.*",
 		}
 
 		includedirs {
+			"../src/",
 			"../deps/imgui/",
 			"../deps/imgui/backends/",
 			"../deps/imgui/misc/freetype/",
@@ -638,4 +719,18 @@ workspace "Radio.Garten"
 
 		includedirs {
 			"../deps/ini_rw/src/",
+		}
+
+	project "MinHook"
+		targetname "MinHook"
+
+		language "c++"
+		kind "staticlib"
+
+		files {
+			"../deps/minhook/src/**",
+		}
+
+		includedirs {
+			"../deps/minhook/include/",
 		}
