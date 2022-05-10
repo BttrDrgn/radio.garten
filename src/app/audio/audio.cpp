@@ -24,8 +24,7 @@ void audio::init()
 	if (!BASS_Init(-1, 44100, 0, 0, 0))
 	{
 #endif
-		SDL_ShowSimpleMessageBox(0, "Radio.Garten BASS", "Can't initialize device", global::window);
-		global::shutdown = true;
+		SDL_ShowSimpleMessageBox(0, "Radio.Garten BASS", "Can't initialize device!\nNo audio will play for this session!", global::window);
 	}
 
 	BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
