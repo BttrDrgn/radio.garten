@@ -29,6 +29,7 @@ void audio::init()
 	}
 
 	BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+	audio::set_volume(audio::volume);
 }
 #else
 void audio::init_overlay(HWND hwnd)
@@ -55,10 +56,25 @@ void audio::play(const std::string& url)
 	{
 		std::string final_url = logger::va("%s%s", API_URL, AUDIO_ENDPOINT(&url[0]));
 		audio::currently_playing.title = "N/A";
+		audio::currently_playing.url = url;
+		audio::paused = false;
 		open_url(&final_url[0]);
 	}).detach();
 }
 
+void audio::stop()
+{
+	BASS_StreamFree(audio::chan);
+	audio::chan = 0;
+}
+
+void audio::set_volume(std::int32_t vol_in)
+{
+	BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, vol_in * 100);
+}
+
 std::int32_t audio::req;
 std::int32_t audio::chan;
+bool audio::paused = false;
+std::int32_t audio::volume = 100;
 playing_t audio::currently_playing = {"N/A", "N/A"};

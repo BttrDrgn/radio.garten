@@ -10,6 +10,7 @@ struct playing_t
 	std::string title;
 	station_t station;
 	place_t region;
+	std::string url;
 };
 
 class audio
@@ -21,9 +22,14 @@ public:
 	static void init();
 #endif
 	static void play(const std::string& url);
+	static void stop();
+	static void set_volume(std::int32_t vol_in);
 
 	static std::int32_t req;
 	static std::int32_t chan;
+
+	static bool paused;
+	static std::int32_t volume;
 
 	static playing_t currently_playing;
 };
