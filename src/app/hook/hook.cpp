@@ -2,14 +2,14 @@
 #include "logger/logger.hpp"
 #include "fs/fs.hpp"
 
-void hook::load(process_t proc)
+bool hook::load(process_t proc)
 {
 
 #ifdef _M_AMD64
 	if (proc.arch == "x86")
 	{
 		ShellExecuteA(0, "open", "x86\\helper.exe", &logger::va("--pid %i --arch %s --hwnd %u", proc.pid, &proc.arch[0], proc.hwnd)[0], 0, 1);
-		return;
+		return true;
 	}
 #endif
 
@@ -24,20 +24,20 @@ void hook::load(process_t proc)
 		if (!handle)
 		{
 			logger::log("HOOK_ERR", "Failed to open target");
-			return;
+			return false;
 		}
 
 		LPVOID alloc = VirtualAllocEx(handle, 0, dll_path.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 		if (!alloc)
 		{
 			logger::log("HOOK_ERR", "Failed to allocate memory in target");
-			return;
+			return false;
 		}
 
 		if (!WriteProcessMemory(handle, alloc, (LPVOID)&dll_path[0], dll_path.length(), 0))
 		{
 			logger::log("HOOK_ERR", "Failed to write memory in target");
-			return;
+			return false;
 		}
 
 		DWORD thread_id;
@@ -45,7 +45,7 @@ void hook::load(process_t proc)
 		if (!CreateRemoteThread(handle, 0, 0, (LPTHREAD_START_ROUTINE)loadlib, alloc, 0, &thread_id))
 		{
 			logger::log("HOOK_ERR", "Failed to create remote thread");
-			return;
+			return false;
 		}
 	}
 
@@ -55,6 +55,7 @@ void hook::load(process_t proc)
 	SetFocus(proc.hwnd);
 
 	hook::dlls.pop_back();
+	return true;
 }
 
 int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
@@ -71,6 +72,7 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 	{
 		if (window_title.find(look_up) != std::string::npos)
 		{
+			logger::log("Found %s", &look_up[0]);
 			return 0;
 		}
 	}

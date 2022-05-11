@@ -109,8 +109,43 @@ void menus::main_menu_bar()
 		menus::favorites();
 #ifndef OVERLAY
 		menus::overlay();
+
+		std::string listening = logger::va("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station.title[0]);
+
+		//If text offscreen
+		if ((ImGui::GetCursorPosX() + ImGui::CalcTextSize(&listening[0]).x) > global::resolution.x)
+		{
+			//This is probably a terrible way to do this but it works TM
+			static bool mode = false;
+			static float counter = 0;
+
+			if (counter > 500.0f)
+			{
+				counter = 0;
+				mode = !mode;
+			}
+
+			switch (mode)
+			{
+			case true:
+				ImGui::Text("Listening: %s", &audio::currently_playing.station.title[0]);
+				break;
+			case false:
+				ImGui::Text("Listening: %s", &audio::currently_playing.title[0]);
+				break;
+			}
+
+			counter += 1 * global::get_timestep();
+		}
+		else
+		{
+			ImGui::Text(&listening[0]);
+		}
+#else
+		std::string listening = logger::va("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station.title[0]);
+		ImGui::Text(&listening[0]);
 #endif
-		ImGui::Text("Listening: %s on %s", &audio::currently_playing.title[0], &audio::currently_playing.station.title[0]);
+
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -123,6 +158,44 @@ void menus::actions()
 		{
 			memset(menus::search_buffer, 0, sizeof(menus::search_buffer));
 			api::get_places();
+		}
+
+		ImGui::NewLine();
+		
+		ImGui::Text("Audio Controls");
+		ImGui::Text("Volume: ");
+
+		ImGui::SameLine();
+		ImGui::PushItemWidth(50.0f);
+
+		if (ImGui::SliderInt("##Volume", &audio::volume, 0, 100))
+		{
+			audio::set_volume(audio::volume);
+		}
+
+		if (!audio::paused)
+		{
+			if (audio::currently_playing.url != "")
+			{
+				ImGui::SameLine();
+				if (ImGui::Button("||"))
+				{
+					audio::paused = true;
+					audio::stop();
+				}
+			}
+		}
+		else if (audio::paused)
+		{
+			ImGui::SameLine();
+			if (ImGui::Button(">"))
+			{
+				if (audio::currently_playing.url != "")
+				{
+					audio::paused = false;
+					audio::play(audio::currently_playing.url);
+				}
+			}
 		}
 
 		ImGui::NewLine();
@@ -141,7 +214,6 @@ void menus::actions()
 				break;
 			}
 		}
-#endif
 
 #ifndef OVERLAY
 		if (ImGui::Button(&logger::va("Toggle Snow [%s]", &logger::get_toggle(menus::show_snow)[0])[0]))
@@ -149,6 +221,8 @@ void menus::actions()
 			menus::show_snow = !menus::show_snow;
 		}
 #endif
+#endif
+
 
 		ImGui::NewLine();
 
@@ -352,13 +426,19 @@ void menus::overlay()
 		{
 			hook::get_procs();
 		}
+		
+		ImGui::NewLine();
 
 		for (process_t proc : hook::processes)
 		{
 			if (ImGui::Button(&logger::va("%s [%s]", &proc.title[0], &proc.arch[0])[0]))
 			{
 				logger::log("HOOK", logger::va("Loading overlay into %s [%u]", &proc.title[0], proc.pid));
-				hook::load(proc);
+				if (hook::load(proc))
+				{
+					audio::paused = true;
+					audio::stop();
+				}
 			}
 		}
 

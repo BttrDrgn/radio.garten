@@ -6,7 +6,7 @@ class hook
 {
 public:
 	static std::vector<process_t> processes;
-	static void load(process_t proc);
+	static bool load(process_t proc);
 	static void get_procs();
 
 private:
