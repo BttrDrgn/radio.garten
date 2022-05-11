@@ -14,5 +14,6 @@ std::uint32_t global::framelimit;
 std::uint64_t global::counter;
 std::uint32_t global::start;
 #else
+bool global::hide = false;
 HWND global::hwnd;
 #endif

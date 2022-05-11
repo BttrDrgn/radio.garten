@@ -1,45 +1,63 @@
 #include "hook.hpp"
 #include "logger/logger.hpp"
+#include "fs/fs.hpp"
 
-void hook::load(std::uint32_t pid)
+void hook::load(process_t proc)
 {
-	wchar_t* path = L"overlay.radio.garten.x86.dll";
 
-	logger::log_info("Hook in progress");
-
-	HANDLE handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
-	if (!handle)
+#ifdef _M_AMD64
+	if (proc.arch == "x86")
 	{
-		logger::log("HOOK_ERR", "Failed to open target");
+		ShellExecuteA(0, "open", "x86\\helper.exe", &logger::va("--pid %i --arch %s --hwnd %u", proc.pid, &proc.arch[0], proc.hwnd)[0], 0, 1);
 		return;
 	}
+#endif
 
-	LPVOID alloc = VirtualAllocEx(handle, 0, lstrlenW(path), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-	if (!alloc)
+	hook::dlls.emplace_back(logger::va("overlay.radio.garten.%s.dll", &proc.arch[0]));
+
+	for (const std::string& dll : hook::dlls)
 	{
-		logger::log("HOOK_ERR", "Failed to allocate memory in target");
-		return;
+		std::string dll_path = fs::get_cur_dir().append(logger::va("\\%s\\%s", &proc.arch[0], &dll[0]));
+		logger::log_debug(logger::va("Loading %s", &dll_path[0]));
+
+		HANDLE handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, proc.pid);
+		if (!handle)
+		{
+			logger::log("HOOK_ERR", "Failed to open target");
+			return;
+		}
+
+		LPVOID alloc = VirtualAllocEx(handle, 0, dll_path.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+		if (!alloc)
+		{
+			logger::log("HOOK_ERR", "Failed to allocate memory in target");
+			return;
+		}
+
+		if (!WriteProcessMemory(handle, alloc, (LPVOID)&dll_path[0], dll_path.length(), 0))
+		{
+			logger::log("HOOK_ERR", "Failed to write memory in target");
+			return;
+		}
+
+		DWORD thread_id;
+		LPVOID loadlib = (LPVOID)GetProcAddress(LoadLibraryA("kernel32.dll"), "LoadLibraryA");
+		if (!CreateRemoteThread(handle, 0, 0, (LPTHREAD_START_ROUTINE)loadlib, alloc, 0, &thread_id))
+		{
+			logger::log("HOOK_ERR", "Failed to create remote thread");
+			return;
+		}
 	}
 
-	if (!WriteProcessMemory(handle, alloc, path, lstrlenW(path), 0))
-	{
-		logger::log("HOOK_ERR", "Failed to write memory in target");
-		return;
-	}
+	//Not sure one does the trick but they all sound nice
+	BringWindowToTop(proc.hwnd);
+	SetForegroundWindow(proc.hwnd);
+	SetFocus(proc.hwnd);
 
-	DWORD thread_id;
-	LPVOID loadlib = (LPVOID)GetProcAddress(LoadLibraryW(L"kernel32.dll"), "LoadLibraryW");
-	if (!CreateRemoteThread(handle, 0, 0, (LPTHREAD_START_ROUTINE)loadlib, alloc, 0, &thread_id))
-	{
-		logger::log("HOOK_ERR", "Failed to create remote thread");
-		return;
-	}
-
-	logger::log_info("Hook finished!");
-
+	hook::dlls.pop_back();
 }
 
-int CALLBACK get_window(HWND hWnd, LPARAM lparam)
+int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 {
 
 	int length = GetWindowTextLengthA(hWnd);
@@ -92,7 +110,7 @@ int CALLBACK get_window(HWND hWnd, LPARAM lparam)
 			logger::log_error("Unable to open proc for arch detection!");
 		}
 
-		hook::processes.emplace_back(process_t{ window_title, arch, proc_id});
+		hook::processes.emplace_back(process_t{ window_title, arch, proc_id, hWnd});
 	}
 
 	return 1;
@@ -102,10 +120,11 @@ void hook::get_procs()
 {
 	hook::processes = {};
 
-	EnumWindows(get_window, 0);
+	EnumWindows(hook::get_window, 0);
 }
 
 std::vector<process_t> hook::processes;
+
 std::vector<std::string> hook::blacklist
 {
 	"Groove Music",
@@ -113,4 +132,10 @@ std::vector<std::string> hook::blacklist
 	"Settings",
 	"Movies & TV",
 	"Google Chrome",
+};
+
+std::vector<std::string> hook::dlls
+{
+	"bass.dll",
+	"discord_game_sdk.dll",
 };

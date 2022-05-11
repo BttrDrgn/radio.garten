@@ -20,6 +20,14 @@
 #ifndef OVERLAY
 void init_app()
 {
+#ifdef WIN32
+#ifdef _M_AMD64
+	SetDllDirectoryA("x86_64");
+#else
+	SetDllDirectoryA("x86");
+#endif
+#endif
+
 	settings::init();
 
 	global::desired_framerate = 60;
@@ -96,7 +104,6 @@ int main(int argc, char* argv[])
 void init_overlay()
 {
 	settings::init();
-
 	if (kiero::init(kiero::RenderType::Auto) == kiero::Status::Success)
 	{
 		switch (kiero::getRenderType())

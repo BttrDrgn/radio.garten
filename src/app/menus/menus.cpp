@@ -158,7 +158,7 @@ void menus::actions()
 #ifndef OVERLAY
 			SDL_MinimizeWindow(global::window);
 #else
-			//Hide overlay
+			global::hide = true;
 #endif
 		}
 
@@ -358,7 +358,7 @@ void menus::overlay()
 			if (ImGui::Button(&logger::va("%s [%s]", &proc.title[0], &proc.arch[0])[0]))
 			{
 				logger::log("HOOK", logger::va("Loading overlay into %s [%u]", &proc.title[0], proc.pid));
-				hook::load(proc.pid);
+				hook::load(proc);
 			}
 		}
 
@@ -400,9 +400,9 @@ void menus::enumerate_snow()
 
 void menus::build_font(ImGuiIO& io)
 {
-	std::string font = "fonts/NotoSans-Regular.ttf";
-	std::string font_jp = "fonts/NotoSansJP-Regular.ttf";
-	std::string emoji = "fonts/NotoEmoji-Regular.ttf";
+	std::string font = fs::get_cur_dir().append("/fonts/NotoSans-Regular.ttf");
+	std::string font_jp = fs::get_cur_dir().append("/fonts/NotoSansJP-Regular.ttf");
+	std::string emoji = fs::get_cur_dir().append("/fonts/NotoEmoji-Regular.ttf");
 
 	if (fs::exists(font))
 	{

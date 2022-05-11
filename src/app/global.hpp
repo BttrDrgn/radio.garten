@@ -1,5 +1,12 @@
 #pragma once
 
+struct process_t
+{
+	std::string title, arch;
+	std::uint32_t pid;
+	HWND hwnd;
+};
+
 struct vec2
 {
 	int x, y;
@@ -54,6 +61,7 @@ public:
 		return (global::desired_framerate / global::framerate);
 	}
 #else
+	static bool hide;
 	static HWND hwnd;
 #endif
 };

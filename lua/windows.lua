@@ -53,8 +53,10 @@ workspace "Radio.Garten"
 		}
 
 		postbuildcommands {
-			"copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"",
-			"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"",
+			"mkdir \"$(OutDir)x86\\",
+
+			"copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"x86\\",
+			"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"\\x86\\",
 		}
 	--end
 
@@ -68,8 +70,14 @@ workspace "Radio.Garten"
 		}
 
 		postbuildcommands {
-			"copy /y \"..\\deps\\bass\\Win32\\x64\\bass.dll\" \"$(OutDir)\"",
-			"copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"",
+			"mkdir \"$(OutDir)x86\\",
+			"mkdir \"$(OutDir)x86_64\\",
+
+			"copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"x86\\",
+			"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"\\x86\\",
+
+			"copy /y \"..\\deps\\bass\\Win32\\x64\\bass.dll\" \"$(OutDir)\"\\x86_64\\",
+			"copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"x86_64\\",
 		}
 	--end
 
@@ -95,6 +103,7 @@ workspace "Radio.Garten"
 	project "App"
 		targetname "radio.garten"
 		language "c++"
+		cppdialect "c++17"
 		kind "consoleapp"
 		warnings "off"
 
@@ -116,6 +125,7 @@ workspace "Radio.Garten"
 		}
 
 		links {
+			"delayimp",
 			"imgui",
 			"SDL2",
 			"SDL2main",
@@ -163,9 +173,15 @@ workspace "Radio.Garten"
 			"../deps/bass/Win32/c/bass.h",
 		}
 
+		linkoptions{
+			"/DELAYLOAD:bass.dll",
+			"/DELAYLOAD:discord_game_sdk.dll",
+		}
+
 	project "Overlay"
-		targetname "overlay.radio.garten.%{cfg.architecture}"
+		targetname "%{cfg.architecture}/overlay.radio.garten.%{cfg.architecture}"
 		language "c++"
+		cppdialect "c++17"
 		kind "sharedlib"
 		warnings "off"
 
@@ -236,6 +252,32 @@ workspace "Radio.Garten"
 			"../deps/kiero/*.h",
 			"../deps/kiero/*.cpp",
 		}
+
+	project "Helper"
+		architecture "x86"
+		targetname "x86/helper"
+		language "c++"
+		cppdialect "c++17"
+		kind "windowedapp"
+		warnings "off"
+
+		defines "OVERLAY"
+
+		pchheader "stdafx.hpp"
+		pchsource "../src/helper/stdafx.cpp"
+		forceincludes "stdafx.hpp"
+
+		filter "platforms:Win-x64"
+			includedirs {
+				"../src/helper/",
+				"../src/utils/",
+			}
+
+		filter "platforms:Win-x64"
+			files {
+				"../src/helper/stdafx.**",
+				"../src/helper/main.**",
+			}
 
 	group "Dependencies"
 	

@@ -45,7 +45,10 @@ long __stdcall hkPresent10(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 
 void impl::d3d10::init()
 {
-	assert(kiero::bind(8, (void**)&oPresent, hkPresent10) == kiero::Status::Success);
+	if (kiero::bind(16, (void**)&oPresent, hkPresent10) != kiero::Status::Success )
+	{
+		MessageBoxA(nullptr, "Failed to hook DirectX 10!", "Radio.Garten", 0);
+	}
 }
 
 #endif // KIERO_INCLUDE_D3D10

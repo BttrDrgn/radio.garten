@@ -14,6 +14,7 @@ BOOL __stdcall hwglSwapBuffers(_In_ HDC hDc)
 	{
 		HWND hwnd = WindowFromDC(hDc);
 
+		impl::win32::init(hwnd);
 		audio::init_overlay(hwnd);
 
 		ImGui::CreateContext();
@@ -23,15 +24,18 @@ BOOL __stdcall hwglSwapBuffers(_In_ HDC hDc)
 		init = true;
 	}
 
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+	if (!global::hide)
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
 
-	menus::update();
+		menus::update();
 
-	ImGui::EndFrame();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		ImGui::EndFrame();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
 
 	return owglSwapBuffers(hDc);
 }

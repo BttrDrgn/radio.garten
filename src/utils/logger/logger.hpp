@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cstdio>
 
 #include "../app/global.hpp"
@@ -61,7 +62,7 @@ public:
 		}
 	}
 
-	std::vector<std::string> split(std::string string, const std::string& delimiter)
+	static std::vector<std::string> split(std::string string, const std::string& delimiter)
 	{
 		std::vector<std::string> out = std::vector<std::string>();
 		std::uint32_t pos = 0u;
