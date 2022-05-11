@@ -62,7 +62,7 @@ void api::get_places()
 						}
 					}
 
-					//If we don't add it
+					//If we don't have it
 					if (!found)
 					{
 						api::all_countries.emplace_back(country);
@@ -74,6 +74,14 @@ void api::get_places()
 
 				//Sort alphabetically
 				std::sort(api::all_countries.begin(), api::all_countries.end());
+				std::sort(api::places.begin(), api::places.end(), ([](const place_t& l, const place_t& r)
+				{
+					if (l.country < r.country) return true;
+					if (r.country < l.country)return false;
+
+					if (l.city < r.city) return true;
+					if (r.city < l.city)return false;
+				}));
 
 				//Finish
 				api::places_done = true;
@@ -134,6 +142,11 @@ void api::get_details(const place_t& place_in)
 					}
 
 				}
+
+				std::sort(api::stations.begin(), api::stations.end(), ([](const station_t& l, const station_t& r)
+				{
+					return (l.title < r.title);
+				}));
 
 				//Finish
 				api::detail_done = true;
