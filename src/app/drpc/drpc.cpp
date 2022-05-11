@@ -43,6 +43,7 @@ void drpc::init()
 				{
 					core->RunCallbacks();
 
+					drpc::change_large_image("logo", &logger::va("%s, %s", &audio::currently_playing.region.city[0], &audio::currently_playing.region.country[0])[0]);
 					drpc::change_details(logger::va("Listening to %s", &audio::currently_playing.title[0]));
 					drpc::change_status(logger::va("on %s", &audio::currently_playing.station.title[0]));
 
