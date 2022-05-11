@@ -14,4 +14,11 @@ public:
 	{
 		return std::filesystem::current_path().string();
 	}
+
+	static void write(const std::string& path, const std::string& contents)
+	{
+		std::ofstream ofs(path);
+		ofs << contents;
+		ofs.close();
+	}
 };

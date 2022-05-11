@@ -4,8 +4,10 @@
 */
 
 #include "logger/logger.hpp"
+#include "fs/fs.hpp"
 #include "global.hpp"
 #include "audio.hpp"
+#include "settings/settings.hpp"
 
 
 // update stream title from metadata
@@ -74,6 +76,15 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 			}
 		}
 	}
+
+	//Streamer mode for a later point in time
+	/*
+	std::string info = logger::va("Playing: %s on %s in %s, %s",
+		&audio::currently_playing.title[0], &audio::currently_playing.station.title[0],
+		&audio::currently_playing.region.city[0], &audio::currently_playing.region.country[0]);
+
+	fs::write("playing.txt", info);
+	*/
 }
 
 void CALLBACK null_callback(HSYNC handle, DWORD channel, DWORD data, void *user)
