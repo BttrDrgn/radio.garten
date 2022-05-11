@@ -104,7 +104,7 @@ workspace "Radio.Garten"
 		targetname "radio.garten"
 		language "c++"
 		cppdialect "c++17"
-		kind "consoleapp"
+		kind "windowedapp"
 		warnings "off"
 
 		pchheader "stdafx.hpp"

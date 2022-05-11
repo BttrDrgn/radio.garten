@@ -83,8 +83,12 @@ void init_app()
 int main(int argc, char* argv[])
 {
 #ifdef _WIN32
-#ifdef NDEBUG
-	ShowWindow(GetConsoleWindow(), 0);
+#ifdef DEBUG
+	AllocConsole();
+	SetConsoleTitleA("Radio.Garten Debug Console");
+
+	std::freopen("CONOUT$", "w", stdout);
+	std::freopen("CONIN$", "r", stdin);
 #endif
 #endif
 
