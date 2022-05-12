@@ -5,17 +5,23 @@
 #include "input.hpp"
 
 #ifdef OVERLAY
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 WNDPROC o_wndproc;
+bool toggle_once = false;
 
 LRESULT __stdcall wndproc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (!global::hide)
+	if (ImGui::IsKeyPressed(192, false) && !toggle_once)
 	{
-		ImGui::GetIO().WantCaptureMouse = true;
-		ImGui::GetIO().MouseDrawCursor = true;
-		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+		global::hide = !global::hide;
+		toggle_once = true;
+	}
+	else if (!ImGui::IsKeyPressed(192, false) && toggle_once) toggle_once = false;
+
+	//Should prevent some applications from getting input
+	if (!global::hide && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+	{
+		return true;
 	}
 
 	return CallWindowProc(o_wndproc, hWnd, uMsg, wParam, lParam);
@@ -29,7 +35,7 @@ void input::init_overlay(HWND hwnd)
 		return;
 	}
 
-	//o_wndproc = (WNDPROC)SetWindowLongPtr(global::hwnd, GWLP_WNDPROC, (LONG_PTR)wndproc);
+	o_wndproc = (WNDPROC)SetWindowLongPtr(global::hwnd, GWLP_WNDPROC, (LONG_PTR)wndproc);
 }
 #endif
 

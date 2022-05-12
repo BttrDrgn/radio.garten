@@ -48,17 +48,24 @@ void menus::update()
 	}
 #endif
 
-	ImGui::SetNextWindowPos({0, 0});
-#ifndef OVERLAY
-	ImGui::SetNextWindowSize(global::resolution);
-#endif
-	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoBringToFrontOnFocus| ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
-	if(ImGui::Begin("Radio.Garten", nullptr, flags))
+#ifdef OVERLAY
+	if (!global::hide)
 	{
-		menus::main_menu_bar();
-		ImGui::End();
+#endif
+		ImGui::SetNextWindowPos({ 0, 0 });
+#ifndef OVERLAY
+		ImGui::SetNextWindowSize(global::resolution);
+#endif
+		ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
+		if (ImGui::Begin("Radio.Garten", nullptr, flags))
+		{
+			menus::main_menu_bar();
+			ImGui::End();
+		}
+#ifdef OVERLAY
 	}
+#endif
 }
 
 #ifndef OVERLAY

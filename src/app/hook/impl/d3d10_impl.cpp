@@ -35,18 +35,15 @@ long __stdcall hkPresent10(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		init = true;
 	}
 
-	if (!global::hide)
-	{
-		ImGui_ImplDX10_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
+	ImGui_ImplDX10_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
 
-		menus::update();
+	menus::update();
 
-		ImGui::EndFrame();
-		ImGui::Render();
-		ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
-	}
+	ImGui::EndFrame();
+	ImGui::Render();
+	ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
 
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }
