@@ -83,10 +83,10 @@ void api::get_places()
 				std::sort(api::places.begin(), api::places.end(), ([](const place_t& l, const place_t& r)
 				{
 					if (l.country < r.country) return true;
-					if (r.country < l.country)return false;
+					if (r.country < l.country) return false;
 
 					if (l.city < r.city) return true;
-					if (r.city < l.city)return false;
+					if (r.city < l.city) return false;
 				}));
 
 				//Finish
