@@ -14,6 +14,6 @@ public:
 
 private:
 	static int CALLBACK get_window(HWND hWnd, LPARAM lparam);
-	static std::vector<std::string> blacklist;
-	static std::vector<std::string> dlls;
+	static std::initializer_list<std::string> blacklist;
+	static std::initializer_list<std::string> dlls;
 };

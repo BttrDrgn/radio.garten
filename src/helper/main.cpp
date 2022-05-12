@@ -5,7 +5,7 @@
 process_t proc;
 
 std::vector<std::string> args;
-std::vector<std::string> dlls
+std::initializer_list<std::string> dlls
 {
 	"bass.dll",
 	"discord_game_sdk.dll",

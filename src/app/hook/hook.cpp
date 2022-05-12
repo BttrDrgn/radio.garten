@@ -152,7 +152,7 @@ void hook::get_procs()
 
 std::vector<process_t> hook::processes;
 
-std::vector<std::string> hook::blacklist
+std::initializer_list<std::string> hook::blacklist
 {
 	"explorer.exe",
 	"radio.garten.exe",
@@ -166,7 +166,7 @@ std::vector<std::string> hook::blacklist
 	"devenv.exe",
 };
 
-std::vector<std::string> hook::dlls
+std::initializer_list<std::string> hook::dlls
 {
 	"bass.dll",
 	"discord_game_sdk.dll",
