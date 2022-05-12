@@ -24,7 +24,8 @@ long __stdcall hkPresent10(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		audio::init_overlay(hwnd);
 		input::init_overlay(hwnd);
 
-		ImGui::CreateContext();
+		menus::init();
+
 		ImGui_ImplWin32_Init(hwnd);
 		ImGui_ImplDX10_Init(device);
 

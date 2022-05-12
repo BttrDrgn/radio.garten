@@ -22,9 +22,9 @@ bool hook::load(process_t proc)
 	for (const std::string& dll : hook::dlls)
 	{
 #ifdef _M_AMD64
-		std::string dll_path = fs::get_cur_dir().append(logger::va("\\x86_64\\%s", &dll[0]));
+		std::string dll_path = fs::get_cur_dir().append(logger::va("x86_64\\%s", &dll[0]));
 #else
-		std::string dll_path = fs::get_cur_dir().append(logger::va("\\x86\\%s", &dll[0]));
+		std::string dll_path = fs::get_cur_dir().append(logger::va("x86\\%s", &dll[0]));
 #endif
 		logger::log_debug(logger::va("Loading %s", &dll_path[0]));
 
@@ -61,7 +61,10 @@ bool hook::load(process_t proc)
 	BringWindowToTop(proc.hwnd);
 	SetForegroundWindow(proc.hwnd);
 	SetFocus(proc.hwnd);
+	//Set to top most temporarily
 	SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	//Set back
+	SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 	ShowWindow(proc.hwnd, SW_NORMAL);
 
 	return true;

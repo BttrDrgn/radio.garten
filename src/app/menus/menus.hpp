@@ -5,10 +5,10 @@
 class menus
 {
 public:
+	static void init();
 	static void update();
 
 #ifndef OVERLAY
-	static void init();
 	static void prepare();
 	static void present();
 	static void cleanup();
@@ -21,6 +21,7 @@ public:
 	static bool show_drpc;
 
 	static char search_buffer[64];
+	static std::string current_country;
 
 	static std::string currently_playing;
 

@@ -1,4 +1,3 @@
-#include "global.hpp"
 
 #include "logger/logger.hpp"
 #include "fs/fs.hpp"
@@ -14,7 +13,7 @@ void settings::init()
 
 void settings::update()
 {
-	if(fs::exists(settings::config_file)) settings::config = ini_load(settings::config_file);
+	if(fs::exists(settings::config_file)) settings::config = ini_load(&settings::config_file[0]);
 	else if (!fs::exists(settings::config_file))
 	{
 		const char* ini_default =
@@ -27,7 +26,7 @@ void settings::update()
 
 		settings::config = ini_create(ini_default, strlen(ini_default));
 
-		ini_save(settings::config, settings::config_file); 
+		ini_save(settings::config, &settings::config_file[0]);
 	}
 
 	menus::show_drpc = settings::get_boolean(ini_get(settings::config, "startup", "Discord"));
@@ -43,6 +42,94 @@ void settings::update()
 	}
 
 	ini_free(settings::config);
+
+
+	if (!fs::exists(settings::favorites_file))
+	{
+		fs::write(settings::favorites_file, "", false);
+	}
+
+	std::string fav_contents = fs::read(settings::favorites_file);
+	std::vector<std::string> stations = logger::split(fs::read(settings::favorites_file), '|');
+
+	if (stations.size() > 0)
+	{
+		api::favorite_stations = {};
+
+		for (std::string station : stations)
+		{
+			std::vector<std::string> temp = logger::split(station, ',');
+
+			if (temp.size() == 5)
+			{
+				station_t s;
+
+				s.title = temp[0];
+
+				s.place.country = temp[1];
+				s.place.city = temp[2];
+				s.place.id = temp[3];
+
+				s.id = temp[4];
+
+				api::favorite_stations.emplace_back(s);
+			}
+		}
+	}
+}
+
+void settings::add_favorite(station_t station)
+{
+	std::string contents;
+
+	contents.append(station.title);
+	contents.append(",");
+
+	contents.append(station.place.country);
+	contents.append(",");
+	contents.append(station.place.city);
+	contents.append(",");
+	contents.append(station.place.id);
+	contents.append(",");
+
+	contents.append(station.id);
+
+	contents.append("|");
+
+	logger::va("%s", &contents[0]);
+
+	fs::write(settings::favorites_file, contents, true);
+}
+
+void settings::remove_favorite(station_t station)
+{
+	std::string contents = fs::read(settings::favorites_file);
+
+	int index = -1;
+	std::vector<std::string> stations = logger::split(contents, '|');
+	for (int i = 0; i < stations.size(); i++)
+	{
+		std::string id = logger::split(stations[i], ',')[4];
+		if (!station.id.compare(id))
+		{
+			index = i;
+			break;
+		}
+	}
+
+	if (index != -1)
+	{
+		stations.erase(stations.begin() + index);
+	}
+
+	contents.clear();
+
+	for (std::string s : stations)
+	{
+		contents.append(s);
+	}
+
+	fs::write(settings::favorites_file, contents, false);
 }
 
 bool settings::get_boolean(const char* bool_text)
@@ -51,6 +138,6 @@ bool settings::get_boolean(const char* bool_text)
 	else return false;
 }
 
-const char* settings::config_file = "config.ini";
-const char* settings::favorites_file = "stations.fav";
+std::string settings::config_file = logger::va("%s%s", &fs::get_pref_dir()[0], "config.ini");
+std::string settings::favorites_file = logger::va("%s%s", &fs::get_pref_dir()[0], "stations.fav");;
 ini_t* settings::config;

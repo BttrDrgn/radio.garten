@@ -18,7 +18,8 @@ BOOL __stdcall hwglSwapBuffers(_In_ HDC hDc)
 		audio::init_overlay(hwnd);
 		input::init_overlay(hwnd);
 
-		ImGui::CreateContext();
+		menus::init();
+
 		ImGui_ImplWin32_Init(hwnd);
 		ImGui_ImplOpenGL3_Init();
 

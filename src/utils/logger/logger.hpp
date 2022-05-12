@@ -62,19 +62,23 @@ public:
 		}
 	}
 
-	static std::vector<std::string> split(std::string string, const std::string& delimiter)
+	static std::vector<std::string> split(const std::string& s, char seperator)
 	{
-		std::vector<std::string> out = std::vector<std::string>();
-		std::uint32_t pos = 0u;
+		std::vector<std::string> output;
 
-		while ((pos = string.find(delimiter)) != std::string::npos)
+		std::string::size_type prev_pos = 0, pos = 0;
+
+		while ((pos = s.find(seperator, pos)) != std::string::npos)
 		{
-			out.emplace_back(string.substr(0, pos));
-			string.erase(0, pos + delimiter.size());
+			std::string substring(s.substr(prev_pos, pos - prev_pos));
+
+			output.push_back(substring);
+
+			prev_pos = ++pos;
 		}
 
-		out.emplace_back(string);
+		output.push_back(s.substr(prev_pos, pos - prev_pos)); // Last word
 
-		return out;
+		return output;
 	}
 };

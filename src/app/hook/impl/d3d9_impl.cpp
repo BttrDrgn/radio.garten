@@ -33,7 +33,8 @@ long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
 		audio::init_overlay(hwnd);
 		input::init_overlay(hwnd);
 
-		ImGui::CreateContext();
+		menus::init();
+
 		ImGui_ImplWin32_Init(hwnd);
 		ImGui_ImplDX9_Init(pDevice);
 

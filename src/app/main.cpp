@@ -5,6 +5,7 @@
 #include "menus/menus.hpp"
 #include "audio/audio.hpp"
 #include "settings/settings.hpp"
+#include "fs/fs.hpp"
 
 #ifndef OVERLAY
 #include "window/window.hpp"
@@ -28,6 +29,7 @@ void init_app()
 #endif
 #endif
 
+	fs::init();
 	settings::init();
 
 	global::desired_framerate = 60;

@@ -5,6 +5,7 @@
 #include "api/api.hpp"
 #include "audio/audio.hpp"
 #include "hook/hook.hpp"
+#include "settings/settings.hpp"
 
 #ifndef OVERLAY
 #include "gfx/gfx.hpp"
@@ -15,21 +16,25 @@
 #include <shellapi.h>
 #endif
 
-#ifndef OVERLAY
+
 void menus::init()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
+	ImGui::GetIO().IniFilename = nullptr;
+
 	menus::build_font(ImGui::GetIO());
 
+#ifndef OVERLAY
 	ImGui_ImplSDL2_InitForSDLRenderer(global::window, global::renderer);
 	ImGui_ImplSDLRenderer_Init(global::renderer);
-}
 #endif
+}
 
 void menus::update()
 {
+
 #ifndef OVERLAY
 	if (menus::show_snow)
 	{
@@ -46,7 +51,20 @@ void menus::update()
 			menus::snow = {};
 		}
 	}
+
+	static float count = 0;
+	count += 1.0f * global::get_timestep();
+	if (count > 100.0f)
+	{
+		count = 0.0f;
+		if (hook::auto_refresh)
+		{
+			hook::get_procs();
+		}
+	}
 #endif
+
+	settings::update();
 
 #ifdef OVERLAY
 	if (!global::hide)
@@ -299,7 +317,32 @@ void menus::places()
 		if (ImGui::Button("Reset Filter"))
 		{
 			menus::filtering = false;
+			menus::current_country = "N/A";
 			memset(menus::search_buffer, 0, sizeof(menus::search_buffer));
+		}
+
+		if (ImGui::BeginCombo("Country", &menus::current_country[0]))
+		{
+			if (api::places_done)
+			{
+				if (ImGui::Button("Reset ##country"))
+				{
+					menus::current_country = "N/A";
+				}
+
+				ImGui::NewLine();
+
+				for (std::string c : api::all_countries)
+				{
+					if (ImGui::Button(&c[0]))
+					{
+						menus::current_country = c;
+
+						ImGui::CloseCurrentPopup();
+					}
+				}
+			}
+			ImGui::EndCombo();
 		}
 
 		if (ImGui::InputText("Search", menus::search_buffer, sizeof(search_buffer)))
@@ -349,10 +392,21 @@ void menus::places()
 
 								for (auto place : api::places)
 								{
-									if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
+									if (!menus::current_country.compare("N/A"))
 									{
-										api::get_details(place);
-										ImGui::CloseCurrentPopup();
+										if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
+										{
+											api::get_details(place);
+											ImGui::CloseCurrentPopup();
+										}
+									}
+									else if (!menus::current_country.compare(place.country))
+									{
+										if (ImGui::Button(&logger::va("%s", &place.city[0])[0]))
+										{
+											api::get_details(place);
+											ImGui::CloseCurrentPopup();
+										}
 									}
 								}
 							}
@@ -365,13 +419,25 @@ void menus::places()
 							ImGui::Text("No results found with the search term\n%s", menus::search_buffer);
 							ImGui::Text("Tip: Search filters country, city, and place ID; case sensitive");
 						}
+						else 
 						{
 							for (auto place : api::filtered_places)
 							{
-								if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
+								if (!menus::current_country.compare("N/A"))
 								{
-									api::get_details(place);
-									ImGui::CloseCurrentPopup();
+									if (ImGui::Button(&logger::va("[%s] %s", &place.country[0], &place.city[0])[0]))
+									{
+										api::get_details(place);
+										ImGui::CloseCurrentPopup();
+									}
+								}
+								else if (!menus::current_country.compare(place.country))
+								{
+									if (ImGui::Button(&logger::va("%s", &place.city[0])[0]))
+									{
+										api::get_details(place);
+										ImGui::CloseCurrentPopup();
+									}
 								}
 							}
 						}
@@ -423,6 +489,7 @@ void menus::stations()
 					if (!has)
 					{
 						api::favorite_stations.emplace_back(station);
+						settings::add_favorite(station);
 					}
 				}
 			}
@@ -451,6 +518,21 @@ void menus::favorites()
 					audio::currently_playing.region.city = station.place.city;
 					audio::currently_playing.region.country = station.place.country;
 					audio::play(station.id);
+				}
+
+				ImGui::SameLine();
+				
+				if (ImGui::Button(&logger::va("-##%s", &station.id[0])[0]))
+				{
+					for (int i = 0; i < api::favorite_stations.size(); i++)
+					{
+						if (api::favorite_stations[i].id == station.id)
+						{
+							settings::remove_favorite(station);
+							api::favorite_stations.erase(api::favorite_stations.begin() + i);
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -481,6 +563,13 @@ void menus::overlay()
 		if (ImGui::Button("Refresh"))
 		{
 			hook::get_procs();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button(&logger::va("Auto Refresh [%s]", &logger::get_toggle(hook::auto_refresh)[0])[0]))
+		{
+			hook::auto_refresh = !hook::auto_refresh;
 		}
 		
 		ImGui::NewLine();
@@ -543,9 +632,9 @@ void menus::enumerate_snow()
 
 void menus::build_font(ImGuiIO& io)
 {
-	std::string font = fs::get_cur_dir().append("/fonts/NotoSans-Regular.ttf");
-	std::string font_jp = fs::get_cur_dir().append("/fonts/NotoSansJP-Regular.ttf");
-	std::string emoji = fs::get_cur_dir().append("/fonts/NotoEmoji-Regular.ttf");
+	std::string font = fs::get_pref_dir().append("fonts/NotoSans-Regular.ttf");
+	std::string font_jp = fs::get_pref_dir().append("fonts/NotoSansJP-Regular.ttf");
+	std::string emoji = fs::get_pref_dir().append("fonts/NotoEmoji-Regular.ttf");
 
 	if (fs::exists(font))
 	{
@@ -583,3 +672,4 @@ bool menus::show_drpc;
 
 bool menus::filtering = false;
 char menus::search_buffer[64];
+std::string menus::current_country = "N/A";
