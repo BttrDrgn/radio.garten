@@ -37,7 +37,7 @@ void input::init_overlay(HWND hwnd)
 		return;
 	}
 
-	o_wndproc = (WNDPROC)SetWindowLongPtr(global::hwnd, GWLP_WNDPROC, (LONG_PTR)wndproc);
+	o_wndproc = (WNDPROC)SetWindowLongW(global::hwnd, GWLP_WNDPROC, (LONG_PTR)wndproc);
 }
 #endif
 

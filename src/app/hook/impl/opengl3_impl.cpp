@@ -6,7 +6,7 @@
 typedef bool(__stdcall* twglSwapBuffers) (_In_ HDC hDc);
 twglSwapBuffers owglSwapBuffers;
 
-BOOL __stdcall hwglSwapBuffers(_In_ HDC hDc)
+BOOL __stdcall hkWglSwapBuffers(_In_ HDC hDc)
 {
 	static bool init = false;
 
@@ -41,10 +41,10 @@ BOOL __stdcall hwglSwapBuffers(_In_ HDC hDc)
 
 void impl::opengl3::init()
 {
-	void* ptr = GetProcAddress(GetModuleHandleA("opengl32.dll"), "wglSwapBuffers");
-	MH_Initialize();
-	MH_CreateHook(ptr, hwglSwapBuffers, reinterpret_cast<void**>(&owglSwapBuffers));
-	MH_EnableHook(ptr);
+	if (kiero::bind(336, (void**)&owglSwapBuffers, hkWglSwapBuffers) != kiero::Status::Success)
+	{
+		MessageBoxA(nullptr, "Failed to hook OpenGL!", "Radio.Garten", 0);
+	}
 }
 
 #endif // KIERO_INCLUDE_OPENGL
