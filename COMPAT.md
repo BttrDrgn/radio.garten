@@ -4,4 +4,5 @@ This list will mainly focus on incompatibilites, but will be updated accordingly
 |---|---|---|---|
 | American Truck Simulator (DX11, OGL3) | :x: | [v0.3.0+][v0.3.0] | Crashes on injection |
 
+<!-- Quick links -->
 [v0.3.0]: https://github.com/BttrDrgn/radio.garten/releases/tag/v0.3.0

@@ -11,6 +11,9 @@
   <img width="640" height="360" src="/../assets/overlay_example_nfsu2.png">
 </p>
 
+## Overlay Compatibility
+Please check the [compatibility list][COMPAT_LIST] if you have any issues. If you are having issues with an application, please add it to the list!
+
 ## Compiling
 
 - Run `git clone --recursive https://www.github.com/BttrDrgn/radio.garten`
@@ -39,3 +42,8 @@ For license information, please check the containing depedency folder in `./deps
 - [cpp-httplib](https://github.com/yhirose/cpp-httplib) - Single header http(s) request library
 - [Nlohmann](https://github.com/nlohmann/json) - C++ JSON parser
 - [ini_rw (personal fork)](https://github.com/BttrDrgn/ini_rw) - INI reader/writer
+- [kiero (personal fork)](https://github.com/bttrdrgn/kiero/) - Multiple Graphical API hooking tool
+- [MinHook](https://github.com/TsudaKageyu/minhook) - Hooking library (used in combination with Kiero)
+
+<!-- Quick links -->
+[COMPAT_LIST]: https://github.com/BttrDrgn/radio.garten/blob/main/COMPAT.md
