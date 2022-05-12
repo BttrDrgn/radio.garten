@@ -145,7 +145,8 @@ std::vector<process_t> hook::processes;
 
 std::vector<std::string> hook::blacklist
 {
-	"explorer"
+	"explorer",
+	"radio.garten",
 };
 
 std::vector<std::string> hook::dlls
