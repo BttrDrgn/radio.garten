@@ -61,13 +61,15 @@ bool hook::load(process_t proc)
 	BringWindowToTop(proc.hwnd);
 	SetForegroundWindow(proc.hwnd);
 	SetFocus(proc.hwnd);
+	SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	ShowWindow(proc.hwnd, SW_NORMAL);
 
 	return true;
 }
 
 int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 {
-
+	bool do_not_add = false;
 	int length = GetWindowTextLengthA(hWnd);
 	char* buffer = new char[length + 1];
 	GetWindowTextA(hWnd, buffer, length + 1);
@@ -107,11 +109,13 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 			K32GetModuleFileNameExA(handle, 0, exe_path, sizeof(exe_path));
 			exe = exe_path;
 
-			for (const std::string& look_up : hook::blacklist)
+			for (std::string look_up : hook::blacklist)
 			{
 				if (exe.find(look_up) != std::string::npos)
 				{
-					return 0;
+					logger::log_debug(logger::va("Found %s [%s]", &look_up[0], &exe[0]));
+					do_not_add = true;
+					break;
 				}
 			}
 		}
@@ -124,11 +128,13 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 #ifndef _M_AMD64
 		if (!arch.compare("x86_64"))
 		{
-			return 0;
+			do_not_add = true;
 		}
 #endif
-
-		hook::processes.emplace_back(process_t{ window_title, arch, std::string(exe), proc_id, hWnd});
+		if (!do_not_add)
+		{
+			hook::processes.emplace_back(process_t{ window_title, arch, std::string(exe), proc_id, hWnd });
+		}
 	}
 
 	return 1;
@@ -145,8 +151,16 @@ std::vector<process_t> hook::processes;
 
 std::vector<std::string> hook::blacklist
 {
-	"explorer",
-	"radio.garten",
+	"explorer.exe",
+	"radio.garten.exe",
+	"ApplicationFrameHost.exe",
+	"ShellExperienceHost.exe",
+	"Discord.exe",
+	"Video.UI.exe",
+	"TextInputHost.exe",
+	"SystemSettings.exe",
+	"Calculator.exe",
+	"devenv.exe",
 };
 
 std::vector<std::string> hook::dlls
@@ -159,3 +173,5 @@ std::vector<std::string> hook::dlls
 	"overlay.radio.garten.x86.dll",
 #endif
 };
+
+bool hook::auto_refresh = false;
