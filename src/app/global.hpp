@@ -2,7 +2,7 @@
 
 struct process_t
 {
-	std::string title, arch;
+	std::string title, arch, exe;
 	std::uint32_t pid;
 	HWND hwnd;
 };

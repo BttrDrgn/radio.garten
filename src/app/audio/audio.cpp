@@ -34,7 +34,12 @@ void audio::init()
 #else
 void audio::init_overlay(HWND hwnd)
 {
-	global::hwnd = hwnd;
+	if (global::hwnd != hwnd)
+	{
+		logger::log("AUDIO_ERR", "Global hwnd is not the same!");
+		return;
+	}
+
 	if (HIWORD(BASS_GetVersion()) != BASSVERSION)
 	{
 		global::msg_box("Radio.Garten BASS", "An incorrect version of BASS.DLL was loaded!");
@@ -66,6 +71,8 @@ void audio::stop()
 {
 	BASS_StreamFree(audio::chan);
 	audio::chan = 0;
+	audio::currently_playing.title = "N/A";
+	audio::currently_playing.station.title = "N/A";
 }
 
 void audio::set_volume(std::int32_t vol_in)

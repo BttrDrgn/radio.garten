@@ -4,6 +4,35 @@
 
 #include "input.hpp"
 
+#ifdef OVERLAY
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+WNDPROC o_wndproc;
+
+LRESULT __stdcall wndproc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (!global::hide)
+	{
+		ImGui::GetIO().WantCaptureMouse = true;
+		ImGui::GetIO().MouseDrawCursor = true;
+		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+	}
+
+	return CallWindowProc(o_wndproc, hWnd, uMsg, wParam, lParam);
+}
+
+void input::init_overlay(HWND hwnd)
+{
+	if (global::hwnd != hwnd)
+	{
+		logger::log("INPUT_ERR", "Global hwnd is not the same!");
+		return;
+	}
+
+	//o_wndproc = (WNDPROC)SetWindowLongPtr(global::hwnd, GWLP_WNDPROC, (LONG_PTR)wndproc);
+}
+#endif
+
 void input::update()
 {
 #ifndef OVERLAY

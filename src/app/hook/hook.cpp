@@ -6,18 +6,26 @@ bool hook::load(process_t proc)
 {
 
 #ifdef _M_AMD64
-	if (proc.arch == "x86")
+	if (!proc.arch.compare("x86"))
 	{
 		ShellExecuteA(0, "open", "x86\\helper.exe", &logger::va("--pid %i --arch %s --hwnd %u", proc.pid, &proc.arch[0], proc.hwnd)[0], 0, 1);
 		return true;
 	}
+#else
+	if (!proc.arch.compare("x86_64"))
+	{
+		global::msg_box("Radio.Garten Overlay", "Unable to inject into x64 application in x86 mode!\nPlease consider using the x64 build.");
+		return false;
+	}
 #endif
-
-	hook::dlls.emplace_back(logger::va("overlay.radio.garten.%s.dll", &proc.arch[0]));
 
 	for (const std::string& dll : hook::dlls)
 	{
-		std::string dll_path = fs::get_cur_dir().append(logger::va("\\%s\\%s", &proc.arch[0], &dll[0]));
+#ifdef _M_AMD64
+		std::string dll_path = fs::get_cur_dir().append(logger::va("\\x86_64\\%s", &dll[0]));
+#else
+		std::string dll_path = fs::get_cur_dir().append(logger::va("\\x86\\%s", &dll[0]));
+#endif
 		logger::log_debug(logger::va("Loading %s", &dll_path[0]));
 
 		HANDLE handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, proc.pid);
@@ -54,7 +62,6 @@ bool hook::load(process_t proc)
 	SetForegroundWindow(proc.hwnd);
 	SetFocus(proc.hwnd);
 
-	hook::dlls.pop_back();
 	return true;
 }
 
@@ -66,20 +73,10 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 	GetWindowTextA(hWnd, buffer, length + 1);
 	std::string window_title(buffer);
 
-	if(!IsWow64Process)
-
-	for (std::string look_up : hook::blacklist)
-	{
-		if (window_title.find(look_up) != std::string::npos)
-		{
-			logger::log("Found %s", &look_up[0]);
-			return 0;
-		}
-	}
-
 	if (IsWindowVisible(hWnd) && length != 0)
 	{
 		std::string arch;
+		std::string exe;
 		std::uint32_t proc_id;
 
 		//Get proc_id
@@ -105,6 +102,18 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 				arch = "???";
 				logger::log_error(logger::va("Unable to determine arch! (0x%x)", GetLastError()));
 			}
+
+			char exe_path[MAX_PATH];
+			K32GetModuleFileNameExA(handle, 0, exe_path, sizeof(exe_path));
+			exe = exe_path;
+
+			for (const std::string& look_up : hook::blacklist)
+			{
+				if (exe.find(look_up) != std::string::npos)
+				{
+					return 0;
+				}
+			}
 		}
 		else if(!handle)
 		{
@@ -112,7 +121,14 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 			logger::log_error("Unable to open proc for arch detection!");
 		}
 
-		hook::processes.emplace_back(process_t{ window_title, arch, proc_id, hWnd});
+#ifndef _M_AMD64
+		if (!arch.compare("x86_64"))
+		{
+			return 0;
+		}
+#endif
+
+		hook::processes.emplace_back(process_t{ window_title, arch, std::string(exe), proc_id, hWnd});
 	}
 
 	return 1;
@@ -129,15 +145,16 @@ std::vector<process_t> hook::processes;
 
 std::vector<std::string> hook::blacklist
 {
-	"Groove Music",
-	"Calculator",
-	"Settings",
-	"Movies & TV",
-	"Google Chrome",
+	"explorer"
 };
 
 std::vector<std::string> hook::dlls
 {
 	"bass.dll",
 	"discord_game_sdk.dll",
+#ifdef _M_AMD64
+	"overlay.radio.garten.x86_64.dll",
+#else
+	"overlay.radio.garten.x86.dll",
+#endif
 };

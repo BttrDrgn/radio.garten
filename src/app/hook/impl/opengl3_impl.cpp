@@ -15,7 +15,10 @@ BOOL __stdcall hwglSwapBuffers(_In_ HDC hDc)
 		HWND hwnd = WindowFromDC(hDc);
 
 		impl::win32::init(hwnd);
+
+		global::hwnd = hwnd;
 		audio::init_overlay(hwnd);
+		input::init_overlay(hwnd);
 
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(hwnd);

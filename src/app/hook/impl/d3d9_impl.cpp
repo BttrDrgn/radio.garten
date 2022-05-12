@@ -27,11 +27,16 @@ long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
 		D3DDEVICE_CREATION_PARAMETERS params;
 		pDevice->GetCreationParameters(&params);
 
-		impl::win32::init(params.hFocusWindow);
-		audio::init_overlay(params.hFocusWindow);
+		HWND hwnd = params.hFocusWindow;
+
+		impl::win32::init(hwnd);
+
+		global::hwnd = hwnd;
+		audio::init_overlay(hwnd);
+		input::init_overlay(hwnd);
 
 		ImGui::CreateContext();
-		ImGui_ImplWin32_Init(params.hFocusWindow);
+		ImGui_ImplWin32_Init(hwnd);
 		ImGui_ImplDX9_Init(pDevice);
 
 		init = true;

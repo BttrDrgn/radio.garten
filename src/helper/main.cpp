@@ -12,6 +12,8 @@ std::vector<std::string> dlls
 	"overlay.radio.garten.x86.dll",
 };
 
+bool failed = false;
+
 void load()
 {
 	//A smaller version of hook::load
@@ -21,10 +23,43 @@ void load()
 		std::string dll_path = fs::get_cur_dir().append(logger::va("\\%s\\%s", &proc.arch[0], &dll[0]));
 
 		HANDLE handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, proc.pid);
+		if (!handle)
+		{
+			logger::log_error("Unable to open process!");
+			failed = true;
+		}
+
 		LPVOID alloc = VirtualAllocEx(handle, 0, dll_path.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-		WriteProcessMemory(handle, alloc, (LPVOID)&dll_path[0], dll_path.length(), 0);
+		if (!alloc)
+		{
+			logger::log_error("Unable to alloc!");
+			failed = true;
+		}
+
+		if (!WriteProcessMemory(handle, alloc, (LPVOID)&dll_path[0], dll_path.length(), 0))
+		{
+			logger::log_error("Unable to write memory!");
+			failed = true;
+		}
+
 		LPVOID loadlib = (LPVOID)GetProcAddress(LoadLibraryA("kernel32.dll"), "LoadLibraryA");
-		CreateRemoteThread(handle, 0, 0, (LPTHREAD_START_ROUTINE)loadlib, alloc, 0, &thread_id);
+		if (!loadlib)
+		{
+			logger::log_error("Unable to get LoadLibraryA!");
+			failed = true;
+		}
+
+		if (!CreateRemoteThread(handle, 0, 0, (LPTHREAD_START_ROUTINE)loadlib, alloc, 0, &thread_id))
+		{
+			logger::log_error("Unable to create remote thread!");
+			failed = true;
+		}
+	}
+
+	if (failed)
+	{
+		MessageBoxA(0, "Error! Read console for more information", "Helper", 0);
+		exit(0);
 	}
 
 	BringWindowToTop(proc.hwnd);
@@ -34,6 +69,13 @@ void load()
 
 int __stdcall WinMain(HINSTANCE instance, HINSTANCE prev_instance, char* cmd_line, int cmd_show)
 {
+#ifdef DEBUG
+	AllocConsole();
+	SetConsoleTitleA("Helper Console");
+	std::freopen("CONOUT$", "w", stdout);
+	std::freopen("CONIN$", "r", stdin);
+#endif
+
 	for (int i = 0; i < __argc; i++)
 	{
 		args.emplace_back(__argv[i]);

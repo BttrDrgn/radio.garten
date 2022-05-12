@@ -104,6 +104,8 @@ int main(int argc, char* argv[])
 }
 
 #else
+HMODULE self;
+
 //Overlay init
 void init_overlay()
 {
@@ -135,6 +137,10 @@ void init_overlay()
 			impl::opengl3::init();
 			break;
 #endif
+
+		case kiero::RenderType::None:
+			FreeLibraryAndExitThread(self, 0);
+			break;
 		}
 	}
 }
@@ -152,6 +158,7 @@ bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
 		logger::log_info("Attached!");
 #endif
 		DisableThreadLibraryCalls(hmod);
+		self = hmod;
 		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init_overlay, 0, 0, 0);
 	}
 	return true;

@@ -183,6 +183,13 @@ void menus::actions()
 					audio::paused = true;
 					audio::stop();
 				}
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("Pause");
+					ImGui::EndTooltip();
+				}
 			}
 		}
 		else if (audio::paused)
@@ -196,12 +203,19 @@ void menus::actions()
 					audio::play(audio::currently_playing.url);
 				}
 			}
+
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				ImGui::Text("Play");
+				ImGui::EndTooltip();
+			}
 		}
 
 		ImGui::NewLine();
 
 #ifdef _WIN32
-		if (ImGui::Button(&logger::va("Toggle Discord RPC [%s]", &logger::get_toggle(menus::show_drpc)[0])[0]))
+		if (ImGui::Button(&logger::va("Toggle Discord [%s]", &logger::get_toggle(menus::show_drpc)[0])[0]))
 		{
 			menus::show_drpc = !menus::show_drpc;
 			switch (menus::show_drpc)
@@ -215,10 +229,30 @@ void menus::actions()
 			}
 		}
 
+		if (!menus::show_drpc)
+		{
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				ImGui::Text("Discord now playing status\n\nShows: time since enabled, song title,\nstation name, and region of station");
+				ImGui::EndTooltip();
+			}
+		}
+
 #ifndef OVERLAY
 		if (ImGui::Button(&logger::va("Toggle Snow [%s]", &logger::get_toggle(menus::show_snow)[0])[0]))
 		{
 			menus::show_snow = !menus::show_snow;
+		}
+
+		if (!menus::show_snow)
+		{
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				ImGui::Text("Fun snow rains down\nfrom the top of the screen!");
+				ImGui::EndTooltip();
+			}
 		}
 #endif
 #endif
@@ -422,6 +456,19 @@ void menus::overlay()
 {
 	if (ImGui::BeginMenu("Overlay"))
 	{
+		ImGui::Text("What is this (?)");
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::Text(
+				"The overlay can be injected into any\n"
+				"DirectX (9, 10, 11) or OpenGL3 application\n"
+				"and will provide a nearly identical\n"
+				"expierence as the normal application"
+			);
+			ImGui::EndTooltip();
+		}
+
 		if (ImGui::Button("Refresh"))
 		{
 			hook::get_procs();
@@ -431,7 +478,7 @@ void menus::overlay()
 
 		for (process_t proc : hook::processes)
 		{
-			if (ImGui::Button(&logger::va("%s [%s]", &proc.title[0], &proc.arch[0])[0]))
+			if (ImGui::Button(&logger::va("%s", &proc.title[0], &proc.arch[0])[0]))
 			{
 				logger::log("HOOK", logger::va("Loading overlay into %s [%u]", &proc.title[0], proc.pid));
 				if (hook::load(proc))
@@ -439,6 +486,13 @@ void menus::overlay()
 					audio::paused = true;
 					audio::stop();
 				}
+			}
+			
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				ImGui::Text("[%u] %s", proc.pid, &proc.exe[0]);
+				ImGui::EndTooltip();
 			}
 		}
 

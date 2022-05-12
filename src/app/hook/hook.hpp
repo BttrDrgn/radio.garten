@@ -1,5 +1,7 @@
 #pragma once
 
+#include <psapi.h>
+
 #include "global.hpp"
 
 class hook
