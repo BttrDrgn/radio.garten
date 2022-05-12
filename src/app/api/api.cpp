@@ -45,7 +45,7 @@ void api::get_places()
 				}
 
 				nl::json data = nl::json::parse(api::places_json["data"].dump());
-				for (nl::detail::iteration_proxy_value<nl::detail::iter_impl<nl::json>>& i : data["list"].items())
+				for (const nl::detail::iteration_proxy_value<nl::detail::iter_impl<nl::json>>& i : data["list"].items())
 				{
 					//Get string
 					std::string id = i.value()["id"].dump();
@@ -58,20 +58,13 @@ void api::get_places()
 					city.erase(std::remove(city.begin(), city.end(), '\"'), city.end());
 
 					//Check if we already have this country
-					bool found = false;
-					for (auto j : api::all_countries)
+					for (const std::string& j : api::all_countries)
 					{
 						if (!std::strcmp(&j[0], &country[0]))
 						{
-							found = true;
+							api::all_countries.emplace_back(country);
 							break;
 						}
-					}
-
-					//If we don't have it
-					if (!found)
-					{
-						api::all_countries.emplace_back(country);
 					}
 
 					//Add
@@ -140,7 +133,7 @@ void api::get_details(const place_t& place_in)
 
 				nl::json data = nl::json::parse(api::details_json["data"].dump());
 
-				for (auto& i : data["content"][0]["items"])
+				for (const nl::basic_json<>::value_type& i : data["content"][0]["items"])
 				{
 					std::string id = i["href"].dump();
 					std::string title = i["title"].dump();
@@ -217,7 +210,7 @@ void api::filter_place(const std::string& key)
 {
 	api::filtered_places = {};
 
-	for (auto place : api::places)
+	for (const place_t& place : api::places)
 	{
 		//Look for city, country, or id with this string
 		if (place.city.find(key) != std::string::npos || place.country.find(key) != std::string::npos || place.id.find(key) != std::string::npos)

@@ -15,18 +15,18 @@ void drpc::init()
 		discord::Result result = discord::Core::Create(971461199919202344, DiscordCreateFlags_NoRequireDiscord, &core);
 		if (result == discord::Result::Ok)
 		{
-			core->SetLogHook(discord::LogLevel::Info, [](auto, auto message)
+			core->SetLogHook(discord::LogLevel::Info, [](discord::LogLevel, const char* message)
 			{
 				logger::log("DISCORD", message);
 			});
 
-			core->SetLogHook(discord::LogLevel::Warn, [](auto, auto message)
+			core->SetLogHook(discord::LogLevel::Warn, [](discord::LogLevel, const char* message)
 			{
 				logger::log("DISCORD", message);
 
 			});
 
-			core->SetLogHook(discord::LogLevel::Error, [](auto, auto message)
+			core->SetLogHook(discord::LogLevel::Error, [](discord::LogLevel, const char* message)
 			{
 				logger::log("DISCORD", message);
 			});

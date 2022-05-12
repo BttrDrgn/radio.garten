@@ -59,7 +59,7 @@ void settings::favorites_update()
 	{
 		api::favorite_stations = {};
 
-		for (std::string station : stations)
+		for (const std::string& station : stations)
 		{
 			std::vector<std::string> temp = logger::split(station, ',');
 
@@ -110,7 +110,7 @@ void settings::remove_favorite(station_t station)
 
 	int index = -1;
 	std::vector<std::string> stations = logger::split(contents, '|');
-	for (int i = 0; i < stations.size(); i++)
+	for (int i = 0; i < stations.size(); ++i)
 	{
 		std::string id = logger::split(stations[i], ',')[4];
 		if (!station.id.compare(id))
@@ -127,7 +127,7 @@ void settings::remove_favorite(station_t station)
 
 	contents.clear();
 
-	for (std::string s : stations)
+	for (const std::string& s : stations)
 	{
 		contents.append(s);
 	}

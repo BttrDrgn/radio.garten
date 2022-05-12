@@ -58,9 +58,19 @@ public:
 		return out.str();
 	}
 
-	static void del(const std::string& path)
+	static void del(const std::string& path, bool folder = false)
 	{
-		std::filesystem::remove(path);
+		if (!fs::exists(path)) return;
+
+		switch (folder)
+		{
+		case false:
+			std::filesystem::remove(path);
+			break;
+		case true:
+			std::filesystem::remove_all(path);
+			break;
+		}
 	}
 
 	static void move(const std::string& path, const std::string& new_path, bool create_root = true)
@@ -70,18 +80,21 @@ public:
 			std::filesystem::create_directory(new_path);
 		}
 
-		for (std::filesystem::path p : std::filesystem::directory_iterator(path))
+		for (const std::filesystem::path& p : std::filesystem::directory_iterator(path))
 		{
 			std::filesystem::path dest = new_path / p.filename();
 
-			if (std::filesystem::is_directory(p))
+			if (fs::exists(path))
 			{
-				std::filesystem::create_directory(dest);
-				move(p.string().c_str(), dest.string().c_str(), false);
-			}
-			else
-			{
-				std::filesystem::rename(p, dest);
+				if (std::filesystem::is_directory(p))
+				{
+					std::filesystem::create_directory(dest);
+					fs::move(&p.string()[0], &dest.string()[0], false);
+				}
+				else
+				{
+					std::filesystem::rename(p, dest);
+				}
 			}
 		}
 	}

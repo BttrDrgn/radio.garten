@@ -332,7 +332,7 @@ void menus::places()
 
 				ImGui::NewLine();
 
-				for (std::string c : api::all_countries)
+				for (const std::string& c : api::all_countries)
 				{
 					if (ImGui::Button(&c[0]))
 					{
@@ -390,7 +390,7 @@ void menus::places()
 
 								ImGui::NewLine();
 
-								for (auto place : api::places)
+								for (const place_t& place : api::places)
 								{
 									if (!menus::current_country.compare("N/A"))
 									{
@@ -421,7 +421,7 @@ void menus::places()
 						}
 						else 
 						{
-							for (auto place : api::filtered_places)
+							for (const place_t& place : api::filtered_places)
 							{
 								if (!menus::current_country.compare("N/A"))
 								{
@@ -461,7 +461,7 @@ void menus::stations()
 		}
 		else
 		{
-			for (station_t station : api::stations)
+			for (const station_t& station : api::stations)
 			{
 				if (ImGui::Button(&logger::va("%s", &station.title[0])[0]))
 				{
@@ -477,7 +477,7 @@ void menus::stations()
 				if (ImGui::Button(&logger::va("*##%s", &station.id[0])[0]))
 				{
 					bool has = false;
-					for (station_t favorite : api::favorite_stations)
+					for (const station_t& favorite : api::favorite_stations)
 					{
 						if (favorite.id == station.id)
 						{
@@ -509,7 +509,7 @@ void menus::favorites()
 		}
 		else
 		{
-			for (station_t station : api::favorite_stations)
+			for (const station_t& station : api::favorite_stations)
 			{
 				if (ImGui::Button(&logger::va("%s ##favorite", &station.title[0])[0]))
 				{
@@ -524,7 +524,7 @@ void menus::favorites()
 				
 				if (ImGui::Button(&logger::va("-##%s", &station.id[0])[0]))
 				{
-					for (int i = 0; i < api::favorite_stations.size(); i++)
+					for (int i = 0; i < api::favorite_stations.size(); ++i)
 					{
 						if (api::favorite_stations[i].id == station.id)
 						{
@@ -574,7 +574,7 @@ void menus::overlay()
 		
 		ImGui::NewLine();
 
-		for (process_t proc : hook::processes)
+		for (const process_t& proc : hook::processes)
 		{
 			if (ImGui::Button(&logger::va("%s", &proc.title[0], &proc.arch[0])[0]))
 			{
@@ -601,7 +601,7 @@ void menus::overlay()
 void menus::render_snow()
 {
 	std::int32_t gravity = (std::int32_t)std::ceil(global::get_timestep() * 1.0f);
-	for (std::int32_t i = 0; i < menus::snow.size(); i++)
+	for (std::int32_t i = 0; i < menus::snow.size(); ++i)
 	{
 		if (menus::snow[i].y > global::resolution.y)
 		{
@@ -618,12 +618,12 @@ void menus::render_snow()
 
 void menus::enumerate_snow()
 {
-	std::random_device rd;
-	std::mt19937 mt(rd());
-	std::uniform_int_distribution<std::int32_t> x_pos(0, global::resolution.x);
-	std::uniform_int_distribution<std::int32_t> y_pos(0, global::resolution.y);
+	static std::random_device rd;
+	static std::mt19937 mt(rd());
+	static std::uniform_int_distribution<std::int32_t> x_pos(0, global::resolution.x);
+	static std::uniform_int_distribution<std::int32_t> y_pos(0, global::resolution.y);
 
-	for (std::int32_t i = 0; i < menus::max_points; i++)
+	for (std::int32_t i = 0; i < menus::max_points; ++i)
 	{
 		menus::snow.emplace_back(vec2{ x_pos(mt), y_pos(mt) });
 	}
