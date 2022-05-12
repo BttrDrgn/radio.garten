@@ -39,7 +39,7 @@ void api::get_places()
 				}
 
 				std::string version_hash = api::places_json["version"].dump();
-				if (std::strcmp(VERSION_HASH, &version_hash[0]))
+				if (version_hash.compare(VERSION_HASH))
 				{
 					logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
 				}
@@ -60,7 +60,7 @@ void api::get_places()
 					//Check if we already have this country
 					for (const std::string& j : api::all_countries)
 					{
-						if (!std::strcmp(&j[0], &country[0]))
+						if (!j.compare(country))
 						{
 							api::all_countries.emplace_back(country);
 							break;
@@ -126,7 +126,7 @@ void api::get_details(const place_t& place_in)
 				}
 
 				std::string version_hash = api::details_json["version"].dump();
-				if (std::strcmp(VERSION_HASH, &version_hash[0]))
+				if (version_hash.compare(VERSION_HASH))
 				{
 					logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
 				}
@@ -141,7 +141,7 @@ void api::get_details(const place_t& place_in)
 					id.erase(std::remove(id.begin(), id.end(), '\"'), id.end());
 					title.erase(std::remove(title.begin(), title.end(), '\"'), title.end());
 
-					if (std::strcmp(&id[0], "null"))
+					if (!id.compare("null"))
 					{
 						api::stations.emplace_back(station_t{ title, id.substr(id.size() - 8), place_in });
 					}
@@ -189,7 +189,7 @@ void api::get_station(const std::string& id)
 					}
 
 					std::string version_hash = api::stations_json["version"].dump();
-					if (std::strcmp(VERSION_HASH, &version_hash[0]))
+					if (version_hash.compare(VERSION_HASH))
 					{
 						logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
 					}

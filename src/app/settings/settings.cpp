@@ -137,7 +137,7 @@ void settings::remove_favorite(station_t station)
 
 bool settings::get_boolean(const char* bool_text)
 {
-	if (!strcmp(bool_text, "true")) return true;
+	if (!std::strcmp(bool_text, "true")) return true;
 	else return false;
 }
 
