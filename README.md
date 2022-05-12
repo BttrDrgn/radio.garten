@@ -1,8 +1,14 @@
-# Radio.Garten
-A [radio.garden](https://radio.garden/) desktop client written with SDL2 and ImGui
+<h1 align="center"> Radio.Garten </h1>
+<p align="center"> A <a href="https://radio.garden/"> radio.garden </a> desktop client and overlay written with SDL2 and ImGui </p>
 
 <p align="center">
   <img width="400" height="300" src="/../assets/preview.png">
+</p>
+
+
+<h2 align="center"> Overlay Example </h2>
+<p align="center">
+  <img width="640" height="360" src="/../assets/overlay_example_nfsu2.png">
 </p>
 
 ## Compiling
