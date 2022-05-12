@@ -107,32 +107,41 @@ void settings::add_favorite(station_t station)
 void settings::remove_favorite(station_t station)
 {
 	std::string contents = fs::read(settings::favorites_file);
+	std::vector<station_t> stations;
 
-	int index = -1;
-	std::vector<std::string> stations = logger::split(contents, '|');
-	for (int i = 0; i < stations.size(); ++i)
+	std::vector<std::string> contents_split = logger::split(contents, '|');
+
+	for (const std::string& c : contents_split)
 	{
-		std::string id = logger::split(stations[i], ',')[4];
-		if (!station.id.compare(id))
+		std::vector<std::string> temp = logger::split(c, ',');
+
+		if (temp.size() == 5)
 		{
-			index = i;
-			break;
+			if (station.id.compare(temp[4]))
+			{
+				station_t s;
+
+				s.title = temp[0];
+
+				s.place.country = temp[1];
+				s.place.city = temp[2];
+				s.place.id = temp[3];
+
+				s.id = temp[4];
+
+				stations.emplace_back(s);
+			}
 		}
 	}
 
-	if (index != -1)
+	//Wipe
+	fs::write(settings::favorites_file, "", false);
+
+	for (const station_t& s : stations)
 	{
-		stations.erase(stations.begin() + index);
+		//Add
+		settings::add_favorite(s);
 	}
-
-	contents.clear();
-
-	for (const std::string& s : stations)
-	{
-		contents.append(s);
-	}
-
-	fs::write(settings::favorites_file, contents, false);
 }
 
 bool settings::get_boolean(const char* bool_text)
