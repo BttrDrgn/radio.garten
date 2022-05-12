@@ -76,15 +76,6 @@ void CALLBACK meta_sync(HSYNC handle, DWORD channel, DWORD data, void* user)
 			}
 		}
 	}
-
-	//Streamer mode for a later point in time
-	/*
-	std::string info = logger::va("Playing: %s on %s in %s, %s",
-		&audio::currently_playing.title[0], &audio::currently_playing.station.title[0],
-		&audio::currently_playing.region.city[0], &audio::currently_playing.region.country[0]);
-
-	fs::write("playing.txt", info);
-	*/
 }
 
 void CALLBACK null_callback(HSYNC handle, DWORD channel, DWORD data, void *user)
@@ -129,5 +120,11 @@ void open_url(const char* url)
 
 		//Play channel
 		BASS_ChannelPlay(audio::chan, FALSE);
+
+		fs::write (
+			fs::get_pref_dir().append("last_played.txt"),
+			logger::va("%s,%s", &audio::currently_playing.station.title[0], &audio::currently_playing.station.id[0]),
+			false
+		);
 	}
 }

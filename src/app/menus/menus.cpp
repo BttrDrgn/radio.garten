@@ -237,6 +237,24 @@ void menus::actions()
 			}
 		}
 
+		if (audio::currently_playing.url != "")
+		{
+			ImGui::SameLine();
+
+			if (ImGui::Button("[]"))
+			{
+				audio::paused = false;
+				audio::stop(true);
+			}
+
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				ImGui::Text("Stop");
+				ImGui::EndTooltip();
+			}
+		}
+
 		ImGui::NewLine();
 
 #ifdef _WIN32

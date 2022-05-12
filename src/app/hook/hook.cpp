@@ -1,9 +1,17 @@
 #include "hook.hpp"
+#include "audio/audio.hpp"
 #include "logger/logger.hpp"
 #include "fs/fs.hpp"
 
 bool hook::load(process_t proc)
 {
+	if (audio::currently_playing.station.id == "")
+	{
+		if(fs::exists(audio::last_played_file))
+		{
+			fs::del(audio::last_played_file);
+		}
+	}
 
 #ifdef _M_AMD64
 	if (!proc.arch.compare("x86"))

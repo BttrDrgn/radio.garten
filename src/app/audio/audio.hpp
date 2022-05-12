@@ -22,11 +22,13 @@ public:
 	static void init();
 #endif
 	static void play(const std::string& url);
-	static void stop();
+	static void stop(bool hard = false);
 	static void set_volume(std::int32_t vol_in);
 
 	static std::int32_t req;
 	static std::int32_t chan;
+
+	static std::string last_played_file;
 
 	static bool paused;
 	static std::int32_t volume;

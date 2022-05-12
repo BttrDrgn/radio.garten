@@ -4,6 +4,7 @@
 #include "audio.hpp"
 #include "api/api.hpp"
 #include "streamer.hpp"
+#include "fs/fs.hpp"
 
 #ifndef OVERLAY
 void audio::init()
@@ -52,6 +53,13 @@ void audio::init_overlay(HWND hwnd)
 	}
 
 	BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+
+	if (fs::exists(audio::last_played_file))
+	{
+		std::vector<std::string> contents = logger::split(fs::read(audio::last_played_file), ',');
+		audio::currently_playing.station.title = contents[0];
+		audio::play(contents[1]);
+	}
 }
 #endif
 
@@ -67,12 +75,19 @@ void audio::play(const std::string& url)
 	}).detach();
 }
 
-void audio::stop()
+void audio::stop(bool hard)
 {
 	BASS_StreamFree(audio::chan);
 	audio::chan = 0;
-	audio::currently_playing.title = "N/A";
-	audio::currently_playing.station.title = "N/A";
+
+	if (hard)
+	{
+		audio::currently_playing = { "N/A", "N/A" };
+	}
+	else
+	{
+		audio::currently_playing.title = "N/A";
+	}
 }
 
 void audio::set_volume(std::int32_t vol_in)
@@ -85,3 +100,4 @@ std::int32_t audio::chan;
 bool audio::paused = false;
 std::int32_t audio::volume = 100;
 playing_t audio::currently_playing = {"N/A", "N/A"};
+std::string audio::last_played_file = fs::get_pref_dir().append("last_played.txt");
