@@ -9,6 +9,7 @@
 void settings::init()
 {
 	settings::update();
+	settings::favorites_update();
 }
 
 void settings::update()
@@ -42,8 +43,10 @@ void settings::update()
 	}
 
 	ini_free(settings::config);
+}
 
-
+void settings::favorites_update()
+{
 	if (!fs::exists(settings::favorites_file))
 	{
 		fs::write(settings::favorites_file, "", false);

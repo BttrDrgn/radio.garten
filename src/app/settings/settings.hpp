@@ -9,6 +9,7 @@ class settings
 public:
 	static void init();
 	static void update();
+	static void favorites_update();
 	static bool get_boolean(const char* bool_text);
 	static void add_favorite(station_t station);
 	static void remove_favorite(station_t station);

@@ -64,7 +64,7 @@ void menus::update()
 	}
 #endif
 
-	settings::update();
+	settings::favorites_update();
 
 #ifdef OVERLAY
 	if (!global::hide)
