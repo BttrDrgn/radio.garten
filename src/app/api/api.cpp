@@ -4,6 +4,12 @@
 
 void api::get_places()
 {
+	if (!api::places_done)
+	{
+		logger::log_debug("Refreshing places not done! Cancelling request.");
+		return;
+	}
+
 	api::places_json = {};
 	api::details_json = {};
 	api::places_done = false;
@@ -97,6 +103,12 @@ void api::get_places()
 
 void api::get_details(const place_t& place_in)
 {
+	if (!api::stations_done)
+	{
+		logger::log_debug("Refreshing stations not done! Cancelling request.");
+		return;
+	}
+
 	api::details_json = {};
 	api::detail_done = false;
 	api::stations = {};
