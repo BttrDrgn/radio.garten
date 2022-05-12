@@ -11,6 +11,8 @@ bool toggle_once = false;
 
 LRESULT __stdcall wndproc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	long retn = ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+
 	if (ImGui::IsKeyPressed(192, false) && !toggle_once)
 	{
 		global::hide = !global::hide;
@@ -19,7 +21,7 @@ LRESULT __stdcall wndproc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	else if (!ImGui::IsKeyPressed(192, false) && toggle_once) toggle_once = false;
 
 	//Should prevent some applications from getting input
-	if (!global::hide && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam) > 0)
+	if (!global::hide && retn > 0)
 	{
 		return 1L;
 	}
