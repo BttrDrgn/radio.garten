@@ -19,12 +19,12 @@ LRESULT __stdcall wndproc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	else if (!ImGui::IsKeyPressed(192, false) && toggle_once) toggle_once = false;
 
 	//Should prevent some applications from getting input
-	if (!global::hide && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+	if (!global::hide && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam) > 0)
 	{
-		return true;
+		return 1L;
 	}
 
-	return CallWindowProc(o_wndproc, hWnd, uMsg, wParam, lParam);
+	return CallWindowProcA(o_wndproc, hWnd, uMsg, wParam, lParam);
 }
 
 void input::init_overlay(HWND hwnd)

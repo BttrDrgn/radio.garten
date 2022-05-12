@@ -3,8 +3,6 @@
 #include "d3d11_impl.h"
 #include <d3d11.h>
 
-#include "win32_impl.h"
-
 typedef long(__stdcall* Present)(IDXGISwapChain*, UINT, UINT);
 static Present oPresent = NULL;
 
@@ -24,8 +22,6 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		device->GetImmediateContext(&context);
 
 		HWND hwnd = desc.OutputWindow;
-
-		impl::win32::init(hwnd);
 
 		global::hwnd = hwnd;
 		audio::init_overlay(hwnd);
