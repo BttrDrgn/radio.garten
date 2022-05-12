@@ -16,7 +16,8 @@ bool hook::load(process_t proc)
 #ifdef _M_AMD64
 	if (!proc.arch.compare("x86"))
 	{
-		ShellExecuteA(0, "open", "x86\\helper.exe", &logger::va("--pid %i --arch %s --hwnd %u", proc.pid, &proc.arch[0], proc.hwnd)[0], 0, 1);
+		ShellExecuteA(0, "open", "x86\\helper.exe", &logger::va("--pid %i --arch %s --hwnd %u --auto %i", proc.pid, &proc.arch[0], proc.hwnd, hook::auto_refresh)[0], 0, 1);
+		hook::injected_apps.emplace_back(proc);
 		return true;
 	}
 #else
@@ -65,15 +66,20 @@ bool hook::load(process_t proc)
 		}
 	}
 
-	//Not sure one does the trick but they all sound nice
-	BringWindowToTop(proc.hwnd);
-	SetForegroundWindow(proc.hwnd);
-	SetFocus(proc.hwnd);
-	//Set to top most temporarily
-	SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-	//Set back
-	SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-	ShowWindow(proc.hwnd, SW_NORMAL);
+	if (!hook::auto_refresh)
+	{
+		//Not sure one does the trick but they all sound nice
+		BringWindowToTop(proc.hwnd);
+		SetForegroundWindow(proc.hwnd);
+		SetFocus(proc.hwnd);
+		//Set to top most temporarily
+		SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+		//Set back
+		SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+		ShowWindow(proc.hwnd, SW_NORMAL);
+	}
+
+	hook::injected_apps.emplace_back(proc);
 
 	return true;
 }
@@ -145,6 +151,32 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 		if (!do_not_add)
 		{
 			hook::processes.emplace_back(process_t{ window_title, arch, std::string(exe), proc_id, hWnd });
+
+			if (hook::auto_refresh)
+			{
+				for (const std::string& hook : hook::auto_hook)
+				{
+					process_t proc = hook::processes[hook::processes.size() - 1];
+
+					if (proc.exe.find(hook))
+					{
+						if (hook::injected_apps.size() > 0)
+						{
+							for (const process_t& app : hook::injected_apps)
+							{
+								if (app.pid != proc_id)
+								{
+									hook::load(proc);
+								}
+							}
+						}
+						else if (hook::injected_apps.size() == 0)
+						{
+							hook::load(proc);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -186,3 +218,5 @@ std::initializer_list<std::string> hook::dlls
 };
 
 bool hook::auto_refresh = false;
+std::vector<std::string> hook::auto_hook;
+std::vector<process_t> hook::injected_apps;

@@ -13,6 +13,7 @@ std::initializer_list<std::string> dlls
 };
 
 bool failed = false;
+bool manual = true;
 
 void load()
 {
@@ -62,15 +63,18 @@ void load()
 		exit(0);
 	}
 
-	//Not sure one does the trick but they all sound nice
-	BringWindowToTop(proc.hwnd);
-	SetForegroundWindow(proc.hwnd);
-	SetFocus(proc.hwnd);
-	//Set to top most temporarily
-	SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-	//Set back
-	SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-	ShowWindow(proc.hwnd, SW_NORMAL);
+	if (manual)
+	{
+		//Not sure one does the trick but they all sound nice
+		BringWindowToTop(proc.hwnd);
+		SetForegroundWindow(proc.hwnd);
+		SetFocus(proc.hwnd);
+		//Set to top most temporarily
+		SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+		//Set back
+		SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+		ShowWindow(proc.hwnd, SW_NORMAL);
+	}
 }
 
 int __stdcall WinMain(HINSTANCE instance, HINSTANCE prev_instance, char* cmd_line, int cmd_show)
@@ -103,6 +107,11 @@ int __stdcall WinMain(HINSTANCE instance, HINSTANCE prev_instance, char* cmd_lin
 		{
 			HWND value = reinterpret_cast<HWND>(std::stoul(__argv[i + 1], nullptr, 0));
 			proc.hwnd = value;
+		}
+		else if (args[i].find("--auto") != std::string::npos)
+		{
+			int value = std::stoi(__argv[i + 1]);
+			manual = value;
 		}
 	}
 

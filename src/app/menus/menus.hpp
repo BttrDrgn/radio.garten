@@ -15,6 +15,9 @@ public:
 	static std::vector<vec2> snow;
 	static std::int32_t max_points;
 	static bool show_snow;
+
+	static void render_snow();
+	static void enumerate_snow();
 #endif
 
 	static bool show_all_stations;
@@ -37,7 +40,5 @@ private:
 
 #ifndef OVERLAY
 	static void overlay();
-	static void render_snow();
-	static void enumerate_snow();
 #endif
 };

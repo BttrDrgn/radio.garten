@@ -5,6 +5,8 @@
 #include "settings.hpp"
 #include "menus/menus.hpp"
 #include "api/api.hpp"
+#include "hook/hook.hpp"
+#include "drpc/drpc.hpp"
 
 void settings::init()
 {
@@ -22,7 +24,10 @@ void settings::update()
 			"UseGPU  =	false\n"
 			"[startup]\n"
 			"Refresh =	false\n"
+#ifdef _WIN32
 			"Discord =	false\n"
+			"AutoHook = false\n"
+#endif
 			"Snow	 =	false\n";
 
 		settings::config = ini_create(ini_default, strlen(ini_default));
@@ -30,11 +35,30 @@ void settings::update()
 		ini_save(settings::config, &settings::config_file[0]);
 	}
 
-	menus::show_drpc = settings::get_boolean(ini_get(settings::config, "startup", "Discord"));
+#ifdef _WIN32
+	if (menus::show_drpc = settings::get_boolean(ini_get(settings::config, "startup", "Discord")))
+	{
+		drpc::init();
+	}
+
+#ifndef OVERLAY
+	if (hook::auto_refresh = settings::get_boolean(ini_get(settings::config, "startup", "AutoHook")))
+	{
+		hook::get_procs();
+	}
+#endif
+#endif
 
 #ifndef OVERLAY
 	global::use_hardware = settings::get_boolean(ini_get(settings::config, "core", "UseGPU"));
-	menus::show_snow = settings::get_boolean(ini_get(settings::config, "startup", "Snow"));
+	if (menus::show_snow = settings::get_boolean(ini_get(settings::config, "startup", "Snow")))
+	{
+		if (menus::snow.empty())
+		{
+			menus::enumerate_snow();
+		}
+		menus::render_snow();
+	}
 #endif
 
 	if (settings::get_boolean(ini_get(settings::config, "startup", "Refresh")))
@@ -43,6 +67,11 @@ void settings::update()
 	}
 
 	ini_free(settings::config);
+
+#ifndef OVERLAY
+	if (!fs::exists(settings::auto_hook_file)) fs::write(settings::auto_hook_file, "", false);
+	hook::auto_hook = logger::split(fs::read(settings::auto_hook_file), ',');
+#endif
 }
 
 void settings::favorites_update()
@@ -152,4 +181,5 @@ bool settings::get_boolean(const char* bool_text)
 
 std::string settings::config_file = logger::va("%s%s", &fs::get_pref_dir()[0], "config.ini");
 std::string settings::favorites_file = logger::va("%s%s", &fs::get_pref_dir()[0], "stations.fav");;
+std::string settings::auto_hook_file = logger::va("%s%s", &fs::get_pref_dir()[0], "auto_hook.list");;
 ini_t* settings::config;

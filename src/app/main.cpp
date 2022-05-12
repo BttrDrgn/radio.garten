@@ -57,7 +57,6 @@ void init_app()
 
 	audio::init();
 	menus::init();
-	hook::get_procs();
 
 	while (!global::shutdown)
 	{
