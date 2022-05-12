@@ -10,13 +10,12 @@ void api::get_places()
 		return;
 	}
 
-	api::places_json = {};
-	api::details_json = {};
+	api::places_json.clear();
+	api::details_json.clear();
 	api::places_done = false;
-	api::places = {};
-	api::all_countries = {};
-	api::stations = {};
-	api::stations = {};
+	api::places.clear();
+	api::all_countries.clear();
+	api::stations.clear();
 
 	std::thread([]
 	{
@@ -84,7 +83,7 @@ void api::get_places()
 
 				//Finish
 				api::places_done = true;
-				api::places_json = {};
+				api::places_json.clear();
 			}
 			else
 			{
@@ -102,9 +101,9 @@ void api::get_details(const place_t& place_in)
 		return;
 	}
 
-	api::details_json = {};
+	api::details_json.clear();
 	api::detail_done = false;
-	api::stations = {};
+	api::stations.clear();
 
 	std::thread([place_in]
 	{
@@ -141,7 +140,7 @@ void api::get_details(const place_t& place_in)
 					id.erase(std::remove(id.begin(), id.end(), '\"'), id.end());
 					title.erase(std::remove(title.begin(), title.end(), '\"'), title.end());
 
-					if (!id.compare("null"))
+					if (id.compare("null"))
 					{
 						api::stations.emplace_back(station_t{ title, id.substr(id.size() - 8), place_in });
 					}
@@ -155,7 +154,7 @@ void api::get_details(const place_t& place_in)
 
 				//Finish
 				api::detail_done = true;
-				api::details_json = {};
+				api::details_json.clear();
 			}
 			else
 			{
@@ -196,7 +195,7 @@ void api::get_station(const std::string& id)
 
 					//Finish
 					api::stations_done = true;
-					api::stations_json = {};
+					api::stations_json.clear();
 				}
 				else
 				{
@@ -208,7 +207,7 @@ void api::get_station(const std::string& id)
 
 void api::filter_place(const std::string& key)
 {
-	api::filtered_places = {};
+	api::filtered_places.clear();
 
 	for (const place_t& place : api::places)
 	{

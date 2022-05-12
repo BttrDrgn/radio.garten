@@ -57,7 +57,7 @@ void settings::favorites_update()
 
 	if (stations.size() > 0)
 	{
-		api::favorite_stations = {};
+		api::favorite_stations.clear();
 
 		for (const std::string& station : stations)
 		{

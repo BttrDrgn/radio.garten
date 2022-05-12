@@ -48,7 +48,7 @@ void menus::update()
 	{
 		if (!menus::snow.empty())
 		{
-			menus::snow = {};
+			menus::snow.clear();
 		}
 	}
 

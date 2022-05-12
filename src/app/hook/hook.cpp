@@ -145,7 +145,7 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 
 void hook::get_procs()
 {
-	hook::processes = {};
+	hook::processes.clear();
 
 	EnumWindows(hook::get_window, 0);
 }
