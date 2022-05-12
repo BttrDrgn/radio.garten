@@ -464,7 +464,9 @@ void menus::overlay()
 				"The overlay can be injected into any\n"
 				"DirectX (9, 10, 11) or OpenGL3 application\n"
 				"and will provide a nearly identical\n"
-				"expierence as the normal application"
+				"experience as the normal application\n\n"
+				"USE AT YOUR OWN RISK\n"
+				"DO NOT USE ON ONLINE GAMES"
 			);
 			ImGui::EndTooltip();
 		}
