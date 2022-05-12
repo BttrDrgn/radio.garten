@@ -154,11 +154,19 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 
 			if (hook::auto_refresh)
 			{
-				for (const std::string& hook : hook::auto_hook)
+				for (std::string hook : hook::auto_hook)
 				{
+					//Make the detection lowercase
+					logger::to_lower(hook);
+
 					process_t proc = hook::processes[hook::processes.size() - 1];
 
-					if (proc.exe.find(hook))
+					std::vector<std::string> temp = logger::split(proc.exe, '\\');
+					std::string final_exe = temp[temp.size() - 1];
+					//Make the exe lowercase for comparison
+					logger::to_lower(final_exe);
+
+					if (!final_exe.compare(hook))
 					{
 						if (hook::injected_apps.size() > 0)
 						{
