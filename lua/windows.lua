@@ -196,6 +196,7 @@ workspace "Radio.Garten"
 		}
 
 		dependson {
+			"SDL2",
 			"Discord",
 			"ImGui",
 			"FT2",
@@ -208,6 +209,7 @@ workspace "Radio.Garten"
 			"d3d10",
 			"d3d11",
 
+			"SDL2",
 			"imgui",
 			"ft2",
 			"bass",
@@ -230,6 +232,7 @@ workspace "Radio.Garten"
 			"../deps/kiero/",
 			"../deps/minhook/include/",
 			"../deps/freetype-2.12.1/include/",
+			"../deps/SDL/include/",
 		}
 
 		files {
@@ -261,7 +264,10 @@ workspace "Radio.Garten"
 		kind "windowedapp"
 		warnings "off"
 
-		defines "OVERLAY"
+		defines {
+			"OVERLAY",
+			"HELPER",
+		}
 
 		pchheader "stdafx.hpp"
 		pchsource "../src/helper/stdafx.cpp"
