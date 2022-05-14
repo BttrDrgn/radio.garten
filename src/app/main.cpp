@@ -91,6 +91,47 @@ int main(int argc, char* argv[])
 	std::freopen("CONOUT$", "w", stdout);
 	std::freopen("CONIN$", "r", stdin);
 #endif
+
+	//https://stackoverflow.com/a/940743
+	//Some crap microsoft code i don't want to use to detect windows version
+	if (global::winver == -1)
+	{
+		UINT   buffer_len = 0;
+		LPBYTE buffer = 0;
+		DWORD  info_size = GetFileVersionInfoSizeA("C:\\WINDOWS\\system32\\kernel32.dll", 0);
+		LPSTR info_data = new char[info_size];
+
+		if (info_size != 0)
+		{
+			if (GetFileVersionInfoA("C:\\WINDOWS\\system32\\kernel32.dll", 0, info_size, info_data))
+			{
+				if (VerQueryValueA(info_data, "\\", (LPVOID*)&buffer, &buffer_len))
+				{
+					if (buffer_len)
+					{
+						VS_FIXEDFILEINFO* winver_info = (VS_FIXEDFILEINFO*)buffer;
+						if (winver_info->dwSignature == 0xfeef04bd)
+						{
+							DWORD major_ver = (winver_info->dwFileVersionLS >> 16) & 0xffff;
+							logger::log("WINVER", logger::va("%u", major_ver));
+
+							if (major_ver < 22000)
+							{
+								global::winver = 10;
+							}
+							else if (major_ver >= 22000)
+							{
+								global::winver = 11;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		delete[] info_data;
+	}
+
 #endif
 
 	if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0)

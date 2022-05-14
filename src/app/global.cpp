@@ -8,6 +8,7 @@ SDL_Surface* global::surface = 0;
 ImVec2 global::resolution = { 800, 600 };
 bool global::always_on_top = false;
 bool global::use_hardware = false;
+std::uint32_t global::winver = -1;
 std::float_t global::framerate = 0.0f;
 std::uint32_t  global::desired_framerate;
 std::uint32_t global::framelimit;

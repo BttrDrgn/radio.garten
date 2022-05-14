@@ -33,6 +33,7 @@ public:
 	static ImVec2 resolution;
 	static bool always_on_top;
 	static bool use_hardware;
+	static std::uint32_t winver;
 	static std::float_t framerate;
 	static std::uint32_t  desired_framerate;
 	static std::uint32_t framelimit;

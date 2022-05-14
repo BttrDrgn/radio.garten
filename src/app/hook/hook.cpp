@@ -16,7 +16,7 @@ bool hook::load(process_t proc)
 #ifdef _M_AMD64
 	if (!proc.arch.compare("x86"))
 	{
-		ShellExecuteA(0, "open", "x86\\helper.exe", &logger::va("--pid %i --arch %s --hwnd %u --auto %i", proc.pid, &proc.arch[0], proc.hwnd, hook::auto_refresh)[0], 0, 1);
+		ShellExecuteA(0, "open", "x86\\helper.exe", &logger::va("--pid %i --arch %s --hwnd %u --winver %u --auto %i", proc.pid, &proc.arch[0], proc.hwnd, global::winver, hook::auto_refresh)[0], 0, 1);
 		hook::injected_apps.emplace_back(proc);
 		return true;
 	}
@@ -72,11 +72,15 @@ bool hook::load(process_t proc)
 		BringWindowToTop(proc.hwnd);
 		SetForegroundWindow(proc.hwnd);
 		SetFocus(proc.hwnd);
-		//Set to top most temporarily
-		SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-		//Set back
-		SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-		ShowWindow(proc.hwnd, SW_NORMAL);
+
+		if (global::winver == 11)
+		{
+			//Set to top most temporarily
+			SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			//Set back
+			SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			ShowWindow(proc.hwnd, SW_NORMAL);
+		}
 	}
 
 	hook::injected_apps.emplace_back(proc);

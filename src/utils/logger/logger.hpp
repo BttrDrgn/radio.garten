@@ -44,6 +44,7 @@ public:
 		return std::string(result);
 	}
 
+#ifndef HELPER
 	static std::string get_toggle(bool input)
 	{
 		switch (input)
@@ -97,4 +98,5 @@ public:
 			c = std::toupper(c);
 		}));
 	}
+#endif
 };

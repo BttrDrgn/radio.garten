@@ -14,6 +14,7 @@ std::initializer_list<std::string> dlls
 
 bool failed = false;
 bool manual = true;
+std::uint32_t winver = -1;
 
 void load()
 {
@@ -69,11 +70,15 @@ void load()
 		BringWindowToTop(proc.hwnd);
 		SetForegroundWindow(proc.hwnd);
 		SetFocus(proc.hwnd);
-		//Set to top most temporarily
-		SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-		//Set back
-		SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-		ShowWindow(proc.hwnd, SW_NORMAL);
+
+		if (winver == 11)
+		{
+			//Set to top most temporarily
+			SetWindowPos(proc.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			//Set back
+			SetWindowPos(proc.hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			ShowWindow(proc.hwnd, SW_NORMAL);
+		}
 	}
 }
 
@@ -95,8 +100,8 @@ int __stdcall WinMain(HINSTANCE instance, HINSTANCE prev_instance, char* cmd_lin
 	{
 		if (args[i].find("--pid") != std::string::npos)
 		{
-			int value = std::stoi(__argv[i + 1]);
-			proc.pid = (std::uint32_t)value;
+			std::uint32_t value = std::stoi(__argv[i + 1]);
+			proc.pid = value;
 		}
 		else if (args[i].find("--arch") != std::string::npos)
 		{
@@ -108,6 +113,11 @@ int __stdcall WinMain(HINSTANCE instance, HINSTANCE prev_instance, char* cmd_lin
 			HWND value = reinterpret_cast<HWND>(std::stoul(__argv[i + 1], nullptr, 0));
 			proc.hwnd = value;
 		}
+		else if (args[i].find("--winver") != std::string::npos)
+		{
+			std::uint32_t value = std::stoi(__argv[i + 1]);
+			winver = value;
+		}
 		else if (args[i].find("--auto") != std::string::npos)
 		{
 			int value = std::stoi(__argv[i + 1]);
@@ -115,7 +125,7 @@ int __stdcall WinMain(HINSTANCE instance, HINSTANCE prev_instance, char* cmd_lin
 		}
 	}
 
-	if (!proc.pid || proc.arch.size() == 0 || proc.hwnd == 0)
+	if (!proc.pid || proc.arch.size() == 0 || proc.hwnd == 0 || winver == -1)
 	{
 		MessageBoxA(0, "Not enough arguments!", "Helper", 0);
 	}
