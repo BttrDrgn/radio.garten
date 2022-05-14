@@ -128,6 +128,7 @@ int __stdcall WinMain(HINSTANCE instance, HINSTANCE prev_instance, char* cmd_lin
 	if (!proc.pid || proc.arch.size() == 0 || proc.hwnd == 0 || winver == -1)
 	{
 		MessageBoxA(0, "Not enough arguments!", "Helper", 0);
+		return 0;
 	}
 
 	load();
