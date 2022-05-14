@@ -17,11 +17,11 @@ void api::get_places()
 
 	std::thread([]
 	{
-		httplib::Client cli(API_URL);
+		httplib::Client cli(HOST_NAME);
 
 		if (httplib::Result res = cli.Get(PLACES_ENDPOINT))
 		{
-			logger::log_info(logger::va("Accessing %s%s", API_URL, PLACES_ENDPOINT));
+			logger::log_info(logger::va("Accessing %s%s", HOST_NAME, PLACES_ENDPOINT));
 
 			if (res->status == 200)
 			{
@@ -91,11 +91,11 @@ void api::get_details(const place_t& place_in)
 
 	std::thread([place_in]
 	{
-		httplib::Client cli(API_URL);
+		httplib::Client cli(HOST_NAME);
 
 		if (httplib::Result res = cli.Get(PLACE_DETAIL_ENDPOINT(&place_in.id[0])))
 		{
-			logger::log_info(logger::va("Accessing %s%s", API_URL, PLACE_DETAIL_ENDPOINT(&place_in.id[0])));
+			logger::log_info(logger::va("Accessing %s%s", HOST_NAME, PLACE_DETAIL_ENDPOINT(&place_in.id[0])));
 			if (res->status == 200)
 			{
 				nl::json json = nl::json::parse(res->body);
@@ -135,32 +135,34 @@ void api::get_details(const place_t& place_in)
 	}).detach();
 }
 
-void api::get_station(const std::string& id)
+std::string api::get_shareable_url(const std::string& id)
 {
-	api::stations_done = false;
+	std::string url;
 
-	std::thread([id]
+	//This one isnt threaded; I believe this should be fast enough to not cause issues when playing
+	httplib::Client cli(HOST_NAME);
+
+	if (httplib::Result res = cli.Get(STATION_ENDPOINT(&id[0])))
+	{
+		logger::log_info(logger::va("Accessing %s%s", HOST_NAME, STATION_ENDPOINT(&id[0])));
+
+		if (res->status == 200)
 		{
-			httplib::Client cli(API_URL);
+			nl::json json = nl::json::parse(res->body);
+			api::version_check(json);
 
-			if (httplib::Result res = cli.Get(STATION_ENDPOINT(&id[0])))
-			{
-				logger::log_info(logger::va("Accessing %s%s", API_URL, STATION_ENDPOINT(&id[0])));
-				if (res->status == 200)
-				{
-					nl::json json = nl::json::parse(res->body);
-					api::version_check(json);
+			url = json["data"]["url"].dump();
+			url.erase(std::remove(url.begin(), url.end(), '\"'), url.end());
 
-					//Finish
-					api::stations_done = true;
-					json.clear();
-				}
-				else
-				{
-					logger::log_error("An error occured when gathering station data!");
-				}
-			}
-		}).detach();
+			json.clear();
+		}
+		else
+		{
+			logger::log_error("An error occured when getting shareable url!");
+		}
+	}
+
+	return url;
 }
 
 void api::search_stations(const std::string& str)
@@ -176,11 +178,11 @@ void api::search_stations(const std::string& str)
 
 	std::thread([str]
 	{
-		httplib::Client cli(API_URL);
+		httplib::Client cli(HOST_NAME);
 
 		if (httplib::Result res = cli.Get(SEARCH_ENDPOINT(&str[0])))
 		{
-			logger::log_info(logger::va("Accessing %s%s", API_URL, SEARCH_ENDPOINT(&str[0])));
+			logger::log_info(logger::va("Accessing %s%s", HOST_NAME, SEARCH_ENDPOINT(&str[0])));
 			if (res->status == 200)
 			{
 				nl::json json = nl::json::parse(res->body);

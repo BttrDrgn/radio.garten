@@ -1,6 +1,6 @@
 #pragma once
 
-#define API_URL "http://radio.garden"
+#define HOST_NAME "http://radio.garden"
 #define VERSION 1
 #define VERSION_HASH "\"bd23e54\""	//radio.garden git commit hash
 #define PLACES_ENDPOINT "/api/ara/content/places"
@@ -27,7 +27,7 @@ public:
 	static void get_places();
 	static void filter_place(const std::string& key);
 	static void get_details(const place_t& place_in);
-	static void get_station(const std::string& id);
+	static std::string get_shareable_url(const std::string& id);
 	static void search_stations(const std::string& str);
 
 	static std::vector<place_t> places;

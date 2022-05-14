@@ -234,6 +234,26 @@ void menus::actions()
 			api::get_places();
 		}
 
+		ImGui::SameLine();
+
+		if (audio::currently_playing.station.title != "N/A")
+		{
+			if (ImGui::Button("Share Station"))
+			{
+				std::string url = logger::va("%s%s", HOST_NAME, &api::get_shareable_url(audio::currently_playing.station.id)[0]);
+
+				ImGuiIO& io = ImGui::GetIO();
+				io.SetClipboardTextFn(io.ClipboardUserData, &url[0]);
+			}
+		}
+
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::Text("Copies the link to the\ncurrently playing station");
+			ImGui::EndTooltip();
+		}
+
 		ImGui::NewLine();
 		
 		ImGui::Text("Audio Controls");
