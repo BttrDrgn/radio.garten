@@ -32,6 +32,8 @@ public:
 
 private:
 	static void build_font(ImGuiIO& io);
+	static std::string fav_star;
+	static std::string fav_minus;
 
 	static void main_menu_bar();
 	static void actions();

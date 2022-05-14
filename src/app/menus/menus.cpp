@@ -559,29 +559,30 @@ void menus::stations()
 					ImGui::EndTooltip();
 				}
 
-				ImGui::SameLine();
 
-				if (ImGui::Button(&logger::va("*##search_%s", &station.id[0])[0]))
+				bool has = false;
+				for (const station_t& favorite : api::favorite_stations)
 				{
-					bool has = false;
-					for (const station_t& favorite : api::favorite_stations)
+					if (favorite.id == station.id)
 					{
-						if (favorite.id == station.id)
-						{
-							has = true;
-							break;
-						}
+						has = true;
+						break;
 					}
+				}
 
-					if (!has)
+				if (!has)
+				{
+					ImGui::SameLine();
+					if (ImGui::Button(&logger::va("%s##search_%s", &menus::fav_star[0], &station.id[0])[0]))
 					{
 						api::favorite_stations.emplace_back(station);
 						settings::add_favorite(station);
 					}
 				}
 			}
-			ImGui::NewLine();
 		}
+
+		ImGui::NewLine();
 
 		ImGui::Text("Place Stations:");
 		if (api::stations.empty())
@@ -601,21 +602,20 @@ void menus::stations()
 					audio::play(station.id);
 				}
 
-				ImGui::SameLine();
-
-				if (ImGui::Button(&logger::va("*##%s", &station.id[0])[0]))
+				bool has = false;
+				for (const station_t& favorite : api::favorite_stations)
 				{
-					bool has = false;
-					for (const station_t& favorite : api::favorite_stations)
+					if (favorite.id == station.id)
 					{
-						if (favorite.id == station.id)
-						{
-							has = true;
-							break;
-						}
+						has = true;
+						break;
 					}
-					
-					if (!has)
+				}
+
+				if (!has)
+				{
+					ImGui::SameLine();
+					if (ImGui::Button(&logger::va("%s##%s", &menus::fav_star[0], &station.id[0])[0]))
 					{
 						api::favorite_stations.emplace_back(station);
 						settings::add_favorite(station);
@@ -634,13 +634,13 @@ void menus::favorites()
 		if (api::favorite_stations.empty())
 		{
 			ImGui::Text("Favorites are empty!");
-			ImGui::Text("Click the [*] button next to a station!");
+			ImGui::Text("Click the [%s] button next to a station!", &menus::fav_star[0]);
 		}
 		else
 		{
 			for (const station_t& station : api::favorite_stations)
 			{
-				if (ImGui::Button(&logger::va("%s ##favorite", &station.title[0])[0]))
+				if (ImGui::Button(&logger::va("%s##favorite", &station.title[0])[0]))
 				{
 					audio::currently_playing.station.title = station.title;
 					audio::currently_playing.station.id = station.id;
@@ -651,7 +651,7 @@ void menus::favorites()
 
 				ImGui::SameLine();
 				
-				if (ImGui::Button(&logger::va("-##%s", &station.id[0])[0]))
+				if (ImGui::Button(&logger::va("%s##%s", &menus::fav_minus[0],  & station.id[0])[0]))
 				{
 					for (int i = 0; i < api::favorite_stations.size(); ++i)
 					{
@@ -778,6 +778,8 @@ void menus::build_font(ImGuiIO& io)
 			cfg.OversampleH = cfg.OversampleV = 1;
 			//cfg.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_LoadColor;	//Noto doesnt have color
 			io.Fonts->AddFontFromFileTTF(&emoji[0], 12.0f, &cfg, emoji_ranges);
+			menus::fav_star = "\u2795";
+			menus::fav_minus = "\u2796";
 		}
 
 		if (fs::exists(font_jp))
@@ -789,6 +791,9 @@ void menus::build_font(ImGuiIO& io)
 		}
 	}
 }
+
+std::string menus::fav_star = "*";
+std::string menus::fav_minus = "-";
 
 #ifndef OVERLAY
 std::vector<vec2> menus::snow;
