@@ -70,7 +70,7 @@ void settings::update()
 
 #ifndef OVERLAY
 	if (!fs::exists(settings::auto_hook_file)) fs::write(settings::auto_hook_file, "", false);
-	hook::auto_hook = logger::split(fs::read(settings::auto_hook_file), ',');
+	hook::auto_hook = logger::split(fs::read(settings::auto_hook_file), ",");
 #endif
 }
 
@@ -82,7 +82,7 @@ void settings::favorites_update()
 	}
 
 	std::string fav_contents = fs::read(settings::favorites_file);
-	std::vector<std::string> stations = logger::split(fs::read(settings::favorites_file), '|');
+	std::vector<std::string> stations = logger::split(fs::read(settings::favorites_file), "|");
 
 	if (stations.size() > 0)
 	{
@@ -90,7 +90,7 @@ void settings::favorites_update()
 
 		for (const std::string& station : stations)
 		{
-			std::vector<std::string> temp = logger::split(station, ',');
+			std::vector<std::string> temp = logger::split(station, ",");
 
 			if (temp.size() == 5)
 			{
@@ -138,11 +138,11 @@ void settings::remove_favorite(station_t station)
 	std::string contents = fs::read(settings::favorites_file);
 	std::vector<station_t> stations;
 
-	std::vector<std::string> contents_split = logger::split(contents, '|');
+	std::vector<std::string> contents_split = logger::split(contents, "|");
 
 	for (const std::string& c : contents_split)
 	{
-		std::vector<std::string> temp = logger::split(c, ',');
+		std::vector<std::string> temp = logger::split(c, ",");
 
 		if (temp.size() == 5)
 		{

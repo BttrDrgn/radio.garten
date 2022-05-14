@@ -56,7 +56,7 @@ void audio::init_overlay(HWND hwnd)
 
 	if (fs::exists(audio::last_played_file))
 	{
-		std::vector<std::string> contents = logger::split(fs::read(audio::last_played_file), ',');
+		std::vector<std::string> contents = logger::split(fs::read(audio::last_played_file), ",");
 		audio::currently_playing.station.title = contents[0];
 		audio::play(contents[1]);
 	}

@@ -24,13 +24,16 @@ public:
 	static bool show_all_stations;
 	static bool show_drpc;
 
-	static char search_buffer[64];
+	static char place_search_buffer[64];
+	static char station_search_buffer[64];
 	static std::string current_country;
 
 	static std::string currently_playing;
 
 private:
 	static void build_font(ImGuiIO& io);
+	static std::string fav_star;
+	static std::string fav_minus;
 
 	static void main_menu_bar();
 	static void actions();

@@ -230,7 +230,7 @@ void menus::actions()
 	{
 		if (ImGui::Button("Refresh Places"))
 		{
-			memset(menus::search_buffer, 0, sizeof(menus::search_buffer));
+			memset(menus::place_search_buffer, 0, sizeof(menus::place_search_buffer));
 			api::get_places();
 		}
 
@@ -376,7 +376,7 @@ void menus::places()
 {
 	if (ImGui::BeginMenu("Places"))
 	{
-		if (std::strlen(menus::search_buffer) == 0)
+		if (std::strlen(menus::place_search_buffer) == 0)
 		{
 			menus::filtering = false;
 		}
@@ -385,7 +385,7 @@ void menus::places()
 		{
 			menus::filtering = false;
 			menus::current_country = "N/A";
-			memset(menus::search_buffer, 0, sizeof(menus::search_buffer));
+			memset(menus::place_search_buffer, 0, sizeof(menus::place_search_buffer));
 		}
 
 		if (ImGui::BeginCombo("Country", &menus::current_country[0]))
@@ -412,10 +412,10 @@ void menus::places()
 			ImGui::EndCombo();
 		}
 
-		if (ImGui::InputText("Search", menus::search_buffer, sizeof(search_buffer)))
+		if (ImGui::InputText("Search", menus::place_search_buffer, sizeof(place_search_buffer)))
 		{
 			menus::filtering = true;
-			api::filter_place(std::string(menus::search_buffer));
+			api::filter_place(std::string(menus::place_search_buffer));
 		}
 
 		if (ImGui::BeginMenu("Locations"))
@@ -483,7 +483,7 @@ void menus::places()
 					{
 						if (api::filtered_places.empty())
 						{
-							ImGui::Text("No results found with the search term\n%s", menus::search_buffer);
+							ImGui::Text("No results found with the search term\n%s", menus::place_search_buffer);
 							ImGui::Text("Tip: Search filters country, city, and place ID; case sensitive");
 						}
 						else 
@@ -522,9 +522,72 @@ void menus::stations()
 {
 	if (ImGui::BeginMenu("Stations"))
 	{
+		ImGui::InputText("##station_search", menus::station_search_buffer, sizeof(menus::station_search_buffer));
+		ImGui::SameLine();
+		if (ImGui::Button("Search") && std::strlen(menus::station_search_buffer) > 0)
+		{
+			api::search_stations(menus::station_search_buffer);
+		}
+
+		if (!api::station_search_results.empty())
+		{
+			ImGui::SameLine();
+
+			if (ImGui::Button("Clear"))
+			{
+				api::station_search_results.clear();
+				memset(menus::station_search_buffer, 0, sizeof(menus::station_search_buffer));
+			}
+
+			ImGui::Text("Search results for %s", menus::station_search_buffer);
+
+			for (const station_t& station : api::station_search_results)
+			{
+				if (ImGui::Button(&logger::va("%s##search", &station.title[0])[0]))
+				{
+					audio::currently_playing.station.title = station.title;
+					audio::currently_playing.station.id = station.id;
+					audio::currently_playing.region.city = station.place.city;
+					audio::currently_playing.region.country = station.place.country;
+					audio::play(station.id);
+				}
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("%s, %s", &station.place.city[0], &station.place.country[0]);
+					ImGui::EndTooltip();
+				}
+
+
+				bool has = false;
+				for (const station_t& favorite : api::favorite_stations)
+				{
+					if (favorite.id == station.id)
+					{
+						has = true;
+						break;
+					}
+				}
+
+				if (!has)
+				{
+					ImGui::SameLine();
+					if (ImGui::Button(&logger::va("%s##search_%s", &menus::fav_star[0], &station.id[0])[0]))
+					{
+						api::favorite_stations.emplace_back(station);
+						settings::add_favorite(station);
+					}
+				}
+			}
+		}
+
+		ImGui::NewLine();
+
+		ImGui::Text("Place Stations:");
 		if (api::stations.empty())
 		{
-			ImGui::Text("Stations are empty!\nYou might need to select a place.");
+			ImGui::Text("Stations are empty!\nYou might need to select a place or try\nsearching all global stations above.");
 		}
 		else
 		{
@@ -539,21 +602,20 @@ void menus::stations()
 					audio::play(station.id);
 				}
 
-				ImGui::SameLine();
-
-				if (ImGui::Button(&logger::va("*##%s", &station.id[0])[0]))
+				bool has = false;
+				for (const station_t& favorite : api::favorite_stations)
 				{
-					bool has = false;
-					for (const station_t& favorite : api::favorite_stations)
+					if (favorite.id == station.id)
 					{
-						if (favorite.id == station.id)
-						{
-							has = true;
-							break;
-						}
+						has = true;
+						break;
 					}
-					
-					if (!has)
+				}
+
+				if (!has)
+				{
+					ImGui::SameLine();
+					if (ImGui::Button(&logger::va("%s##%s", &menus::fav_star[0], &station.id[0])[0]))
 					{
 						api::favorite_stations.emplace_back(station);
 						settings::add_favorite(station);
@@ -572,13 +634,13 @@ void menus::favorites()
 		if (api::favorite_stations.empty())
 		{
 			ImGui::Text("Favorites are empty!");
-			ImGui::Text("Click the [*] button next to a station!");
+			ImGui::Text("Click the [%s] button next to a station!", &menus::fav_star[0]);
 		}
 		else
 		{
 			for (const station_t& station : api::favorite_stations)
 			{
-				if (ImGui::Button(&logger::va("%s ##favorite", &station.title[0])[0]))
+				if (ImGui::Button(&logger::va("%s##favorite", &station.title[0])[0]))
 				{
 					audio::currently_playing.station.title = station.title;
 					audio::currently_playing.station.id = station.id;
@@ -589,7 +651,7 @@ void menus::favorites()
 
 				ImGui::SameLine();
 				
-				if (ImGui::Button(&logger::va("-##%s", &station.id[0])[0]))
+				if (ImGui::Button(&logger::va("%s##%s", &menus::fav_minus[0],  & station.id[0])[0]))
 				{
 					for (int i = 0; i < api::favorite_stations.size(); ++i)
 					{
@@ -716,6 +778,8 @@ void menus::build_font(ImGuiIO& io)
 			cfg.OversampleH = cfg.OversampleV = 1;
 			//cfg.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_LoadColor;	//Noto doesnt have color
 			io.Fonts->AddFontFromFileTTF(&emoji[0], 12.0f, &cfg, emoji_ranges);
+			menus::fav_star = "\u2795";
+			menus::fav_minus = "\u2796";
 		}
 
 		if (fs::exists(font_jp))
@@ -728,6 +792,9 @@ void menus::build_font(ImGuiIO& io)
 	}
 }
 
+std::string menus::fav_star = "*";
+std::string menus::fav_minus = "-";
+
 #ifndef OVERLAY
 std::vector<vec2> menus::snow;
 std::int32_t menus::max_points = 255;
@@ -738,5 +805,6 @@ bool menus::show_all_stations = false;
 bool menus::show_drpc;
 
 bool menus::filtering = false;
-char menus::search_buffer[64];
+char menus::place_search_buffer[64];
+char menus::station_search_buffer[64];
 std::string menus::current_country = "N/A";

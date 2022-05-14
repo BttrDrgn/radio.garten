@@ -53,10 +53,10 @@ workspace "Radio.Garten"
 		}
 
 		postbuildcommands {
-			"mkdir \"$(OutDir)x86\\",
+			"IF NOT EXIST \"$(OutDir)\"x86 mkdir \"$(OutDir)x86\\",
 
-			"copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"x86\\",
-			"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"\\x86\\",
+			"IF NOT EXIST \"$(OutDir)\"x86\\bass.dll copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"x86\\",
+			"IF NOT EXIST \"$(OutDir)\"x86\\discord_game_sdk.dll copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"\\x86\\",
 		}
 	--end
 
@@ -70,14 +70,14 @@ workspace "Radio.Garten"
 		}
 
 		postbuildcommands {
-			"mkdir \"$(OutDir)x86\\",
-			"mkdir \"$(OutDir)x86_64\\",
+			"IF NOT EXIST \"$(OutDir)\"x86 mkdir \"$(OutDir)x86\\",
+			"IF NOT EXIST \"$(OutDir)\"x86_64 mkdir \"$(OutDir)x86_64\\",
 
-			"copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"x86\\",
-			"copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"\\x86\\",
+			"IF NOT EXIST \"$(OutDir)\"x86\\bass.dll copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"x86\\",
+			"IF NOT EXIST \"$(OutDir)\"x86\\discord_game_sdk.dll copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"\\x86\\",
 
-			"copy /y \"..\\deps\\bass\\Win32\\x64\\bass.dll\" \"$(OutDir)\"\\x86_64\\",
-			"copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"x86_64\\",
+			"IF NOT EXIST \"$(OutDir)\"x86_64\\bass.dll copy /y \"..\\deps\\bass\\Win32\\x64\\bass.dll\" \"$(OutDir)\"\\x86_64\\",
+			"IF NOT EXIST \"$(OutDir)\"x86_64\\discord_game_sdk.dll copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"x86_64\\",
 		}
 	--end
 

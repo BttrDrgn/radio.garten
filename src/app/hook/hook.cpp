@@ -140,7 +140,6 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 			{
 				if (exe.find(look_up) != std::string::npos)
 				{
-					logger::log_debug(logger::va("Found %s [%s]", &look_up[0], &exe[0]));
 					do_not_add = true;
 					break;
 				}
@@ -171,7 +170,7 @@ int CALLBACK hook::get_window(HWND hWnd, LPARAM lparam)
 
 					process_t proc = hook::processes[hook::processes.size() - 1];
 
-					std::vector<std::string> temp = logger::split(proc.exe, '\\');
+					std::vector<std::string> temp = logger::split(proc.exe, "\\");
 					std::string final_exe = temp[temp.size() - 1];
 					//Make the exe lowercase for comparison
 					logger::to_lower(final_exe);
