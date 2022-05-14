@@ -10,8 +10,6 @@ void api::get_places()
 		return;
 	}
 
-	api::places_json.clear();
-	api::details_json.clear();
 	api::places_done = false;
 	api::places.clear();
 	api::all_countries.clear();
@@ -27,23 +25,11 @@ void api::get_places()
 
 			if (res->status == 200)
 			{
-				api::places_json = nl::json::parse(res->body);
+				nl::json json = nl::json::parse(res->body);
 
-				//Check version matching for future updates
-				std::int32_t version = api::places_json["apiVersion"].get<std::int32_t>();
-				if (version != 1)
-				{
-					global::msg_box("Radio.Garten Places", logger::va("apiVersion was expected to be 1 (got %i)", version));
-					global::shutdown = true;
-				}
+				api::version_check(json);
 
-				std::string version_hash = api::places_json["version"].dump();
-				if (version_hash.compare(VERSION_HASH))
-				{
-					logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
-				}
-
-				nl::json data = nl::json::parse(api::places_json["data"].dump());
+				nl::json data = nl::json::parse(json["data"].dump());
 				for (const nl::detail::iteration_proxy_value<nl::detail::iter_impl<nl::json>>& i : data["list"].items())
 				{
 					//Get string
@@ -83,7 +69,7 @@ void api::get_places()
 
 				//Finish
 				api::places_done = true;
-				api::places_json.clear();
+				json.clear();
 			}
 			else
 			{
@@ -100,8 +86,7 @@ void api::get_details(const place_t& place_in)
 		logger::log_debug("Refreshing stations not done! Cancelling request.");
 		return;
 	}
-
-	api::details_json.clear();
+	
 	api::detail_done = false;
 	api::stations.clear();
 
@@ -114,23 +99,11 @@ void api::get_details(const place_t& place_in)
 			logger::log_info(logger::va("Accessing %s%s", API_URL, PLACE_DETAIL_ENDPOINT(&place_in.id[0])));
 			if (res->status == 200)
 			{
-				api::details_json = nl::json::parse(res->body);
+				nl::json json = nl::json::parse(res->body);
 
-				//Check version matching for future updates
-				std::int32_t version = api::details_json["apiVersion"].get<std::int32_t>();
-				if (version != 1)
-				{
-					global::msg_box("Radio.Garten Places", logger::va("apiVersion was expected to be 1 (got %i)", version));
-					global::shutdown = true;
-				}
+				api::version_check(json);
 
-				std::string version_hash = api::details_json["version"].dump();
-				if (version_hash.compare(VERSION_HASH))
-				{
-					logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
-				}
-
-				nl::json data = nl::json::parse(api::details_json["data"].dump());
+				nl::json data = nl::json::parse(json["data"].dump());
 
 				for (const nl::basic_json<>::value_type& i : data["content"][0]["items"])
 				{
@@ -154,7 +127,7 @@ void api::get_details(const place_t& place_in)
 
 				//Finish
 				api::detail_done = true;
-				api::details_json.clear();
+				json.clear();
 			}
 			else
 			{
@@ -177,25 +150,13 @@ void api::get_station(const std::string& id)
 				logger::log_info(logger::va("Accessing %s%s", API_URL, STATION_ENDPOINT(&id[0])));
 				if (res->status == 200)
 				{
-					api::stations_json = nl::json::parse(res->body);
+					nl::json json = nl::json::parse(res->body);
 
-					//Check version matching for future updates
-					std::int32_t version = api::stations_json["apiVersion"].get<std::int32_t>();
-					if (version != 1)
-					{
-						global::msg_box("Radio.Garten Places", logger::va("apiVersion was expected to be 1 (got %i)", version));
-						global::shutdown = true;
-					}
-
-					std::string version_hash = api::stations_json["version"].dump();
-					if (version_hash.compare(VERSION_HASH))
-					{
-						logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
-					}
+					api::version_check(json);
 
 					//Finish
 					api::stations_done = true;
-					api::stations_json.clear();
+					json.clear();
 				}
 				else
 				{
@@ -203,6 +164,50 @@ void api::get_station(const std::string& id)
 				}
 			}
 		}).detach();
+}
+
+void api::search_stations(const std::string& str)
+{
+	if (!api::station_search_done)
+	{
+		logger::log_debug("Searching stations not done! Cancelling request.");
+		return;
+	}
+
+	api::station_search_done = false;
+
+	std::thread([str]
+	{
+		httplib::Client cli(API_URL);
+
+		if (httplib::Result res = cli.Get(SEARCH_ENDPOINT(&str[0])))
+		{
+			logger::log_info(logger::va("Accessing %s%s", API_URL, SEARCH_ENDPOINT(&str[0])));
+			if (res->status == 200)
+			{
+				nl::json json = nl::json::parse(res->body);
+
+				//Check version matching for future updates
+				
+				api::version_check(json);
+
+				nl::json data = nl::json::parse(json["hits"].dump());
+
+				for (const nl::basic_json<>::value_type& i : data["hits"])
+				{
+					logger::log_debug(i["hits"].dump());
+				}
+
+				//Finish
+				api::station_search_done = true;
+				json.clear();
+			}
+			else
+			{
+				logger::log_error("An error occured when searching for stations!");
+			}
+		}
+	}).detach();
 }
 
 void api::filter_place(const std::string& key)
@@ -219,38 +224,36 @@ void api::filter_place(const std::string& key)
 	}
 }
 
-std::string api::get_final_redirect(const std::string& entry_url)
+bool api::version_check(const nl::json& in_json)
 {
-	std::string domain = entry_url.substr(0, strlen("http://radio.garden"));
-	std::string access = entry_url.substr(strlen("http://radio.garden"), entry_url.length() - strlen("http://radio.garden"));
-	
-	httplib::Client cli(&domain[0]);/*  */
-
-	if(httplib::Result res = cli.Get(&access[0]))
+	std::int32_t version = in_json["apiVersion"].get<std::int32_t>();
+	if (version != 1)
 	{
-		logger::log_info(logger::va("Accessing %s%s", domain, access));
-
-		cli.set_follow_location(true);
-		if(res = cli.Get("/"))
-		{
-			logger::log_debug(logger::va("Status %i", res->status));
-		}
+		global::msg_box("Radio.Garten Places", logger::va("apiVersion was expected to be 1 (got %i)", version));
+		global::shutdown = true;
+		return false;
 	}
 
-	return std::string("");
+	std::string version_hash = in_json["version"].dump();
+	if (version_hash.compare(VERSION_HASH))
+	{
+		logger::log_warning(logger::va("Hash was expected to be %s (got %s)", VERSION_HASH, &version_hash[0]));
+	}
+
+	return true;
 }
 
-nl::json api::places_json;
 std::vector<place_t> api::places;
 std::vector<place_t> api::filtered_places;
 bool api::places_done = true;
 
-nl::json api::details_json;
 bool api::detail_done = true;
 
-nl::json api::stations_json;
 std::vector<station_t> api::stations;
 bool api::stations_done = true;
+
+std::vector<station_t> api::station_search_results;
+bool api::station_search_done = true;
 
 std::vector<station_t> api::favorite_stations;
 

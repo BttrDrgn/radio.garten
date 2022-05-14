@@ -230,7 +230,7 @@ void menus::actions()
 	{
 		if (ImGui::Button("Refresh Places"))
 		{
-			memset(menus::search_buffer, 0, sizeof(menus::search_buffer));
+			memset(menus::place_search_buffer, 0, sizeof(menus::place_search_buffer));
 			api::get_places();
 		}
 
@@ -376,7 +376,7 @@ void menus::places()
 {
 	if (ImGui::BeginMenu("Places"))
 	{
-		if (std::strlen(menus::search_buffer) == 0)
+		if (std::strlen(menus::place_search_buffer) == 0)
 		{
 			menus::filtering = false;
 		}
@@ -385,7 +385,7 @@ void menus::places()
 		{
 			menus::filtering = false;
 			menus::current_country = "N/A";
-			memset(menus::search_buffer, 0, sizeof(menus::search_buffer));
+			memset(menus::place_search_buffer, 0, sizeof(menus::place_search_buffer));
 		}
 
 		if (ImGui::BeginCombo("Country", &menus::current_country[0]))
@@ -412,10 +412,10 @@ void menus::places()
 			ImGui::EndCombo();
 		}
 
-		if (ImGui::InputText("Search", menus::search_buffer, sizeof(search_buffer)))
+		if (ImGui::InputText("Search", menus::place_search_buffer, sizeof(place_search_buffer)))
 		{
 			menus::filtering = true;
-			api::filter_place(std::string(menus::search_buffer));
+			api::filter_place(std::string(menus::place_search_buffer));
 		}
 
 		if (ImGui::BeginMenu("Locations"))
@@ -483,7 +483,7 @@ void menus::places()
 					{
 						if (api::filtered_places.empty())
 						{
-							ImGui::Text("No results found with the search term\n%s", menus::search_buffer);
+							ImGui::Text("No results found with the search term\n%s", menus::place_search_buffer);
 							ImGui::Text("Tip: Search filters country, city, and place ID; case sensitive");
 						}
 						else 
@@ -522,9 +522,18 @@ void menus::stations()
 {
 	if (ImGui::BeginMenu("Stations"))
 	{
+		ImGui::InputText("##station_search", menus::station_search_buffer, sizeof(menus::station_search_buffer));
+		ImGui::SameLine();
+		if (ImGui::Button("Search") && std::strlen(menus::station_search_buffer) > 0)
+		{
+			api::search_stations(menus::station_search_buffer);
+		}
+
+		ImGui::NewLine();
+
 		if (api::stations.empty())
 		{
-			ImGui::Text("Stations are empty!\nYou might need to select a place.");
+			ImGui::Text("Stations are empty!\nYou might need to select a place or try\nsearching all global stations above.");
 		}
 		else
 		{
@@ -738,5 +747,6 @@ bool menus::show_all_stations = false;
 bool menus::show_drpc;
 
 bool menus::filtering = false;
-char menus::search_buffer[64];
+char menus::place_search_buffer[64];
+char menus::station_search_buffer[64];
 std::string menus::current_country = "N/A";
