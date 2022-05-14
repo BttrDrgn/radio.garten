@@ -520,6 +520,8 @@ void menus::places()
 
 void menus::stations()
 {
+	static char search_text[64];
+
 	if (ImGui::BeginMenu("Stations"))
 	{
 		ImGui::InputText("##station_search", menus::station_search_buffer, sizeof(menus::station_search_buffer));
@@ -527,6 +529,8 @@ void menus::stations()
 		if (ImGui::Button("Search") && std::strlen(menus::station_search_buffer) > 0)
 		{
 			api::search_stations(menus::station_search_buffer);
+			memset(search_text, 0, sizeof(search_text));
+			strcpy(search_text, menus::station_search_buffer);
 		}
 
 		if (!api::station_search_results.empty())
@@ -539,7 +543,7 @@ void menus::stations()
 				memset(menus::station_search_buffer, 0, sizeof(menus::station_search_buffer));
 			}
 
-			ImGui::Text("Search results for %s", menus::station_search_buffer);
+			ImGui::Text("Search results for %s", search_text);
 
 			for (const station_t& station : api::station_search_results)
 			{
