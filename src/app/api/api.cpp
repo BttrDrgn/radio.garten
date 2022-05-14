@@ -26,7 +26,6 @@ void api::get_places()
 			if (res->status == 200)
 			{
 				nl::json json = nl::json::parse(res->body);
-
 				api::version_check(json);
 
 				nl::json data = nl::json::parse(json["data"].dump());
@@ -100,10 +99,9 @@ void api::get_details(const place_t& place_in)
 			if (res->status == 200)
 			{
 				nl::json json = nl::json::parse(res->body);
-
 				api::version_check(json);
 
-				nl::json data = nl::json::parse(json["data"].dump());
+				nl::json data = json["data"];
 
 				for (const nl::basic_json<>::value_type& i : data["content"][0]["items"])
 				{
@@ -151,7 +149,6 @@ void api::get_station(const std::string& id)
 				if (res->status == 200)
 				{
 					nl::json json = nl::json::parse(res->body);
-
 					api::version_check(json);
 
 					//Finish
@@ -175,6 +172,7 @@ void api::search_stations(const std::string& str)
 	}
 
 	api::station_search_done = false;
+	api::station_search_results.clear();
 
 	std::thread([str]
 	{
@@ -186,16 +184,29 @@ void api::search_stations(const std::string& str)
 			if (res->status == 200)
 			{
 				nl::json json = nl::json::parse(res->body);
-
-				//Check version matching for future updates
-				
 				api::version_check(json);
 
-				nl::json data = nl::json::parse(json["hits"].dump());
+				nl::json data = json["hits"]["hits"];
 
-				for (const nl::basic_json<>::value_type& i : data["hits"])
+				logger::log_info(data.dump());
+
+				for (const nl::basic_json<>::value_type& i : data)
 				{
-					logger::log_debug(i["hits"].dump());
+					nl::json temp = i["_source"];
+					
+					if (!temp["type"].dump().compare("\"channel\""))
+					{
+						std::vector<std::string> place_info = logger::split(temp["subtitle"], ", ");
+						std::vector<std::string> url = logger::split(temp["url"], "/");
+
+						station_t station;
+						station.title = temp["title"];
+						station.place.country = place_info[1];
+						station.place.city = place_info[0];
+						station.id = url[url.size() - 1];
+
+						api::station_search_results.emplace_back(station);
+					}
 				}
 
 				//Finish

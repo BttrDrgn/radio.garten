@@ -529,8 +529,61 @@ void menus::stations()
 			api::search_stations(menus::station_search_buffer);
 		}
 
-		ImGui::NewLine();
+		if (!api::station_search_results.empty())
+		{
+			ImGui::SameLine();
 
+			if (ImGui::Button("Clear"))
+			{
+				api::station_search_results.clear();
+				memset(menus::station_search_buffer, 0, sizeof(menus::station_search_buffer));
+			}
+
+			ImGui::Text("Search results for %s", menus::station_search_buffer);
+
+			for (const station_t& station : api::station_search_results)
+			{
+				if (ImGui::Button(&logger::va("%s##search", &station.title[0])[0]))
+				{
+					audio::currently_playing.station.title = station.title;
+					audio::currently_playing.station.id = station.id;
+					audio::currently_playing.region.city = station.place.city;
+					audio::currently_playing.region.country = station.place.country;
+					audio::play(station.id);
+				}
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("%s, %s", &station.place.city[0], &station.place.country[0]);
+					ImGui::EndTooltip();
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button(&logger::va("*##search_%s", &station.id[0])[0]))
+				{
+					bool has = false;
+					for (const station_t& favorite : api::favorite_stations)
+					{
+						if (favorite.id == station.id)
+						{
+							has = true;
+							break;
+						}
+					}
+
+					if (!has)
+					{
+						api::favorite_stations.emplace_back(station);
+						settings::add_favorite(station);
+					}
+				}
+			}
+			ImGui::NewLine();
+		}
+
+		ImGui::Text("Place Stations:");
 		if (api::stations.empty())
 		{
 			ImGui::Text("Stations are empty!\nYou might need to select a place or try\nsearching all global stations above.");
