@@ -12,6 +12,8 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 
 	if (!init)
 	{
+		global::renderer = kiero::RenderType::Enum::D3D11;
+
 		DXGI_SWAP_CHAIN_DESC desc;
 		pSwapChain->GetDesc(&desc);
 
@@ -35,15 +37,9 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		init = true;
 	}
 
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
+	menus::prepare();
 	menus::update();
-
-	ImGui::EndFrame();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	menus::present();
 
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }

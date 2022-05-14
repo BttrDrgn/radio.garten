@@ -5,13 +5,14 @@
 class menus
 {
 public:
-	static void init();
 	static void update();
 
-#ifndef OVERLAY
+	static void init();
 	static void prepare();
 	static void present();
 	static void cleanup();
+
+#ifndef OVERLAY
 	static std::vector<vec2> snow;
 	static std::int32_t max_points;
 	static bool show_snow;

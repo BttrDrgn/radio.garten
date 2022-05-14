@@ -12,6 +12,8 @@ BOOL __stdcall hkWglSwapBuffers(_In_ HDC hDc)
 
 	if (!init)
 	{
+		global::renderer = kiero::RenderType::Enum::OpenGL;
+
 		HWND hwnd = WindowFromDC(hDc);
 
 		global::hwnd = hwnd;
@@ -26,15 +28,9 @@ BOOL __stdcall hkWglSwapBuffers(_In_ HDC hDc)
 		init = true;
 	}
 
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
+	menus::prepare();
 	menus::update();
-
-	ImGui::EndFrame();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	menus::present();
 
 	return owglSwapBuffers(hDc);
 }

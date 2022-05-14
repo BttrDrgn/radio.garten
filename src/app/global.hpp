@@ -64,5 +64,6 @@ public:
 #else
 	static bool hide;
 	static HWND hwnd;
+	static kiero::RenderType::Enum renderer;
 #endif
 };

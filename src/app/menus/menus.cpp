@@ -16,7 +16,6 @@
 #include <shellapi.h>
 #endif
 
-
 void menus::init()
 {
 	IMGUI_CHECKVERSION();
@@ -29,6 +28,94 @@ void menus::init()
 #ifndef OVERLAY
 	ImGui_ImplSDL2_InitForSDLRenderer(global::window, global::renderer);
 	ImGui_ImplSDLRenderer_Init(global::renderer);
+#endif
+}
+
+void menus::prepare()
+{
+#ifndef OVERLAY
+	ImGui_ImplSDLRenderer_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+	SDL_SetRenderDrawColor(global::renderer, 68, 43, 134, 255);
+	SDL_RenderClear(global::renderer);
+#else
+	switch (global::renderer)
+	{
+	case kiero::RenderType::D3D9:
+		ImGui_ImplDX9_NewFrame();
+		break;
+
+	case kiero::RenderType::D3D10:
+		ImGui_ImplDX10_NewFrame();
+		break;
+
+	case kiero::RenderType::D3D11:
+		ImGui_ImplDX11_NewFrame();
+		break;
+
+	case kiero::RenderType::OpenGL:
+		ImGui_ImplOpenGL3_NewFrame();
+		break;
+	}
+
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+#endif
+}
+
+void menus::present()
+{
+#ifndef OVERLAY
+	ImGui::Render();
+	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
+	if (!global::use_hardware)
+	{
+		SDL_UpdateWindowSurface(global::window);
+
+	}
+	else if (global::use_hardware)
+	{
+		SDL_RenderPresent(global::renderer);
+	}
+#else
+	ImGui::EndFrame();
+	ImGui::Render();
+
+	switch (global::renderer)
+	{
+	case kiero::RenderType::D3D9:
+		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+		break;
+
+	case kiero::RenderType::D3D10:
+		ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
+		break;
+
+	case kiero::RenderType::D3D11:
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		break;
+
+	case kiero::RenderType::OpenGL:
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		break;
+	}
+#endif
+}
+
+void menus::cleanup()
+{
+#ifndef OVERLAY
+	ImGui_ImplSDLRenderer_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
+	SDL_DestroyRenderer(global::renderer);
+	SDL_DestroyWindow(global::window);
+	SDL_Quit();
+#else
+
 #endif
 }
 
@@ -85,44 +172,6 @@ void menus::update()
 	}
 #endif
 }
-
-#ifndef OVERLAY
-void menus::prepare()
-{
-	ImGui_ImplSDLRenderer_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-	ImGui::NewFrame();
-	SDL_SetRenderDrawColor(global::renderer, 68, 43, 134, 255);
-	SDL_RenderClear(global::renderer);
-}
-
-void menus::present()
-{
-	ImGui::Render();
-	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-
-	if (!global::use_hardware)
-	{
-		SDL_UpdateWindowSurface(global::window);
-
-	}
-	else if(global::use_hardware)
-	{
-		SDL_RenderPresent(global::renderer);
-	}
-}
-
-void menus::cleanup()
-{
-	ImGui_ImplSDLRenderer_Shutdown();
-	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
-
-	SDL_DestroyRenderer(global::renderer);
-	SDL_DestroyWindow(global::window);
-	SDL_Quit();
-}
-#endif
 
 void menus::main_menu_bar()
 {

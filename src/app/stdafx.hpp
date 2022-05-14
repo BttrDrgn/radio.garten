@@ -16,6 +16,10 @@
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_sdlrenderer.h>
 #else
+#include <d3d9.h>
+#include <d3d10.h>
+#include <d3d11.h>
+
 #include <MinHook.h>
 #include <kiero.h>
 

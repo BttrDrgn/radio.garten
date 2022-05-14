@@ -24,6 +24,8 @@ long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
 
 	if (!init)
 	{
+		global::renderer = kiero::RenderType::Enum::D3D9;
+
 		D3DDEVICE_CREATION_PARAMETERS params;
 		pDevice->GetCreationParameters(&params);
 
@@ -41,15 +43,9 @@ long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
 		init = true;
 	}
 
-	ImGui_ImplDX9_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
+	menus::prepare();
 	menus::update();
-
-	ImGui::EndFrame();
-	ImGui::Render();
-	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+	menus::present();
 
 	return oEndScene(pDevice);
 }
