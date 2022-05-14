@@ -16,6 +16,12 @@ bool hook::load(process_t proc)
 #ifdef _M_AMD64
 	if (!proc.arch.compare("x86"))
 	{
+		if (!fs::exists("x86/helper.exe"))
+		{
+			global::msg_box("Radio.Garten Overlay", "helper.exe is missing from the x86 folder!\nPlease try downloading the latest version and try again.");
+			return false;
+		}
+
 		ShellExecuteA(0, "open", "x86\\helper.exe", &logger::va("--pid %i --arch %s --hwnd %u --winver %u --auto %i", proc.pid, &proc.arch[0], proc.hwnd, global::winver, hook::auto_refresh)[0], 0, 1);
 		hook::injected_apps.emplace_back(proc);
 		return true;

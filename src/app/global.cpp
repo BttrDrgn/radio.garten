@@ -17,5 +17,7 @@ std::uint32_t global::start;
 #else
 bool global::hide = false;
 HWND global::hwnd;
+#ifndef HELPER
 kiero::RenderType::Enum global::renderer;
+#endif
 #endif
