@@ -67,7 +67,7 @@ void audio::play(const std::string& url)
 {
 	std::thread([url]
 	{
-		std::string final_url = logger::va("%s%s", API_URL, AUDIO_ENDPOINT(&url[0]));
+		std::string final_url = logger::va("%s%s", HOST_NAME, AUDIO_ENDPOINT(&url[0]));
 		audio::currently_playing.title = "N/A";
 		audio::currently_playing.url = url;
 		audio::paused = false;
