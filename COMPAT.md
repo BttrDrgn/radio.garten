@@ -14,3 +14,4 @@ This list will mainly focus on incompatibilites, but will be updated accordingly
 [v0.3.0]: https://github.com/BttrDrgn/radio.garten/releases/tag/v0.3.0
 [v0.4.0]: https://github.com/BttrDrgn/radio.garten/releases/tag/v0.4.0
 [v0.5.0]: https://github.com/BttrDrgn/radio.garten/releases/tag/v0.5.0
+[v0.5.1]: https://github.com/BttrDrgn/radio.garten/releases/tag/v0.5.1
