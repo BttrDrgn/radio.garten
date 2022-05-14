@@ -35,6 +35,11 @@ private:
 	static std::string fav_star;
 	static std::string fav_minus;
 
+	static ImVec4 rgba_to_col(float r, float g, float b, float a)
+	{
+		return ImVec4{r/255.0f, g/255.0f, b/255.0f, a/255.0f};
+	}
+
 	static void main_menu_bar();
 	static void actions();
 	static void places();
