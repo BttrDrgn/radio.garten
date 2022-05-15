@@ -17,7 +17,7 @@ class audio
 {
 public:
 #ifdef OVERLAY
-	static void init_overlay(HWND hwnd);
+	static void init_overlay();
 #else
 	static void init();
 #endif

@@ -33,14 +33,8 @@ void audio::init()
 	audio::set_volume(audio::volume);
 }
 #else
-void audio::init_overlay(HWND hwnd)
+void audio::init_overlay()
 {
-	if (global::hwnd != hwnd)
-	{
-		logger::log("AUDIO_ERR", "Global hwnd is not the same!");
-		return;
-	}
-
 	if (HIWORD(BASS_GetVersion()) != BASSVERSION)
 	{
 		global::msg_box("Radio.Garten BASS", "An incorrect version of BASS.DLL was loaded!");

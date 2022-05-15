@@ -29,14 +29,8 @@ LRESULT __stdcall wndproc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	return CallWindowProcA(o_wndproc, hWnd, uMsg, wParam, lParam);
 }
 
-void input::init_overlay(HWND hwnd)
+void input::init_overlay()
 {
-	if (global::hwnd != hwnd)
-	{
-		logger::log("INPUT_ERR", "Global hwnd is not the same!");
-		return;
-	}
-
 	o_wndproc = (WNDPROC)SetWindowLongW(global::hwnd, GWLP_WNDPROC, (LONG_PTR)wndproc);
 }
 #endif
