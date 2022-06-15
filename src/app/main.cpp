@@ -19,8 +19,13 @@ void sys_init_()
 	global::sys_init = true;
 
 	//Mute the in-game music
-	*(float*)(0x0083AA30) = 0.0f; //FE
-	*(float*)(0x0083AA34) = 0.0f; //IG
+	switch (global::game)
+	{
+	case game_t::NFSU2:
+		*(float*)(0x0083AA30) = 0.0f; //FE
+		*(float*)(0x0083AA34) = 0.0f; //IG
+		break;
+	}
 
 	audio::enumerate_playlist(audio::playlist_dir);
 	audio::shuffle();
@@ -36,11 +41,40 @@ __declspec(naked) void sys_init()
 	}
 }
 
+static void(* sub_00537980_)(int a2, char* a3, int a4);
+void sub_00537980(int a2, char* a3, int a4)
+{
+	logger::log_debug(logger::va("%s", a3));
+
+	bool found = false;
+	for (const char* package : audio::mute_detection)
+	{
+		if (!strcmp(package, a3))
+		{
+			found = true;
+			break;
+		}
+	}
+
+	if (found)
+	{
+		audio::pause();
+	}
+	else
+	{
+		audio::play();
+	}
+
+	return sub_00537980_(a2, a3, a4);
+}
+
 HMODULE self;
 
 //Overlay init
 void init_overlay()
 {
+	MH_Initialize();
+
 	switch (game)
 	{
 	case game_t::NFSU2:
@@ -56,6 +90,8 @@ void init_overlay()
 
 		//Wait for sys init stub
 		hook::jump(0x0057EDA3, sys_init);
+
+		MH_CreateHook((void*)0x00537980, sub_00537980, (void**)&sub_00537980_);
 		break;
 	}
 
@@ -93,15 +129,20 @@ void init_overlay()
 			break;
 		}
 	}
+
+	MH_EnableHook(MH_ALL_HOOKS);
 }
 
 bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
 {
 	if (reason == DLL_PROCESS_ATTACH)
 	{
+		std::ios_base::sync_with_stdio(false);
+
 #ifdef DEBUG
 		AllocConsole();
 		SetConsoleTitleA("ECM Debug Console");
+
 
 		std::freopen("CONOUT$", "w", stdout);
 		std::freopen("CONIN$", "r", stdin);
@@ -110,6 +151,7 @@ bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
 		DisableThreadLibraryCalls(hmod);
 		self = hmod;
 		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init_overlay, 0, 0, 0);
+		return true;
 	}
 	return true;
 }

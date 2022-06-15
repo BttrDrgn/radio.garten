@@ -35,8 +35,4 @@ void play_file(const char* file)
 
 		hook::SummonChyron(title.c_str(), artist.c_str(), "Custom Playlist");
 	}
-	else
-	{
-		logger::log_error(logger::va("Error = %i", BASS_ErrorGetCode()));
-	}
 }

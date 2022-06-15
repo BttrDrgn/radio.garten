@@ -10,7 +10,7 @@ class logger
 public:
 	static void log(const std::string& type, const std::string& text)
 	{
-		std::cout << "[ " << type << " ] " << text << std::endl;
+		std::cout << "[ " << type << " ] " << text << '\n';
 	}
 
 	static void log_info(const std::string& text)

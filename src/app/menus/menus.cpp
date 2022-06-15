@@ -71,18 +71,6 @@ void menus::present()
 
 void menus::update()
 {
-	static bool once = false;
-
-	if (GetAsyncKeyState(VK_F12) < 0 && !once)
-	{
-		global::hide = !global::hide;
-		once = true;
-	}
-	else if (GetAsyncKeyState(VK_F12) == 0 && once)
-	{
-		once = false;
-	}
-
 	ImGui::GetIO().MouseDrawCursor = !global::hide;
 
 	if (!global::hide)

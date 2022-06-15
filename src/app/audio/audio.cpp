@@ -8,6 +8,18 @@
 
 void audio::init_overlay()
 {
+	switch (global::game)
+	{
+	case game_t::NFSU2:
+		//WIP filter detection
+		audio::mute_detection.emplace_back("LS_PSAMovie.fng");
+		audio::mute_detection.emplace_back("LS_THXMovie.fng");
+		audio::mute_detection.emplace_back("LS_EAlogo.fng");
+		audio::mute_detection.emplace_back("LS_BlankMovie.fng");
+		audio::mute_detection.emplace_back("UG_LS_IntroFMV.fng");
+		break;
+	}
+
 	if (HIWORD(BASS_GetVersion()) != BASSVERSION)
 	{
 		global::msg_box("ECM BASS", "An incorrect version of BASS.DLL was loaded!");
@@ -31,12 +43,14 @@ void audio::update()
 		while (true)
 		{
 			std::uint32_t state = BASS_ChannelIsActive(audio::chan);
-			logger::log_debug(logger::va("%i", state));
 
 			switch (state)
 			{
 			case BASS_ACTIVE_STOPPED:
-				audio::play_next_song();
+				if (!audio::paused)
+				{
+					audio::play_next_song();
+				}
 				break;
 			}
 
@@ -58,6 +72,7 @@ void audio::play_file(const std::string& file)
 
 void audio::stop()
 {
+	audio::paused = false;
 	BASS_StreamFree(audio::chan);
 	audio::chan = 0;
 	audio::currently_playing.title = "N/A";
@@ -84,10 +99,22 @@ void audio::shuffle()
 	}
 }
 
+void audio::play()
+{
+	audio::paused = false;
+	BASS_Start();
+}
+
+void audio::pause()
+{
+	audio::paused = true;
+	BASS_Pause();
+}
+
 void audio::enumerate_playlist(const std::string& path)
 {
 	std::vector<std::string> files = fs::get_all_files(path, audio::supported_files);
-	for (std::string file : files)
+	for (const std::string& file : files)
 	{
 		audio::playlist_files.emplace_back(file);
 	}
@@ -122,6 +149,7 @@ void audio::set_volume(std::int32_t vol_in)
 	BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, vol_in * 100);
 }
 
+bool audio::paused = false;
 std::int32_t audio::req;
 std::int32_t audio::chan;
 std::int32_t audio::volume = 25;
@@ -131,3 +159,4 @@ std::vector<std::string> audio::playlist_files;
 std::vector<int> audio::playlist_order;
 int audio::current_song_index = 0;
 std::initializer_list<std::string> audio::supported_files { "wav", "mp1", "mp2", "mp3", "ogg", "aif"};
+std::vector<const char*> audio::mute_detection;

@@ -7,12 +7,6 @@
 class hook
 {
 public:
-	static std::vector<process_t> processes;
-	static bool load(process_t proc);
-	static void get_procs();
-	static bool auto_refresh;
-	static std::vector<std::string> auto_hook;
-
 	static void SummonChyron(const char* title, const char* artist, const char* album)
 	{
 		switch (global::game)

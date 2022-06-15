@@ -21,14 +21,19 @@ public:
 	static void update();
 	static void shuffle();
 	static void play_next_song();
+	static void pause();
+	static void play();
 
 	static std::string playlist_dir;
 	static std::vector<std::string> playlist_files;
 	static std::vector<int> playlist_order;
 	static int current_song_index;
 
+	static std::vector<const char*> mute_detection;
+
 	static std::initializer_list<std::string> supported_files;
 
+	static bool paused;
 	static std::int32_t req;
 	static std::int32_t chan;
 

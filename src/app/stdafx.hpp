@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <random>
 #include <thread>
+#include <unordered_map>
 
 //Deps
 #include <imgui_freetype.h>
@@ -26,3 +27,6 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include <bass.h>
+
+
+#define __fartcall __fastcall
