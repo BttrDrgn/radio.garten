@@ -3,7 +3,7 @@
 <p align="center"> A mod for NFSU2 + more to allow custom music without overwriting game files </p>
 
 # How To Use
-### Mr. Modman:
+### [Mr. Modman](https://github.com/VelocityCL/mr.modman):
 Extract the files from the `scripts` folder into your game's global directory or pack directory. Ie. only the `ecm.x86.asi` and the `bass.dll`.
 Make a `Music` folder where you put it.
 
