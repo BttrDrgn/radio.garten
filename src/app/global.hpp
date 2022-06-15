@@ -31,6 +31,7 @@ public:
 		MessageBoxA(global::hwnd, &message[0], &title[0], 0);
 	}
 
+	static HMODULE self;
 	static bool sys_init;
 	static game_t game;
 	static bool hide;

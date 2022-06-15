@@ -113,4 +113,23 @@ public:
 
 		return retn;
 	}
+
+	static std::string get_self_path()
+	{
+		char path[MAX_PATH];
+		if (!GetModuleFileNameA(global::self, path, sizeof(path)))
+		{
+			logger::log_error(logger::va("Unable to get path of self... %i", GetLastError()));
+		}
+
+		std::vector<std::string> split_path = logger::split(path, "\\");
+		int rem_size = split_path[split_path.size() - 1].length() + 1;
+		std::string final_path;
+		for (const std::string& part : split_path)
+		{
+			final_path.append(part + "/");
+		}
+
+		return final_path.erase(final_path.size() - rem_size, rem_size);
+	}
 };

@@ -44,8 +44,6 @@ __declspec(naked) void sys_init()
 static void(* sub_00537980_)(int a2, char* a3, int a4);
 void sub_00537980(int a2, char* a3, int a4)
 {
-	logger::log_debug(logger::va("%s", a3));
-
 	bool found = false;
 	for (const char* package : audio::mute_detection)
 	{
@@ -67,8 +65,6 @@ void sub_00537980(int a2, char* a3, int a4)
 
 	return sub_00537980_(a2, a3, a4);
 }
-
-HMODULE self;
 
 //Overlay init
 void init_overlay()
@@ -96,6 +92,10 @@ void init_overlay()
 	}
 
 	settings::init();
+
+	audio::playlist_dir = fs::get_self_path() + audio::playlist_dir;
+	logger::log_debug(audio::playlist_dir);
+
 	if (kiero::init(kiero::RenderType::Auto) == kiero::Status::Success)
 	{
 		switch (kiero::getRenderType())
@@ -125,7 +125,7 @@ void init_overlay()
 #endif
 
 		case kiero::RenderType::None:
-			FreeLibraryAndExitThread(self, 0);
+			FreeLibraryAndExitThread(global::self, 0);
 			break;
 		}
 	}
@@ -148,8 +148,9 @@ bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
 		std::freopen("CONIN$", "r", stdin);
 		logger::log_info("Attached!");
 #endif
+
 		DisableThreadLibraryCalls(hmod);
-		self = hmod;
+		global::self = hmod;
 		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init_overlay, 0, 0, 0);
 		return true;
 	}
