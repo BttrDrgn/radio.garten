@@ -34,7 +34,7 @@ public:
 	static std::string get_pref_dir()
 	{
 #ifndef HELPER
-		return std::string(SDL_GetPrefPath("BttrDrgn", "radio.garten"));
+		return std::string(SDL_GetPrefPath("BttrDrgn", "ECM"));
 #endif
 		return "";
 	}
@@ -97,5 +97,42 @@ public:
 				}
 			}
 		}
+	}
+
+	static std::vector<std::string> get_all_files(const std::string& path, const std::initializer_list<std::string>& exts)
+	{
+		std::vector<std::string> retn;
+
+		if (std::filesystem::exists(path) && std::filesystem::is_directory(path))
+		{
+			for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
+			{
+				if (std::filesystem::is_regular_file(entry))
+				{
+					//Check if we got this extension
+					bool found = false;
+					for (const std::string& ext : exts)
+					{
+						if (entry.path().extension().compare(ext))
+						{
+							found = true;
+							break;
+						}
+					}
+
+					//Oh no we didn't :(
+					if (!found)
+					{
+						continue;
+					}
+					else if (found)	//Oh wait we did ;)
+					{
+						retn.emplace_back(entry.path().string());
+					}
+				}
+			}
+		}
+
+		return retn;
 	}
 };

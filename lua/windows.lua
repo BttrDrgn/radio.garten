@@ -49,14 +49,12 @@ workspace "Radio.Garten"
 
 		syslibdirs {
 			"../deps/bass/Win32/c/",
-			"../deps/discord/lib/x86/",
 		}
 
 		postbuildcommands {
 			"IF NOT EXIST \"$(OutDir)\"x86 mkdir \"$(OutDir)x86\\",
 
 			"IF NOT EXIST \"$(OutDir)\"x86\\bass.dll copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"x86\\",
-			"IF NOT EXIST \"$(OutDir)\"x86\\discord_game_sdk.dll copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"\\x86\\",
 		}
 	--end
 
@@ -66,7 +64,6 @@ workspace "Radio.Garten"
 
 		syslibdirs {
 			"../deps/bass/Win32/c/x64/",
-			"../deps/discord/lib/x86_64/",
 		}
 
 		postbuildcommands {
@@ -74,10 +71,8 @@ workspace "Radio.Garten"
 			"IF NOT EXIST \"$(OutDir)\"x86_64 mkdir \"$(OutDir)x86_64\\",
 
 			"IF NOT EXIST \"$(OutDir)\"x86\\bass.dll copy /y \"..\\deps\\bass\\Win32\\bass.dll\" \"$(OutDir)\"x86\\",
-			"IF NOT EXIST \"$(OutDir)\"x86\\discord_game_sdk.dll copy /y \"..\\deps\\discord\\lib\\x86\\discord_game_sdk.dll\" \"$(OutDir)\"\\x86\\",
 
 			"IF NOT EXIST \"$(OutDir)\"x86_64\\bass.dll copy /y \"..\\deps\\bass\\Win32\\x64\\bass.dll\" \"$(OutDir)\"\\x86_64\\",
-			"IF NOT EXIST \"$(OutDir)\"x86_64\\discord_game_sdk.dll copy /y \"..\\deps\\discord\\lib\\x86_64\\discord_game_sdk.dll\" \"$(OutDir)\"x86_64\\",
 		}
 	--end
 
@@ -100,84 +95,6 @@ workspace "Radio.Garten"
 		runtime "debug"
 		symbols "on"
 
-	project "App"
-		targetname "radio.garten"
-		language "c++"
-		cppdialect "c++17"
-		kind "windowedapp"
-		warnings "off"
-
-		pchheader "stdafx.hpp"
-		pchsource "../src/app/stdafx.cpp"
-		forceincludes "stdafx.hpp"
-
-		defines {
-			"IMGUI_USER_CONFIG=\"menus/config.h\""
-		}
-
-		dependson {
-			"Discord",
-			"ImGui",
-			"FT2",
-			"SDL2",
-			"SDL2main",
-			"ini_rw",
-		}
-
-		links {
-			"delayimp",
-			"imgui",
-			"SDL2",
-			"SDL2main",
-			"bass",
-			"Discord",
-			"ft2",
-			"discord_game_sdk.dll.lib",
-			"ini_rw",
-		}
-
-		includedirs {
-			"../src/app/",
-			"../src/utils/",
-			"../deps/json/include/",
-			"../deps/cpp-httplib/",
-			"../deps/imgui/backends/",
-			"../deps/imgui/misc/freetype/",
-			"../deps/SDL/include/",
-			"../deps/discord/cpp/",
-			"../deps/bass/Win32/c/",
-			"../deps/freetype-2.12.1/include/",
-			"../deps/ini_rw/src/",
-		}
-
-		files {
-			"../src/app/stdafx.hpp",
-			"../src/app/stdafx.cpp",
-			"../src/app/main.cpp",
-			"../src/app/global.hpp",
-			"../src/app/global.cpp",
-			"../src/app/api/**",
-			"../src/app/hook/hook.*",
-			"../src/app/audio/**",
-			"../src/app/gfx/**",
-			"../src/app/input/**",
-			"../src/app/menus/**",
-			"../src/app/window/**",
-			"../src/app/settings/**",
-
-			"../src/utils/fs/**",
-			"../src/utils/logger/**",
-
-			"../src/app/resource/**",
-			"../src/app/drpc/**",
-			"../deps/bass/Win32/c/bass.h",
-		}
-
-		linkoptions{
-			"/DELAYLOAD:bass.dll",
-			"/DELAYLOAD:discord_game_sdk.dll",
-		}
-
 	project "Overlay"
 		targetname "%{cfg.architecture}/overlay.radio.garten.%{cfg.architecture}"
 		language "c++"
@@ -197,7 +114,6 @@ workspace "Radio.Garten"
 
 		dependson {
 			"SDL2",
-			"Discord",
 			"ImGui",
 			"FT2",
 			"ini_rw",
@@ -213,8 +129,6 @@ workspace "Radio.Garten"
 			"imgui",
 			"ft2",
 			"bass",
-			"Discord",
-			"discord_game_sdk.dll.lib",
 			"ini_rw",
 			"MinHook",
 		}
@@ -226,7 +140,6 @@ workspace "Radio.Garten"
 			"../deps/cpp-httplib/",
 			"../deps/imgui/backends/",
 			"../deps/imgui/misc/freetype/",
-			"../deps/discord/cpp/",
 			"../deps/bass/Win32/c/",
 			"../deps/ini_rw/src/",
 			"../deps/kiero/",
@@ -239,8 +152,8 @@ workspace "Radio.Garten"
 			"../src/app/stdafx.**",
 			"../src/app/main.cpp",
 			"../src/app/global.**",
+			"../src/app/hook/hook.hpp",
 			"../src/app/hook/impl/**",
-			"../src/app/api/**",
 			"../src/app/menus/**",
 			"../src/app/input/**",
 			"../src/app/audio/**",
@@ -255,35 +168,6 @@ workspace "Radio.Garten"
 			"../deps/kiero/*.h",
 			"../deps/kiero/*.cpp",
 		}
-
-	project "Helper"
-		architecture "x86"
-		targetname "x86/helper"
-		language "c++"
-		cppdialect "c++17"
-		kind "windowedapp"
-		warnings "off"
-
-		defines {
-			"OVERLAY",
-			"HELPER",
-		}
-
-		pchheader "stdafx.hpp"
-		pchsource "../src/helper/stdafx.cpp"
-		forceincludes "stdafx.hpp"
-
-		filter "platforms:Win-x64"
-			includedirs {
-				"../src/helper/",
-				"../src/utils/",
-			}
-
-		filter "platforms:Win-x64"
-			files {
-				"../src/helper/stdafx.**",
-				"../src/helper/main.**",
-			}
 
 	group "Dependencies"
 	
@@ -745,20 +629,6 @@ workspace "Radio.Garten"
 			"../deps/imgui/misc/freetype/",
 			"../deps/SDL/include/",
 			"../deps/freetype-2.12.1/include/",
-		}
-	
-	project "Discord"
-		targetname "discord"
-
-		language "c++"
-		kind "staticlib"
-
-		files {
-			"../deps/discord/cpp/**",
-		}
-
-		includedirs {
-			"../deps/discord/cpp/",
 		}
 
 	project "ini_rw"

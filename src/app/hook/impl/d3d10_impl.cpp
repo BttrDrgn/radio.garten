@@ -45,7 +45,7 @@ void impl::d3d10::init()
 {
 	if (kiero::bind(8, (void**)&oPresent, hkPresent10) != kiero::Status::Success)
 	{
-		MessageBoxA(nullptr, "Failed to hook DirectX 10!", "Radio.Garten", 0);
+		MessageBoxA(nullptr, "Failed to hook DirectX 10!", "ECM", 0);
 	}
 }
 

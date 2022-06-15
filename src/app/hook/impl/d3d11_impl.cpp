@@ -48,7 +48,7 @@ void impl::d3d11::init()
 {
 	if (kiero::bind(8, (void**)&oPresent, hkPresent11) != kiero::Status::Success)
 	{
-		MessageBoxA(nullptr, "Failed to hook DirectX 11!", "Radio.Garten", 0);
+		MessageBoxA(nullptr, "Failed to hook DirectX 11!", "ECM", 0);
 	}
 }
 

@@ -9,13 +9,6 @@
 
 #include <imgui_freetype.h>
 
-#ifndef OVERLAY
-#include <SDL.h>
-#include <SDL_syswm.h>
-
-#include <backends/imgui_impl_sdl.h>
-#include <backends/imgui_impl_sdlrenderer.h>
-#else
 #include <MinHook.h>
 #include <kiero.h>
 
@@ -30,7 +23,6 @@
 #include <backends/imgui_impl_dx10.h>
 #include <backends/imgui_impl_dx11.h>
 #include <backends/imgui_impl_opengl3.h>
-#endif
 
 #include <nlohmann/json.hpp>	
 

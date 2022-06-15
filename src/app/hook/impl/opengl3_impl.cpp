@@ -39,7 +39,7 @@ void impl::opengl3::init()
 {
 	if (kiero::bind(336, (void**)&owglSwapBuffers, hkWglSwapBuffers) != kiero::Status::Success)
 	{
-		MessageBoxA(nullptr, "Failed to hook OpenGL!", "Radio.Garten", 0);
+		MessageBoxA(nullptr, "Failed to hook OpenGL!", "ECM", 0);
 	}
 }
 

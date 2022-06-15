@@ -54,7 +54,7 @@ void impl::d3d9::init()
 {
 	if (kiero::bind(16, (void**)&oReset, hkReset) != kiero::Status::Success || kiero::bind(42, (void**)&oEndScene, hkEndScene) != kiero::Status::Success)
 	{
-		MessageBoxA(nullptr, "Failed to hook DirectX 9!", "Radio.Garten", 0);
+		MessageBoxA(nullptr, "Failed to hook DirectX 9!", "ECM", 0);
 	}
 }
 
