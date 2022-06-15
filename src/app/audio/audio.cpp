@@ -126,7 +126,6 @@ std::int32_t audio::req;
 std::int32_t audio::chan;
 std::int32_t audio::volume = 25;
 playing_t audio::currently_playing = {"N/A"};
-std::string audio::last_played_file = fs::get_pref_dir().append("last_played.txt");
 std::string audio::playlist_dir = "./Music";
 std::vector<std::string> audio::playlist_files;
 std::vector<int> audio::playlist_order;

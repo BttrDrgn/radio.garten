@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef HELPER
-#include <SDL.h>
-#endif
-
 #include <fstream>
 #include <sstream>
 #include <filesystem>
@@ -11,16 +7,6 @@
 class fs
 {
 public:
-	//Copies important files to the pref directory
-	static void init()
-	{
-		if (fs::exists("fonts"))
-		{
-			fs::move(fs::get_cur_dir().append("fonts"), fs::get_pref_dir().append("fonts"));
-			fs::del("fonts");
-		}
-	}
-
 	static bool exists(const std::string& path)
 	{
 		return std::filesystem::exists(path);
@@ -29,14 +15,6 @@ public:
 	static std::string get_cur_dir()
 	{
 		return std::filesystem::current_path().string() + "\\";
-	}
-
-	static std::string get_pref_dir()
-	{
-#ifndef HELPER
-		return std::string(SDL_GetPrefPath("BttrDrgn", "ECM"));
-#endif
-		return "";
 	}
 
 	static void write(const std::string& path, const std::string& contents, const bool append)

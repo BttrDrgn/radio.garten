@@ -157,9 +157,9 @@ void menus::playlist()
 
 void menus::build_font(ImGuiIO& io)
 {
-	std::string font = fs::get_pref_dir().append("fonts/NotoSans-Regular.ttf");
-	std::string font_jp = fs::get_pref_dir().append("fonts/NotoSansJP-Regular.ttf");
-	std::string emoji = fs::get_pref_dir().append("fonts/NotoEmoji-Regular.ttf");
+	std::string font = "ecm/fonts/NotoSans-Regular.ttf";
+	std::string font_jp = "ecm/fonts/NotoSansJP-Regular.ttf";
+	std::string emoji = "ecm/fonts/NotoEmoji-Regular.ttf";
 
 	if (fs::exists(font))
 	{

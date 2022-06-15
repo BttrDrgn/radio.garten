@@ -32,8 +32,6 @@ public:
 	static std::int32_t req;
 	static std::int32_t chan;
 
-	static std::string last_played_file;
-
 	static std::int32_t volume;
 
 	static playing_t currently_playing;

@@ -32,5 +32,5 @@ bool settings::get_boolean(const char* bool_text)
 	else return false;
 }
 
-std::string settings::config_file = logger::va("%s%s", &fs::get_pref_dir()[0], "config.ini");
+std::string settings::config_file = "ecm/config.ini";
 ini_t* settings::config;

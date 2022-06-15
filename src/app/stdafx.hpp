@@ -2,11 +2,12 @@
 
 //System
 #include <vector>
+#include <string>
+#include <algorithm>
+#include <random>
+#include <thread>
 
 //Deps
-//This HAS to be called before SDL2 or else it throws errors for Linux building
-#include <httplib.h>
-
 #include <imgui_freetype.h>
 
 #include <MinHook.h>
@@ -24,8 +25,4 @@
 #include <backends/imgui_impl_dx11.h>
 #include <backends/imgui_impl_opengl3.h>
 
-#include <nlohmann/json.hpp>	
-
 #include <bass.h>
-
-namespace nl = nlohmann;
