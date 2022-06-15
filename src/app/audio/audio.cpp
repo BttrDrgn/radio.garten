@@ -80,22 +80,25 @@ void audio::stop()
 
 void audio::shuffle()
 {
-	static std::random_device rd;
-	static std::mt19937 mt(rd());
-	static std::uniform_int_distribution<std::int32_t> range(0, audio::playlist_files.size() - 1);
-
-	audio::playlist_order.clear();
-
-	for (int i = 0; i < audio::playlist_files.size(); ++i)
+	if (audio::playlist_files.size() > 0)
 	{
-		int random_index = range(mt);
+		static std::random_device rd;
+		static std::mt19937 mt(rd());
+		static std::uniform_int_distribution<std::int32_t> range(0, audio::playlist_files.size() - 1);
 
-		while (std::count(audio::playlist_order.begin(), audio::playlist_order.end(), random_index))
+		audio::playlist_order.clear();
+
+		for (int i = 0; i < audio::playlist_files.size(); ++i)
 		{
-			random_index = range(mt);
-		}
+			int random_index = range(mt);
 
-		audio::playlist_order.emplace_back(random_index);
+			while (std::count(audio::playlist_order.begin(), audio::playlist_order.end(), random_index))
+			{
+				random_index = range(mt);
+			}
+
+			audio::playlist_order.emplace_back(random_index);
+		}
 	}
 }
 
