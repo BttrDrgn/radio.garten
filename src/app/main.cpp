@@ -94,7 +94,6 @@ void init_overlay()
 	settings::init();
 
 	audio::playlist_dir = fs::get_self_path() + audio::playlist_dir;
-	logger::log_debug(audio::playlist_dir);
 
 	if (kiero::init(kiero::RenderType::Auto) == kiero::Status::Success)
 	{
