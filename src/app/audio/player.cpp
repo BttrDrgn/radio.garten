@@ -33,6 +33,6 @@ void play_file(const char* file)
 			title = info[1].erase(0, 2);
 		}
 
-		hook::SummonChyron(title.c_str(), artist.c_str(), "Custom Playlist");
+		hook::SummonChyron(title.c_str(), artist.c_str(), audio::playlist_name.c_str());
 	}
 }

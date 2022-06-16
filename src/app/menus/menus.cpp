@@ -93,7 +93,7 @@ void menus::main_menu_bar()
 		menus::actions();
 		menus::playlist();
 
-		ImGui::Text(logger::va("Listening: %s on %s", audio::currently_playing.title.c_str(), "Custom Playlist").c_str());
+		ImGui::Text(logger::va("Listening: %s on %s", audio::currently_playing.title.c_str(), audio::playlist_name.c_str()).c_str());
 
 		ImGui::EndMainMenuBar();
 	}

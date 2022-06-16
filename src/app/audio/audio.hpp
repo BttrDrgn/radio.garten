@@ -24,6 +24,7 @@ public:
 	static void pause();
 	static void play();
 
+	static std::string playlist_name;
 	static std::string playlist_dir;
 	static std::vector<std::string> playlist_files;
 	static std::vector<int> playlist_order;
