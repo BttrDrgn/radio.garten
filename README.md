@@ -2,6 +2,9 @@
 <h2 align="center"> External Custom Music </h2>
 <p align="center"> A mod for NFSU2 + more to allow custom music without overwriting game files </p>
 
+# Prerequisites
+You will need the latest VC Redist installed for Windows: https://aka.ms/vs/17/release/vc_redist.x86.exe
+
 # How To Use
 ### [Mr. Modman](https://github.com/VelocityCL/mr.modman):
 Extract the files from the `scripts` folder into your game's global directory or pack directory. Ie. only the `ecm.x86.asi` and the `bass.dll`.
