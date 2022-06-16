@@ -40,5 +40,6 @@ bool settings::get_boolean(const char* bool_text)
 	else return false;
 }
 
-std::string settings::config_file = "config.ini";
+//Hardcoded until x64 becomes useable
+std::string settings::config_file = "ecm.x86.ini";
 ini_t* settings::config;
