@@ -138,7 +138,6 @@ bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
 	{
 		std::ios_base::sync_with_stdio(false);
 
-#ifdef DEBUG
 		AllocConsole();
 		SetConsoleTitleA("ECM Debug Console");
 
@@ -146,10 +145,16 @@ bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
 		std::freopen("CONOUT$", "w", stdout);
 		std::freopen("CONIN$", "r", stdin);
 		logger::log_info("Attached!");
-#endif
 
 		DisableThreadLibraryCalls(hmod);
 		global::self = hmod;
+
+		//For WHATEVER REASON, the mod fails to load properly without the console allocated
+		//so we hide it here instead...
+#ifdef NDEBUG
+		ShowWindow(GetConsoleWindow(), 0);
+#endif
+
 		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init_overlay, 0, 0, 0);
 		return true;
 	}
