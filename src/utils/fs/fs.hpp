@@ -116,20 +116,25 @@ public:
 
 	static std::string get_self_path()
 	{
-		char path[MAX_PATH];
-		if (!GetModuleFileNameA(global::self, path, sizeof(path)))
+		static std::string mod_path;
+
+		if (mod_path.empty())
 		{
-			logger::log_error(logger::va("Unable to get path of self... %i", GetLastError()));
+			char exe_name[512];
+			GetModuleFileNameA(global::self, exe_name, sizeof(exe_name));
+
+			char* exe_base_name = strrchr(exe_name, '\\');
+			exe_base_name[0] = L'\0';
+
+			mod_path = exe_name;
+			mod_path += "\\";
+
+			GetFullPathNameA(mod_path.c_str(), sizeof(exe_name), exe_name, nullptr);
+
+			mod_path = exe_name;
+			mod_path += "\\";
 		}
 
-		std::vector<std::string> split_path = logger::split(path, "\\");
-		int rem_size = split_path[split_path.size() - 1].length() + 1;
-		std::string final_path;
-		for (const std::string& part : split_path)
-		{
-			final_path.append(part + "/");
-		}
-
-		return final_path.erase(final_path.size() - rem_size, rem_size);
+		return mod_path;
 	}
 };
