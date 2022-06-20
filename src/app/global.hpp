@@ -14,9 +14,10 @@ struct vec2
 
 enum game_t : int
 {
-	NFSU = 1,
+	UNIVERSAL = -1,
+	NFSU,
 	NFSU2,
-	NFSC = 4,
+	NFSC,
 	NFSPS,
 	NFSUC,
 };
@@ -30,6 +31,8 @@ public:
 	{
 		MessageBoxA(global::hwnd, &message[0], &title[0], 0);
 	}
+
+	static std::vector<std::string> game_bins;
 
 	static HMODULE self;
 	static bool sys_init;
