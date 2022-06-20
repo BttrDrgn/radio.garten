@@ -23,7 +23,7 @@ long __stdcall hkPresent10(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		HWND hwnd = desc.OutputWindow;
 
 		global::hwnd = hwnd;
-		audio::init_overlay();
+		audio::init();
 		input::init_overlay();
 
 		menus::init();

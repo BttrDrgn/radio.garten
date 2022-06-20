@@ -17,7 +17,7 @@ BOOL __stdcall hkWglSwapBuffers(_In_ HDC hDc)
 		HWND hwnd = WindowFromDC(hDc);
 
 		global::hwnd = hwnd;
-		audio::init_overlay();
+		audio::init();
 		input::init_overlay();
 
 		menus::init();

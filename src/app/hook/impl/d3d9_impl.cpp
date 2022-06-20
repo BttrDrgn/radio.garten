@@ -32,7 +32,7 @@ long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
 		HWND hwnd = params.hFocusWindow;
 
 		global::hwnd = hwnd;
-		audio::init_overlay();
+		audio::init();
 		input::init_overlay();
 
 		menus::init();

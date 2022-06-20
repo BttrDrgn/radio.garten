@@ -1,4 +1,4 @@
-﻿#if KIERO_INCLUDE_D3D11
+#if KIERO_INCLUDE_D3D11
 
 #include "d3d11_impl.h"
 #include <d3d11.h>
@@ -26,7 +26,7 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		HWND hwnd = desc.OutputWindow;
 
 		global::hwnd = hwnd;
-		audio::init_overlay();
+		audio::init();
 		input::init_overlay();
 
 		menus::init();
