@@ -13,11 +13,11 @@ struct playing_t
 class audio
 {
 public:
-	static void init_overlay();
+	static void init();
 	static void play_file(const std::string& file);
 	static void stop();
 	static void set_volume(std::int32_t vol_in);
-	static void enumerate_playlist(const std::string& path);
+	static void enumerate_playlist();
 	static void update();
 	static void shuffle();
 	static void play_next_song();

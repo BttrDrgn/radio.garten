@@ -6,7 +6,7 @@
 #include "fs/fs.hpp"
 #include "hook/hook.hpp"
 
-void audio::init_overlay()
+void audio::init()
 {
 	switch (global::game)
 	{
@@ -31,9 +31,9 @@ void audio::init_overlay()
 		global::msg_box("ECM BASS", "Can't initialize device!\nNo audio will play for this session!");
 	}
 
-	BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
 	audio::set_volume(audio::volume);
-
+	audio::shuffle();
+	audio::pause();
 	audio::update();
 }
 
@@ -54,20 +54,17 @@ void audio::update()
 				break;
 			}
 
-			std::this_thread::sleep_for(1s);
+			std::this_thread::sleep_for(128ms);
 		}
 	}).detach();
 }
 
 void audio::play_file(const std::string& file)
 {
-	std::thread([file]
-	{
-		std::string title = file;
-		logger::rem_path_info(title, audio::playlist_dir);
-		audio::currently_playing.title = title;
-		::play_file(file.c_str());
-	}).detach();
+	std::string title = file;
+	logger::rem_path_info(title, audio::playlist_dir);
+	audio::currently_playing.title = title;
+	::play_file(file.c_str());
 }
 
 void audio::stop()
@@ -114,10 +111,10 @@ void audio::pause()
 	BASS_Pause();
 }
 
-void audio::enumerate_playlist(const std::string& path)
+void audio::enumerate_playlist()
 {
-	std::vector<std::string> files = fs::get_all_files(path, audio::supported_files);
-	for (const std::string& file : files)
+	std::vector<std::string> files = fs::get_all_files(audio::playlist_dir, audio::supported_files);
+	for (std::string file : files)
 	{
 		audio::playlist_files.emplace_back(file);
 	}
