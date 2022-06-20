@@ -120,6 +120,7 @@ workspace "ECM"
 			"d3d10",
 			"d3d11",
 
+			"dbghelp",
 			"imgui",
 			"ft2",
 			"bass",

@@ -26,9 +26,6 @@ void sys_init_()
 		*(float*)(0x0083AA34) = 0.0f; //IG
 		break;
 	}
-
-	audio::enumerate_playlist(audio::playlist_dir);
-	audio::shuffle();
 }
 
 __declspec(naked) void sys_init()
@@ -54,6 +51,7 @@ void sub_00537980(int a2, char* a3, int a4)
 		}
 	}
 
+	//Will be reworked to better match the game eventually
 	if (found)
 	{
 		audio::pause();
@@ -67,7 +65,7 @@ void sub_00537980(int a2, char* a3, int a4)
 }
 
 //Overlay init
-void init_overlay()
+void init()
 {
 	MH_Initialize();
 
@@ -92,8 +90,6 @@ void init_overlay()
 	}
 
 	settings::init();
-
-	audio::playlist_dir = fs::get_self_path() + audio::playlist_dir;
 
 	if (kiero::init(kiero::RenderType::Auto) == kiero::Status::Success)
 	{
@@ -132,31 +128,115 @@ void init_overlay()
 	MH_EnableHook(MH_ALL_HOOKS);
 }
 
-bool __stdcall DllMain(::HMODULE hmod, ::DWORD reason, ::LPVOID)
+LONG WINAPI CustomUnhandledExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
 {
-	if (reason == DLL_PROCESS_ATTACH)
+	// step 1: write minidump
+	static LPEXCEPTION_POINTERS exceptionData;
+
+	exceptionData = ExceptionInfo;
+
+	char error[1024] = { 0 };
+	char filename[MAX_PATH];
+	__time64_t time;
+	tm* ltime;
+
+	_time64(&time);
+	ltime = _localtime64(&time);
+	strftime(filename, std::size(filename) - 1, "ecm-%Y%m%d%H%M%S.dmp", ltime);
+	_snprintf(error, std::size(error) - 1, "A minidump has been written to %s.", filename);
+
+	HANDLE hFile = CreateFileA(filename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (hFile != INVALID_HANDLE_VALUE)
 	{
-		std::ios_base::sync_with_stdio(false);
+		MINIDUMP_EXCEPTION_INFORMATION ex;
+		memset(&ex, 0, sizeof(ex));
+		ex.ThreadId = GetCurrentThreadId();
+		ex.ExceptionPointers = exceptionData;
+		ex.ClientPointers = FALSE;
 
-		AllocConsole();
-		SetConsoleTitleA("ECM Debug Console");
-
-
-		std::freopen("CONOUT$", "w", stdout);
-		std::freopen("CONIN$", "r", stdin);
-		logger::log_info("Attached!");
-
-		DisableThreadLibraryCalls(hmod);
-		global::self = hmod;
-
-		//For WHATEVER REASON, the mod fails to load properly without the console allocated
-		//so we hide it here instead...
-#ifdef NDEBUG
-		ShowWindow(GetConsoleWindow(), 0);
+#if defined(DEBUG)
+		MINIDUMP_TYPE mdType = (MINIDUMP_TYPE)(MiniDumpWithProcessThreadData | MiniDumpWithUnloadedModules | MiniDumpWithThreadInfo | MiniDumpWithFullMemory);
+#else
+		MINIDUMP_TYPE mdType = MiniDumpNormal;
 #endif
 
-		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)init_overlay, 0, 0, 0);
+		MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, mdType, &ex, NULL, NULL);
+		MessageBoxA(NULL, error, "ECM", MB_OK | MB_ICONERROR);
+
+		CloseHandle(hFile);
+	}
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+DWORD WINAPI OnAttachImpl(LPVOID lpParameter)
+{
+	std::ios_base::sync_with_stdio(false);
+
+	AllocConsole();
+	SetConsoleTitleA("ECM Debug Console");
+
+
+	std::freopen("CONOUT$", "w", stdout);
+	std::freopen("CONIN$", "r", stdin);
+
+	//For WHATEVER REASON, the mod fails to load properly without the console allocated
+	//so we hide it here instead...
+#ifdef NDEBUG
+	ShowWindow(GetConsoleWindow(), 0);
+#endif
+
+
+	int found = -1;
+	for (int i = 0; i < global::game_bins.size(); ++i)
+	{
+		if (fs::exists(global::game_bins[i]))
+		{
+			found = i;
+			break;
+		}
+	}
+
+	if (found == -1)
+	{
+		global::game = game_t::UNIVERSAL;
+		logger::log_info("No game found! Switching to universal mode.");
+	}
+	else
+	{
+		global::game = (game_t)found;
+		logger::log_info(logger::va("Game = %i", global::game));
+	}
+
+	init();
+	return 0;
+}
+
+DWORD WINAPI OnAttach(LPVOID lpParameter)
+{
+	__try
+	{
+		return OnAttachImpl(lpParameter);
+	}
+	__except (CustomUnhandledExceptionFilter(GetExceptionInformation()))
+	{
+		FreeLibraryAndExitThread((HMODULE)lpParameter, 0xDECEA5ED);
+	}
+
+	return 0;
+}
+
+BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
+{
+	switch (dwReason)
+	{
+	case DLL_PROCESS_ATTACH:
+		global::self = hModule;
+		DisableThreadLibraryCalls(global::self);
+		CreateThread(nullptr, 0, OnAttach, global::self, 0, nullptr);
 		return true;
 	}
-	return true;
+
+	return false;
 }
