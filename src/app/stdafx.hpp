@@ -7,6 +7,10 @@
 #include <random>
 #include <thread>
 #include <unordered_map>
+#include <regex>
+
+#include <Windows.h>
+#include <DbgHelp.h>
 
 //Deps
 #include <imgui_freetype.h>
