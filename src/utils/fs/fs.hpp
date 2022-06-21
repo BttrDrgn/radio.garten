@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef HELPER
-#include <SDL.h>
-#endif
-
 #include <fstream>
 #include <sstream>
 #include <filesystem>
@@ -11,16 +7,6 @@
 class fs
 {
 public:
-	//Copies important files to the pref directory
-	static void init()
-	{
-		if (fs::exists("fonts"))
-		{
-			fs::move(fs::get_cur_dir().append("fonts"), fs::get_pref_dir().append("fonts"));
-			fs::del("fonts");
-		}
-	}
-
 	static bool exists(const std::string& path)
 	{
 		return std::filesystem::exists(path);
@@ -29,14 +15,6 @@ public:
 	static std::string get_cur_dir()
 	{
 		return std::filesystem::current_path().string() + "\\";
-	}
-
-	static std::string get_pref_dir()
-	{
-#ifndef HELPER
-		return std::string(SDL_GetPrefPath("BttrDrgn", "radio.garten"));
-#endif
-		return "";
 	}
 
 	static void write(const std::string& path, const std::string& contents, const bool append)
@@ -97,5 +75,66 @@ public:
 				}
 			}
 		}
+	}
+
+	static std::vector<std::string> get_all_files(const std::string& path, const std::initializer_list<std::string>& exts)
+	{
+		std::vector<std::string> retn;
+
+		if (std::filesystem::exists(path) && std::filesystem::is_directory(path))
+		{
+			for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
+			{
+				if (std::filesystem::is_regular_file(entry))
+				{
+					//Check if we got this extension
+					bool found = false;
+					for (const std::string& ext : exts)
+					{
+						if (entry.path().extension().compare(ext))
+						{
+							found = true;
+							break;
+						}
+					}
+
+					//Oh no we didn't :(
+					if (!found)
+					{
+						continue;
+					}
+					else if (found)	//Oh wait we did ;)
+					{
+						retn.emplace_back(entry.path().string());
+					}
+				}
+			}
+		}
+
+		return retn;
+	}
+
+	static std::string get_self_path()
+	{
+		static std::string mod_path;
+
+		if (mod_path.empty())
+		{
+			char exe_name[512];
+			GetModuleFileNameA(global::self, exe_name, sizeof(exe_name));
+
+			char* exe_base_name = strrchr(exe_name, '\\');
+			exe_base_name[0] = L'\0';
+
+			mod_path = exe_name;
+			mod_path += "\\";
+
+			GetFullPathNameA(mod_path.c_str(), sizeof(exe_name), exe_name, nullptr);
+
+			mod_path = exe_name;
+			mod_path += "\\";
+		}
+
+		return mod_path;
 	}
 };

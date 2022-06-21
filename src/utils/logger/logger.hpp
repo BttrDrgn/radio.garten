@@ -10,7 +10,7 @@ class logger
 public:
 	static void log(const std::string& type, const std::string& text)
 	{
-		std::cout << "[ " << type << " ] " << text << std::endl;
+		std::cout << "[ " << type << " ] " << text << '\n';
 	}
 
 	static void log_info(const std::string& text)
@@ -91,12 +91,44 @@ public:
 		}));
 	}
 
-	static void yo_upper(std::string& string)
+	static void to_upper(std::string& string)
 	{
 		std::for_each(string.begin(), string.end(), ([](char& c)
 		{
 			c = std::toupper(c);
 		}));
+	}
+
+	static void remove_non_ascii(std::string& s)
+	{
+		s.erase(std::remove_if(s.begin(), s.end(), [](char c) {return !(c >= 0 && c < 128); }), s.end());
+	}
+
+	static std::string convert_codepage(std::string& in)
+	{
+		std::vector<wchar_t> wide;
+		std::vector<char> normal;
+		const int max_size = in.size() * 4 + 1;
+
+		wide.resize(max_size);
+		normal.resize(max_size);
+
+		WideCharToMultiByte (
+			CP_UTF8,
+			0,
+			&wide[0],
+			MultiByteToWideChar(1252, 0, in.c_str(), in.size(), &wide[0], wide.size()), &normal[0], normal.size(),
+			nullptr,
+			nullptr
+		);
+
+		return &normal[0];
+	}
+
+	static void rem_path_info(std::string& str, const std::string& dir)
+	{
+		//Assuming ext is 4 for now
+		str.erase(0, dir.size() + 1).erase(str.size() - 4, 4);
 	}
 #endif
 };

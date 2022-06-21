@@ -4,173 +4,76 @@
 
 #include "settings.hpp"
 #include "menus/menus.hpp"
-#include "api/api.hpp"
 #include "hook/hook.hpp"
-#include "drpc/drpc.hpp"
+#include "audio/audio.hpp"
 
 void settings::init()
 {
+	settings::config_file = fs::get_self_path() + settings::config_file;
+
 	settings::update();
-	settings::favorites_update();
 }
 
 void settings::update()
 {
-	if(fs::exists(settings::config_file)) settings::config = ini_load(&settings::config_file[0]);
+	ini_t* config;
+
+	if (fs::exists(settings::config_file))
+	{
+		config = ini_load(&settings::config_file[0]);
+		std::string config_string = ini_tostring(config);
+
+		audio::playlist_name = ini_get(config, "core", "playlist");
+		audio::playlist_dir = audio::playlist_name;
+		audio::playlist_dir = fs::get_self_path() + audio::playlist_dir;
+		audio::enumerate_playlist();
+
+		std::string trax_config = "[trax]\n";
+
+		for (int i = 0; i < audio::playlist_files.size(); ++i)
+		{
+			std::string song = audio::playlist_files[i].first;
+			song.erase(0, audio::playlist_dir.size() + 1);
+			if (config_string.find(song) != std::string::npos)
+			{
+				const char* res = ini_get(config, "trax", song.c_str());
+				audio::playlist_files[i].second = res;
+			}
+			else
+			{
+				trax_config.append(logger::va("%s = ALL\n", song.c_str()));
+				audio::playlist_files[i].second = "ALL";
+			}
+		}
+
+		ini_merge(config, ini_create(trax_config.c_str(), strlen(trax_config.c_str())));
+		ini_save(config, settings::config_file.c_str());
+	}
 	else if (!fs::exists(settings::config_file))
 	{
-		const char* ini_default =
+		std::string ini_default =
 			"[core]\n"
-			"UseGPU  =	false\n"
-			"[startup]\n"
-			"Refresh =	false\n"
-#ifdef _WIN32
-			"Discord =	false\n"
-			"AutoHook = false\n"
-#endif
-			"Snow	 =	false\n";
+			"playlist = \"Music\"\n\n"
+			"[trax]\n";
 
-		settings::config = ini_create(ini_default, strlen(ini_default));
+		audio::playlist_name = "Music";
+		audio::playlist_dir = audio::playlist_name;
+		audio::playlist_dir = fs::get_self_path() + audio::playlist_dir;
+		audio::enumerate_playlist();
 
-		ini_save(settings::config, &settings::config_file[0]);
-	}
-
-#ifdef _WIN32
-	if (menus::show_drpc = settings::get_boolean(ini_get(settings::config, "startup", "Discord")))
-	{
-		drpc::init();
-	}
-
-#ifndef OVERLAY
-	if (hook::auto_refresh = settings::get_boolean(ini_get(settings::config, "startup", "AutoHook")))
-	{
-		hook::get_procs();
-	}
-#endif
-#endif
-
-#ifndef OVERLAY
-	global::use_hardware = settings::get_boolean(ini_get(settings::config, "core", "UseGPU"));
-	if (menus::show_snow = settings::get_boolean(ini_get(settings::config, "startup", "Snow")))
-	{
-		if (menus::snow.empty())
+		for (int i = 0; i < audio::playlist_files.size(); ++i)
 		{
-			menus::enumerate_snow();
+			std::string song = audio::playlist_files[i].first;
+			song.erase(0, audio::playlist_dir.size() + 1);
+			ini_default.append(logger::va("%s = ALL\n", song.c_str()));
 		}
-		menus::render_snow();
-	}
-#endif
 
-	if (settings::get_boolean(ini_get(settings::config, "startup", "Refresh")))
-	{
-		api::get_places();
+		config = ini_create(ini_default.c_str(), strlen(ini_default.c_str()));
+
+		ini_save(config, settings::config_file.c_str());
 	}
 
-	ini_free(settings::config);
-
-#ifndef OVERLAY
-	if (!fs::exists(settings::auto_hook_file)) fs::write(settings::auto_hook_file, "", false);
-	hook::auto_hook = logger::split(fs::read(settings::auto_hook_file), ",");
-#endif
-}
-
-void settings::favorites_update()
-{
-	if (!fs::exists(settings::favorites_file))
-	{
-		fs::write(settings::favorites_file, "", false);
-	}
-
-	std::string fav_contents = fs::read(settings::favorites_file);
-	std::vector<std::string> stations = logger::split(fs::read(settings::favorites_file), "|");
-
-	if (stations.size() > 0)
-	{
-		api::favorite_stations.clear();
-
-		for (const std::string& station : stations)
-		{
-			std::vector<std::string> temp = logger::split(station, ",");
-
-			if (temp.size() == 5)
-			{
-				station_t s;
-
-				s.title = temp[0];
-
-				s.place.country = temp[1];
-				s.place.city = temp[2];
-				s.place.id = temp[3];
-
-				s.id = temp[4];
-
-				api::favorite_stations.emplace_back(s);
-			}
-		}
-	}
-}
-
-void settings::add_favorite(station_t station)
-{
-	std::string contents;
-
-	contents.append(station.title);
-	contents.append(",");
-
-	contents.append(station.place.country);
-	contents.append(",");
-	contents.append(station.place.city);
-	contents.append(",");
-	contents.append(station.place.id);
-	contents.append(",");
-
-	contents.append(station.id);
-
-	contents.append("|");
-
-	logger::va("%s", &contents[0]);
-
-	fs::write(settings::favorites_file, contents, true);
-}
-
-void settings::remove_favorite(station_t station)
-{
-	std::string contents = fs::read(settings::favorites_file);
-	std::vector<station_t> stations;
-
-	std::vector<std::string> contents_split = logger::split(contents, "|");
-
-	for (const std::string& c : contents_split)
-	{
-		std::vector<std::string> temp = logger::split(c, ",");
-
-		if (temp.size() == 5)
-		{
-			if (station.id.compare(temp[4]))
-			{
-				station_t s;
-
-				s.title = temp[0];
-
-				s.place.country = temp[1];
-				s.place.city = temp[2];
-				s.place.id = temp[3];
-
-				s.id = temp[4];
-
-				stations.emplace_back(s);
-			}
-		}
-	}
-
-	//Wipe
-	fs::write(settings::favorites_file, "", false);
-
-	for (const station_t& s : stations)
-	{
-		//Add
-		settings::add_favorite(s);
-	}
+	ini_free(config);
 }
 
 bool settings::get_boolean(const char* bool_text)
@@ -179,7 +82,5 @@ bool settings::get_boolean(const char* bool_text)
 	else return false;
 }
 
-std::string settings::config_file = logger::va("%s%s", &fs::get_pref_dir()[0], "config.ini");
-std::string settings::favorites_file = logger::va("%s%s", &fs::get_pref_dir()[0], "stations.fav");;
-std::string settings::auto_hook_file = logger::va("%s%s", &fs::get_pref_dir()[0], "auto_hook.list");;
-ini_t* settings::config;
+//Hardcoded until x64 becomes useable
+std::string settings::config_file = "ecm.x86.ini";
