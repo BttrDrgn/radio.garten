@@ -2,19 +2,20 @@
 
 //System
 #include <vector>
-#include <string>
-#include <algorithm>
-#include <random>
-#include <thread>
-#include <unordered_map>
-#include <regex>
-
-#include <Windows.h>
-#include <DbgHelp.h>
 
 //Deps
+//This HAS to be called before SDL2 or else it throws errors for Linux building
+#include <httplib.h>
+
 #include <imgui_freetype.h>
 
+#ifndef OVERLAY
+#include <SDL.h>
+#include <SDL_syswm.h>
+
+#include <backends/imgui_impl_sdl.h>
+#include <backends/imgui_impl_sdlrenderer.h>
+#else
 #include <MinHook.h>
 #include <kiero.h>
 
@@ -29,8 +30,10 @@
 #include <backends/imgui_impl_dx10.h>
 #include <backends/imgui_impl_dx11.h>
 #include <backends/imgui_impl_opengl3.h>
+#endif
+
+#include <nlohmann/json.hpp>	
 
 #include <bass.h>
 
-
-#define __fartcall __fastcall
+namespace nl = nlohmann;

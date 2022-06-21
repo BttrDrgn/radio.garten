@@ -1,4 +1,4 @@
-#if KIERO_INCLUDE_D3D11
+﻿#if KIERO_INCLUDE_D3D11
 
 #include "d3d11_impl.h"
 #include <d3d11.h>
@@ -26,7 +26,7 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		HWND hwnd = desc.OutputWindow;
 
 		global::hwnd = hwnd;
-		audio::init();
+		audio::init_overlay();
 		input::init_overlay();
 
 		menus::init();
@@ -48,7 +48,7 @@ void impl::d3d11::init()
 {
 	if (kiero::bind(8, (void**)&oPresent, hkPresent11) != kiero::Status::Success)
 	{
-		MessageBoxA(nullptr, "Failed to hook DirectX 11!", "ECM", 0);
+		MessageBoxA(nullptr, "Failed to hook DirectX 11!", "Radio.Garten", 0);
 	}
 }
 

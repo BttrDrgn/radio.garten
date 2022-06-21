@@ -17,7 +17,7 @@ BOOL __stdcall hkWglSwapBuffers(_In_ HDC hDc)
 		HWND hwnd = WindowFromDC(hDc);
 
 		global::hwnd = hwnd;
-		audio::init();
+		audio::init_overlay();
 		input::init_overlay();
 
 		menus::init();
@@ -39,7 +39,7 @@ void impl::opengl3::init()
 {
 	if (kiero::bind(336, (void**)&owglSwapBuffers, hkWglSwapBuffers) != kiero::Status::Success)
 	{
-		MessageBoxA(nullptr, "Failed to hook OpenGL!", "ECM", 0);
+		MessageBoxA(nullptr, "Failed to hook OpenGL!", "Radio.Garten", 0);
 	}
 }
 

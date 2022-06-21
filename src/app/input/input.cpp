@@ -4,48 +4,18 @@
 
 #include "input.hpp"
 
+#ifdef OVERLAY
+
 WNDPROC o_wndproc;
 bool toggle_once = false;
-std::unordered_map<input::callback_type, std::vector<input::callback>> input::callbacks_;
 
 LRESULT __stdcall wndproc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
-
-	switch (uMsg)
+	if (!global::hide)
 	{
-
-	case WM_SYSKEYDOWN:
-		if (wParam == VK_RETURN)
-		{
-			if ((HIWORD(lParam) & KF_ALTDOWN))
-			{
-				return 1;
-			}
-		}
-		break;
-
-	case WM_KEYDOWN:
-		for (const auto callback : input::callbacks_[input::callback_type::on_key_down])
-		{
-			callback(wParam);
-		}
-		break;
-
-	case WM_KEYUP:
-		for (const auto callback : input::callbacks_[input::callback_type::on_key_up])
-		{
-			callback(wParam);
-		}
-		break;
-
-	case WM_SYSCOMMAND:
-		if ((wParam & 0xFF00) == SC_KEYMENU)
-		{
-			return 1;
-		}
+		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+		return 1L;
 	}
-
 
 	return CallWindowProcA(o_wndproc, hWnd, uMsg, wParam, lParam);
 }
@@ -53,38 +23,41 @@ LRESULT __stdcall wndproc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 void input::init_overlay()
 {
 	o_wndproc = (WNDPROC)SetWindowLongW(global::hwnd, GWLP_WNDPROC, (LONG_PTR)wndproc);
+}
+#endif
 
-	static bool once = false;
-
-	input::on(input::callback_type::on_key_down, [](auto key) -> input::result_type
+void input::update()
+{
+#ifndef OVERLAY
+	SDL_Event evt;
+	while (SDL_PollEvent(&evt))
 	{
-		if (key == 122 && !once)
+		switch (evt.type)
 		{
-			global::hide = !global::hide;
-			once = true;
+		case SDL_QUIT:
+			global::shutdown = true;
+			break;
 		}
 
-		return input::result_type::cont;
-	});
+		ImGui_ImplSDL2_ProcessEvent(&evt);
+	}
+#endif
+}
 
-	input::on(input::callback_type::on_key_up, [](auto key) -> input::result_type
+#ifndef OVERLAY
+SDL_HitTestResult input::hit_test_callback(SDL_Window* window, const SDL_Point* p, void* data)
+{
+	SDL_HitTestResult report = SDL_HITTEST_NORMAL;
+
+	//Menu bar is 20 pixels tall
+	//current buttons are 344 pixels wide
+	if (p->y <= 20 && p->x > 344)
 	{
-		if (key == 122 && once)
-		{
-			once = false;
-		}
+		//Are we on header but not over a button?
+		//Moveable window
+		report = SDL_HITTEST_DRAGGABLE;
+	}
 
-		return input::result_type::cont;
-	});
+	return report;
 }
-
-
-void input::on(input::callback_type type, input::callback callback)
-{
-	input::callbacks_[type].emplace_back(callback);
-}
-
-bool input::is_key_down(std::uint32_t key)
-{
-	return ImGui::IsKeyPressed(key, false);
-}
+#endif
