@@ -116,7 +116,7 @@ void menus::actions()
 
 		if (ImGui::Button("Skip"))
 		{
-			audio::stop();
+			audio::stop(0);
 			audio::play_next_song();
 		}
 
@@ -130,13 +130,9 @@ void menus::playlist()
 	{
 		for (int i = 0; i < audio::playlist_files.size(); ++i)
 		{
-			std::string song = audio::playlist_files[i];
+			std::string song = audio::playlist_files[i].first;
 			logger::rem_path_info(song, audio::playlist_dir);
-			if (ImGui::Button(logger::va("%s", song.c_str()).c_str()))
-			{
-				audio::stop();
-				audio::play_file(audio::playlist_files[i]);
-			}
+			ImGui::Text("%s", song.c_str());
 		}
 
 		ImGui::EndMenu();

@@ -53,10 +53,4 @@ public:
 	{
 		*(std::uint8_t*)(address) = 0xC3;
 	};
-
-private:
-	static int CALLBACK get_window(HWND hWnd, LPARAM lparam);
-	static std::initializer_list<std::string> blacklist;
-	static std::initializer_list<std::string> dlls;
-	static std::vector<process_t> injected_apps;
 };

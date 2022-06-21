@@ -1,11 +1,6 @@
 #pragma once
 
-struct process_t
-{
-	std::string title, arch, exe;
-	std::uint32_t pid;
-	HWND hwnd;
-};
+#include "defs.hpp"
 
 struct vec2
 {
@@ -40,4 +35,5 @@ public:
 	static bool hide;
 	static HWND hwnd;
 	static kiero::RenderType::Enum renderer;
+	static GameFlowState global::state;
 };

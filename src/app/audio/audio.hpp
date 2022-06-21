@@ -7,15 +7,15 @@ using namespace std::literals;
 
 struct playing_t
 {
-	std::string title;
+	std::string title, where;
 };
 
 class audio
 {
 public:
 	static void init();
-	static void play_file(const std::string& file);
-	static void stop();
+	static void play_file(const std::string& file, int channel);
+	static void stop(int channel);
 	static void set_volume(std::int32_t vol_in);
 	static void enumerate_playlist();
 	static void update();
@@ -26,7 +26,7 @@ public:
 
 	static std::string playlist_name;
 	static std::string playlist_dir;
-	static std::vector<std::string> playlist_files;
+	static std::vector<std::pair<std::string, std::string>> playlist_files;
 	static std::vector<int> playlist_order;
 	static int current_song_index;
 
@@ -35,8 +35,9 @@ public:
 	static std::initializer_list<std::string> supported_files;
 
 	static bool paused;
+	static bool playing;
 	static std::int32_t req;
-	static std::int32_t chan;
+	static std::int32_t chan[2];
 
 	static std::int32_t volume;
 

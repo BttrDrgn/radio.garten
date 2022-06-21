@@ -1,2 +1,2 @@
 #pragma once
-void play_file(const char* file);
+void play_file(const char* file, int channel);

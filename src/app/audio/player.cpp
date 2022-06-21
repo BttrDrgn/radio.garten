@@ -10,12 +10,13 @@
 #include "hook/hook.hpp"
 #include "settings/settings.hpp"
 
-void play_file(const char* file)
+void play_file(const char* file, int channel)
 {
-	audio::chan = BASS_StreamCreateFile(0, file, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+	audio::chan[channel] = BASS_StreamCreateFile(0, file, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
 
-	if (audio::chan != 0 && BASS_ChannelPlay(audio::chan, false))
+	if (audio::chan != 0 && BASS_ChannelPlay(audio::chan[channel], false))
 	{
+		audio::playing = true;
 		std::string title = "N/A";
 		std::string artist = "N/A";
 

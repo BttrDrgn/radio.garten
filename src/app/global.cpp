@@ -7,6 +7,7 @@ game_t global::game = game_t::UNIVERSAL;
 bool global::hide = true;
 HWND global::hwnd;
 kiero::RenderType::Enum global::renderer;
+GameFlowState global::state = GameFlowState::None;
 
 std::vector<std::string> global::game_bins
 {

@@ -11,5 +11,4 @@ public:
 	
 private:
 	static std::string config_file;
-	static ini_t* config;
 };

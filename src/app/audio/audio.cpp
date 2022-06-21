@@ -5,6 +5,7 @@
 #include "player.hpp"
 #include "fs/fs.hpp"
 #include "hook/hook.hpp"
+#include "defs.hpp"
 
 void audio::init()
 {
@@ -42,13 +43,41 @@ void audio::update()
 	std::thread([] {
 		while (true)
 		{
-			std::uint32_t state = BASS_ChannelIsActive(audio::chan);
+			global::state = game_state;
+
+			std::uint32_t state = BASS_ChannelIsActive(audio::chan[0]);
 
 			switch (state)
 			{
 			case BASS_ACTIVE_STOPPED:
-				if (!audio::paused)
+				audio::playing = false;
+				break;
+			}
+
+			if (!audio::paused && !audio::playing)
+			{
+				audio::play_next_song();
+			}
+
+			//Setup for channel crossfading
+			switch (global::state)
+			{
+				//Frontend
+			case GameFlowState::LoadingFrontend:
+			case GameFlowState::InFrontend:
+				if(audio::playlist_files[audio::playlist_order[audio::current_song_index]].second == "IG")
 				{
+					audio::stop(0);
+					audio::play_next_song();
+				}
+				break;
+
+				//In-game
+			case GameFlowState::UnloadingFrontend:
+			case GameFlowState::Racing:
+				if (audio::playlist_files[audio::playlist_order[audio::current_song_index]].second == "FE")
+				{
+					audio::stop(0);
 					audio::play_next_song();
 				}
 				break;
@@ -59,19 +88,21 @@ void audio::update()
 	}).detach();
 }
 
-void audio::play_file(const std::string& file)
+void audio::play_file(const std::string& file, int channel)
 {
 	std::string title = file;
 	logger::rem_path_info(title, audio::playlist_dir);
 	audio::currently_playing.title = title;
-	::play_file(file.c_str());
+	::play_file(file.c_str(), channel);
 }
 
-void audio::stop()
+void audio::stop(int channel)
 {
 	audio::paused = false;
-	BASS_StreamFree(audio::chan);
-	audio::chan = 0;
+
+	BASS_StreamFree(audio::chan[channel]);
+	audio::chan[channel] = 0;
+
 	audio::currently_playing.title = "N/A";
 }
 
@@ -116,7 +147,7 @@ void audio::enumerate_playlist()
 	std::vector<std::string> files = fs::get_all_files(audio::playlist_dir, audio::supported_files);
 	for (std::string file : files)
 	{
-		audio::playlist_files.emplace_back(file);
+		audio::playlist_files.emplace_back(file, "N/A");
 	}
 }
 
@@ -140,7 +171,47 @@ void audio::play_next_song()
 			next = audio::playlist_files.size() - 1;
 		}
 
-		audio::play_file(audio::playlist_files[next]);
+		switch (global::state)
+		{
+			//Frontend
+		case GameFlowState::LoadingFrontend:
+		case GameFlowState::InFrontend:
+			while(audio::playlist_files[next].second == "IG")
+			{
+				audio::current_song_index++;
+
+				if (audio::current_song_index > audio::playlist_order.size() - 1)
+				{
+					audio::shuffle();
+					audio::current_song_index = 0;
+				}
+
+				next = audio::playlist_order[audio::current_song_index];
+			}
+
+			audio::play_file(audio::playlist_files[next].first, 0);
+			break;
+
+			//In-game
+		case GameFlowState::LoadingTrack:
+		case GameFlowState::LoadingRegion:
+		case GameFlowState::Racing:
+			while (audio::playlist_files[next].second == "FE")
+			{
+				audio::current_song_index++;
+
+				if (audio::current_song_index > audio::playlist_order.size() - 1)
+				{
+					audio::shuffle();
+					audio::current_song_index = 0;
+				}
+
+				next = audio::playlist_order[audio::current_song_index];
+			}
+
+			audio::play_file(audio::playlist_files[next].first, 0);
+			break;
+		}
 	}
 }
 
@@ -150,13 +221,14 @@ void audio::set_volume(std::int32_t vol_in)
 }
 
 bool audio::paused = false;
+bool audio::playing = false;
 std::int32_t audio::req;
-std::int32_t audio::chan;
+std::int32_t audio::chan[2];
 std::int32_t audio::volume = 25;
 playing_t audio::currently_playing = {"N/A"};
 std::string audio::playlist_name = "Music";
 std::string audio::playlist_dir = "Music";
-std::vector<std::string> audio::playlist_files;
+std::vector<std::pair<std::string, std::string>> audio::playlist_files;
 std::vector<int> audio::playlist_order;
 int audio::current_song_index = 0;
 std::initializer_list<std::string> audio::supported_files { "wav", "mp1", "mp2", "mp3", "ogg", "aif"};

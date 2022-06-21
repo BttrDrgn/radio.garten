@@ -143,6 +143,7 @@ workspace "ECM"
 		files {
 			"../src/app/stdafx.**",
 			"../src/app/main.cpp",
+			"../src/app/defs.hpp",
 			"../src/app/global.**",
 			"../src/app/hook/hook.hpp",
 			"../src/app/hook/impl/**",
@@ -150,7 +151,6 @@ workspace "ECM"
 			"../src/app/input/**",
 			"../src/app/audio/**",
 			"../src/app/settings/**",
-			"../src/app/drpc/**",
 
 			"../src/utils/fs/**",
 			"../src/utils/logger/**",
