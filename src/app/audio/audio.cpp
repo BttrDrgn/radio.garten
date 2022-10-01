@@ -31,6 +31,8 @@ void audio::init()
 
 	BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
 	audio::set_volume(audio::volume);
+
+	audio::last_played_file = fs::get_pref_dir().append("last_played.txt");
 }
 #else
 void audio::init_overlay()
@@ -94,4 +96,4 @@ std::int32_t audio::chan;
 bool audio::paused = false;
 std::int32_t audio::volume = 100;
 playing_t audio::currently_playing = {"N/A", "N/A"};
-std::string audio::last_played_file = fs::get_pref_dir().append("last_played.txt");
+std::string audio::last_played_file = "";

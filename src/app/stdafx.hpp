@@ -10,6 +10,7 @@
 #include <imgui_freetype.h>
 
 #ifndef OVERLAY
+#define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_syswm.h>
 
