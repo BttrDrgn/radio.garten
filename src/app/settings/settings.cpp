@@ -10,6 +10,10 @@
 
 void settings::init()
 {
+	settings::config_file = logger::va("%s%s", &fs::get_pref_dir()[0], "config.ini");
+	settings::favorites_file = logger::va("%s%s", &fs::get_pref_dir()[0], "stations.fav");
+	settings::auto_hook_file = logger::va("%s%s", &fs::get_pref_dir()[0], "auto_hook.list");
+
 	settings::update();
 	settings::favorites_update();
 }
@@ -179,7 +183,7 @@ bool settings::get_boolean(const char* bool_text)
 	else return false;
 }
 
-std::string settings::config_file = logger::va("%s%s", &fs::get_pref_dir()[0], "config.ini");
-std::string settings::favorites_file = logger::va("%s%s", &fs::get_pref_dir()[0], "stations.fav");;
-std::string settings::auto_hook_file = logger::va("%s%s", &fs::get_pref_dir()[0], "auto_hook.list");;
+std::string settings::config_file;
+std::string settings::favorites_file;
+std::string settings::auto_hook_file;
 ini_t* settings::config;
