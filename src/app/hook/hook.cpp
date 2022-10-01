@@ -225,6 +225,7 @@ std::initializer_list<std::string> hook::blacklist
 
 std::initializer_list<std::string> hook::dlls
 {
+	"SDL2.dll",
 	"bass.dll",
 	"discord_game_sdk.dll",
 #ifdef _M_AMD64
