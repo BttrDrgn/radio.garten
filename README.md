@@ -1,6 +1,8 @@
 <h1 align="center"> Radio.Garten </h1>
 <p align="center"> A <a href="https://radio.garden/"> radio.garden </a> desktop client and overlay written with SDL2 and ImGui </p>
 
+<h1 align="center"> Due to a radio.garden API update, this app will no longer work and is no longer being maintained. </h1>
+
 <p align="center">
   <img width="400" height="300" src="/../assets/preview.png">
 </p>
